@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <info.hoang8f.android.segmented.SegmentedGroup xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/fragment_stats_tracker_radiogroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        segmentedgroup:sc_border_width="1dp"
+        segmentedgroup:sc_checked_text_color="@color/white"
+        segmentedgroup:sc_corner_radius="0dp"
+        segmentedgroup:sc_tint_color="@color/black">
+
+        <RadioButton
+            android:id="@+id/fragment_stats_tracker_week_button"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:text="Week" />
+
+        <RadioButton
+            android:id="@+id/fragment_stats_tracker_month_button"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="Month" />
+
+        <RadioButton
+            android:id="@+id/fragment_stats_tracker_sixmonths_button"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="6 Months" />
+
+        <RadioButton
+            android:id="@+id/fragment_stats_tracker_year_button"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="Year" />
+    </info.hoang8f.android.segmented.SegmentedGroup>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/fragment_stats_tracker_spinner_cardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fragment_stats_tracker_radiogroup"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp">
+
+        <LinearLayout
+            android:id="@+id/fragment_stats_tracker_spinner_linearlayout"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/fragment_stats_tracker_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:gravity="center"
+                android:minHeight="36dp">
+
+            </Spinner>
+
+            <TextView
+                android:id="@+id/fragment_stats_tracker_average_textview"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Average"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/fragment_stats_tracker_total_textview"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Total"
+                android:textColor="@color/black" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!--
+    <View
+        android:layout_below="@id/fragment_stats_tracker_spinner_linearlayout"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/transparent_gray">
+    </View>-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="vertical"
+        android:paddingTop="116dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/fragment_stats_tracker_stats_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"></androidx.recyclerview.widget.RecyclerView>
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/fragment_stats_tracker_barchart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"></com.github.mikephil.charting.charts.BarChart>
+
+        </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/fragment_stats_tracker_notabletrends_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+        </androidx.recyclerview.widget.RecyclerView>
+    </LinearLayout>
+
+
+</RelativeLayout>

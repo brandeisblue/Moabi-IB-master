@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:layout_centerInParent="true"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/fragment_pain_entry_entry_prompt_textview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="Where do you feel pain?"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <RelativeLayout
+        android:id="@+id/fragment_pain_entry_entry_framelayout"
+        android:layout_width="match_parent"
+        android:layout_marginStart="36dp"
+        android:layout_marginEnd="36dp"
+        android:layout_height="0dp"
+        android:layout_weight="6"
+        android:layout_below="@id/fragment_pain_entry_entry_prompt_textview"
+        android:layout_centerHorizontal="true">
+
+        <!--
+        <com.ivorybridge.moabi.ui.views.DrawImageView
+            android:id="@+id/fragment_pain_entry_body_imageview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_img_human_body_man" />-->
+
+
+        <com.github.chrisbanes.photoview.PhotoView
+            android:id="@+id/fragment_pain_entry_body_imageview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_imag_human_body_man_front" />
+
+    </RelativeLayout>
+
+    <com.warkiz.widget.IndicatorStayLayout
+        android:id="@+id/fragment_pain_entry_seekbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:layout_below="@id/fragment_pain_entry_entry_framelayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp">
+
+        <com.warkiz.widget.IndicatorSeekBar
+            android:id="@+id/fragment_pain_entry_seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:isb_indicator_color="#b1000000"
+            app:isb_indicator_text_color="@color/white"
+            app:isb_indicator_text_size="14sp"
+            app:isb_max="10"
+            app:isb_min="0"
+            app:isb_progress_value_float="true"
+            app:isb_seek_smoothly="true"
+            app:isb_show_indicator="rectangle"
+            app:isb_show_tick_texts="true"
+            app:isb_thumb_color="@color/colorPrimaryDark"
+            app:isb_thumb_text_color="@color/colorPrimary"
+            app:isb_tick_marks_color="@color/colorPrimaryDark"
+            app:isb_tick_texts_array="@array/pain_seekbar_array"
+            app:isb_tick_texts_color="@color/black"
+            app:isb_ticks_count="2"
+            app:isb_track_progress_color="@color/colorPrimary"
+            app:isb_user_seekable="true" />
+    </com.warkiz.widget.IndicatorStayLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/fragment_pain_entry_submitbutton"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:text="Submit"
+        android:layout_marginTop="-6dp"
+        android:layout_marginBottom="-22dp"
+        android:paddingStart="-16dp"
+        android:paddingEnd="-16dp"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+         />
+
+
+</LinearLayout>

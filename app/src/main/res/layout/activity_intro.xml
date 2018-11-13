@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_intro_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/activity_intro_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="64dp"></androidx.viewpager.widget.ViewPager>
+
+    <ru.tinkoff.scrollingpagerindicator.ScrollingPagerIndicator
+        android:id="@+id/activity_intro_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        app:spi_dotSelectedColor="@color/black"
+        app:layout_anchorGravity="bottom|center_horizontal"
+        app:layout_anchor="@id/activity_intro_viewpager"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="56dp"
+        android:background="@color/transparent_gray"></View>
+
+    <LinearLayout
+        android:id="@+id/activity_intro_sign_in_panel"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:visibility="visible">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/activity_intro_continue_as_guest_button"
+            style="@style/TransparentButton"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/continue_as_a_guest_title"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="14sp"
+            app:rippleColor="@color/colorPrimaryDark" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="56dp"
+            android:background="@color/transparent_gray"></View>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/activity_intro_sign_in_button"
+            style="@style/TransparentButton"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/sign_in_title"
+            android:textColor="@color/colorPrimary"
+            android:textSize="14sp"
+            app:rippleColor="@color/colorPrimary" />
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

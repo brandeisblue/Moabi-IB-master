@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#31AFB4</color>
+    <color name="colorPrimary70">#b331afb4</color>
+    <color name="colorPrimaryDark">#115571</color>
+    <color name="colorPrimaryDarkDark">#002c46</color>
+    <color name="colorAccent">#ff6400</color>
+    <color name="colorPrimaryDarkComplt">#FF8700</color>
+    <color name="transparent_gray">#ccBDBDBD</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="black70">#b3000000</color>
+
+    <!--Blue Colors-->
+    <color name="lightBlue">#add8e6</color>
+    <color name="steelBlue">#4682b4</color>
+    <color name="darkSlateBlue">#483d8b</color>
+    <color name="turquoise">#40e0d0</color>
+    <color name="material_lightBlue">#03A9F4</color>
+    <color name="fitbit_blue">#00B0B9</color>
+
+    <!-- Reduction Design-->
+    <color name="reduction_blue">#4A849f</color>
+    <color name="reduction_darkblue">#1b3440</color>
+    <color name="reduction_orange">#f2845c</color>
+    <color name="reduction_gray">#b4d6c6</color>
+    <color name="reduction_white">#ffffff</color>
+    <color name="fitbit_red">#b93100</color>
+
+    <!-- Activity Colors-->
+    <color name="activity_social">#FBCA60</color>
+    <color name="activity_mbs">#50BFE8</color>
+    <color name="activity_rec">#69C3A3</color>
+    <color name="activity_eduwork">#F16C6B</color>
+    <color name="activity_chores">#153b50</color>
+
+    <!-- Seek Arc -->
+    <color name="progress_gray">#FFD8D8D8</color>
+    <color name="progress_gray_dark">#FF383838</color>
+    <color name="default_blue_light">#ff33b5e5</color>
+
+</resources>

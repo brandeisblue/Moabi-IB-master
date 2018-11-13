@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1013812736265",
+    "firebase_url": "https://moabi-9bb94.firebaseio.com",
+    "project_id": "moabi-9bb94",
+    "storage_bucket": "moabi-9bb94.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013812736265:android:3d56024fd7394d45",
+        "android_client_info": {
+          "package_name": "com.ivorybridge.moabi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1013812736265-fpo5pgoeerckg0jdtduje35a5u2lpson.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ivorybridge.moabi",
+            "certificate_hash": "7f15eaafcad16f97492134fe66cf36ad4e2d5857"
+          }
+        },
+        {
+          "client_id": "1013812736265-fdmd7r3tcbf7vipppanevchrfam5l20v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkuZJf4LNXfiPpWlgbQZlB1f91Cce3xjY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1013812736265-fdmd7r3tcbf7vipppanevchrfam5l20v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

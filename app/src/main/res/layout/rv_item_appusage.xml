@@ -1,0 +1,98 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rv_item_appusage_relativelayout"
+    android:layout_width="match_parent"
+    android:layout_height="216dp">
+
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/rv_item_appusage_barchart"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_below="@id/rv_item_appusage_radiogroup">
+    </com.github.mikephil.charting.charts.BarChart>
+
+    <RelativeLayout
+        android:id="@+id/rv_item_appusage_title_relativelayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp">
+
+        <LinearLayout
+            android:id="@+id/rv_item_appusage_description_linearlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true">
+
+            <ImageView
+                android:id="@+id/rv_item_appusage_description_imageview"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="4dp"
+                app:srcCompat="@drawable/ic_appusage" />
+
+            <TextView
+                android:id="@+id/rv_item_appusage_description_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:text="@string/phone_usage_title"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <ImageButton
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:background="@color/fui_transparent"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_more_vert_black_24dp" />
+    </RelativeLayout>
+
+    <info.hoang8f.android.segmented.SegmentedGroup xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
+        android:layout_below="@id/rv_item_appusage_title_relativelayout"
+        android:id="@+id/rv_item_appusage_radiogroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        segmentedgroup:sc_border_width="1dp"
+        segmentedgroup:sc_checked_text_color="@color/white"
+        segmentedgroup:sc_corner_radius="0dp"
+        segmentedgroup:sc_tint_color="@color/black">
+
+        <RadioButton
+            android:id="@+id/rv_item_appusage_today_button"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:text="@string/today" />
+
+        <RadioButton
+            android:id="@+id/rv_item_appusage_this_week_button"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_weight="1"
+            android:text="@string/this_week" />
+
+        <RadioButton
+            android:id="@+id/rv_item_appusage_this_month_button"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_weight="1"
+            android:text="@string/this_month" />
+        
+    </info.hoang8f.android.segmented.SegmentedGroup>
+</RelativeLayout>

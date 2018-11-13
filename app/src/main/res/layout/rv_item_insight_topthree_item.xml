@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginTop="24dp">
+
+    <TextView
+        android:id="@+id/rv_item_insight_topthree_item_title_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/insight_top3_title"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <RelativeLayout
+        android:id="@+id/rv_item_insight_topthree_item_top1_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"
+        android:layout_below="@id/rv_item_insight_topthree_item_title_textview"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp">
+
+        <LinearLayout
+            android:id="@+id/rv_item_insight_topthree_item_top1_average_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/rv_item_insight_topthree_item_top1_imageview"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_appusage" />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top1_average_name_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Using Moabi" />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top1_average_proposition_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" for " />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top1_average_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10 mins" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/rv_item_insight_topthree_item_top1_recommendation_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rv_item_insight_topthree_item_top1_average_layout"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/rv_item_insight_topthree_item_top1_recommendation_imageview"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_hint" />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top1_recommendation_prompt_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/rv_item_insight_topthree_item_top1_recommendation_imageview"
+                android:text="@string/recommendation_prompt" />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top1_recommendation_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/rv_item_insight_topthree_item_top1_recommendation_prompt_textview"
+                android:text="15 mins" />
+
+            <ImageView
+                android:id="@+id/rv_item_insight_topthree_item_top1_recommendation_arrow_imageview"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/rv_item_insight_topthree_item_top1_recommendation_textview"
+                android:tint="@color/fitbit_red"
+                app:srcCompat="@drawable/ic_arrow_downward_black" />
+        </RelativeLayout>
+
+        <cn.refactor.library.SmoothCheckBox
+            android:id="@+id/rv_item_insight_topthree_item_top1_recommendation_checkbox"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:clickable="false"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="end"
+            app:color_checked="@color/colorPrimary" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rv_item_insight_topthree_item_top2_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"
+        android:layout_below="@id/rv_item_insight_topthree_item_top1_layout"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp">
+
+        <LinearLayout
+            android:id="@+id/rv_item_insight_topthree_item_top2_average_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/rv_item_insight_topthree_item_top2_imageview"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_appusage" />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top2_average_name_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Using Moabi" />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top2_average_proposition_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" for " />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top2_average_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10 mins" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/rv_item_insight_topthree_item_top2_recommendation_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rv_item_insight_topthree_item_top2_average_layout"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/rv_item_insight_topthree_item_top2_recommendation_imageview"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_hint" />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top2_recommendation_prompt_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/rv_item_insight_topthree_item_top2_recommendation_imageview"
+                android:text="@string/recommendation_prompt" />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top2_recommendation_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/rv_item_insight_topthree_item_top2_recommendation_prompt_textview"
+                android:text="15 mins" />
+
+            <ImageView
+                android:id="@+id/rv_item_insight_topthree_item_top2_recommendation_arrow_imageview"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/rv_item_insight_topthree_item_top2_recommendation_textview"
+                android:tint="@color/fitbit_red"
+                app:srcCompat="@drawable/ic_arrow_downward_black" />
+
+        </RelativeLayout>
+        <cn.refactor.library.SmoothCheckBox
+            android:id="@+id/rv_item_insight_topthree_item_top2_recommendation_checkbox"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="end"
+            app:color_checked="@color/colorPrimary" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rv_item_insight_topthree_item_top3_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground"
+        android:layout_below="@id/rv_item_insight_topthree_item_top2_layout"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp">
+
+        <LinearLayout
+            android:id="@+id/rv_item_insight_topthree_item_top3_average_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/rv_item_insight_topthree_item_top3_imageview"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_appusage" />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top3_average_name_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Using Moabi" />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top3_average_proposition_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" for " />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top3_average_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10 mins" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/rv_item_insight_topthree_item_top3_recommendation_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rv_item_insight_topthree_item_top3_average_layout"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/rv_item_insight_topthree_item_top3_recommendation_imageview"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_hint" />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top3_recommendation_prompt_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/rv_item_insight_topthree_item_top3_recommendation_imageview"
+                android:text="@string/recommendation_prompt" />
+
+            <TextView
+                android:id="@+id/rv_item_insight_topthree_item_top3_recommendation_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/rv_item_insight_topthree_item_top3_recommendation_prompt_textview"
+                android:text="15 mins" />
+
+            <ImageView
+                android:id="@+id/rv_item_insight_topthree_item_top3_recommendation_arrow_imageview"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/rv_item_insight_topthree_item_top3_recommendation_textview"
+                android:tint="@color/fitbit_red"
+                app:srcCompat="@drawable/ic_arrow_downward_black" />
+        </RelativeLayout>
+
+        <cn.refactor.library.SmoothCheckBox
+            android:id="@+id/rv_item_insight_topthree_item_top3_recommendation_checkbox"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="end"
+            android:layout_centerVertical="true"
+            app:color_checked="@color/colorPrimary" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

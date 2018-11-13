@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="activitytracker_item" type="id"/>
+    <item name="userinputsinuse_item" type="id"/>
+    <item name="connectservices_item" type="id"/>
+    <item name="googlefit_item" type="id"/>
+    <item name="fitbit_item" type="id"/>
+    <item name="built_in_fitness_item" type="id"/>
+    <item name="empty_item" type="id"/>
+    <item name="appusage_item" type="id"/>
+    <item name="mood_item" type="id"/>
+    <item name="energy_item" type="id"/>
+    <item name="stress_item" type="id"/>
+    <item name="daily_review_item" type="id"/>
+    <item name="depression_item" type="id"/>
+    <item name="anxiety_item" type="id"/>
+    <item name="baactivity_item" type="id"/>
+    <item name="baactivity_rv_griditem" type="id"/>
+    <item name="timedactivity_short_rv_item" type="id"/>
+    <item name="timedactivity_item" type="id"/>
+    <item name="meansandsum_item" type="id"/>
+    <item name="insight_mind_average_item" type="id"/>
+    <item name="insight_body_average_item" type="id"/>
+    <item name="insight_bestandworst_item" type="id"/>
+    <item name="insight_recommendations_item" type="id"/>
+    <item name="insight_topthree_item" type="id"/>
+    <item name="phq9_question_item" type="id"/>
+    <item name="gad7_question_item" type="id"/>
+</resources>

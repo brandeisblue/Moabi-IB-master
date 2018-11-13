@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rv_item_activitytracker_relativelayout"
+    android:layout_width="match_parent"
+    android:layout_height="324dp"
+    android:layout_marginBottom="8dp">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_item_activitytracker_horizontal_rv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal">
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <ImageButton
+        android:id="@+id/rv_item_activitytracker_rightarrow_indicator"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="120dp"
+        android:layout_marginEnd="36dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        app:srcCompat="@drawable/ic_arrow_right"
+        android:tint="@color/black70" />
+
+    <ImageButton
+        android:id="@+id/rv_item_activitytracker_leftarrow_indicator"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="120dp"
+        android:alpha="0.7"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        app:srcCompat="@drawable/ic_arrow_left"
+        android:tint="@color/black70" />
+
+    <ImageButton
+        android:id="@+id/rv_item_activitytracker_menu_imagebutton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:alpha="0.7"
+        android:background="@android:color/transparent"
+        app:srcCompat="@drawable/ic_more_vert_black_24dp"
+        android:visibility="gone" />
+
+
+</RelativeLayout>

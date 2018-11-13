@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rv_item_emptyview_relativelayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/rv_item_emptyview_content_cardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:elevation="8dp">
+
+        <RelativeLayout
+            android:id="@+id/rv_item_emptyview_content_relativelayout"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/rv_item_emptyview_images_linearlayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="12dp"
+                    app:srcCompat="@drawable/ic_exercise" />
+
+                <ImageView
+                    android:id="@+id/rv_item_emptyview_equal_imageview"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="12dp"
+                    app:srcCompat="@drawable/ic_equal" />
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    app:srcCompat="@drawable/ic_medicine" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/rv_item_emptyview_title_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/rv_item_emptyview_images_linearlayout"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:text="@string/empty_view_title"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/rv_item_emptyview_content_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/rv_item_emptyview_title_textview"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:text="@string/empty_view_content" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/rv_item_emptyview_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/rv_item_emptyview_content_textview"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="48dp"
+                android:background="@drawable/bg_button_ripple"
+                android:clickable="true"
+                android:drawableStart="@drawable/ic_edit"
+                android:drawablePadding="8dp"
+                android:drawableTint="@color/white"
+                android:elevation="2dp"
+                android:focusable="true"
+                android:fontFamily="@font/montserrat"
+                android:foreground="?attr/selectableItemBackground"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:stateListAnimator="@null"
+                android:text="@string/empty_view_action_button"
+                android:textAllCaps="true"
+                android:textColor="@color/white" />
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+</RelativeLayout>

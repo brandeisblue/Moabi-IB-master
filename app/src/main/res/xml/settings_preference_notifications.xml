@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.preference.PreferenceCategory android:title="Tracker"
+        app:iconSpaceReserved="false">
+
+        <androidx.preference.SwitchPreference
+            android:key="fitness_tracker_preference"
+            app:iconSpaceReserved="false"
+            android:title="Fitness Tracker Notification" />
+
+        <androidx.preference.SwitchPreference
+            android:key="timer_preference"
+            app:iconSpaceReserved="false"
+            android:title="Timer Notification" />
+
+        <androidx.preference.SwitchPreference
+            android:key="personal_goal_preference"
+            app:iconSpaceReserved="false"
+            android:title="Personal Goal Notification" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory android:title="Reminder"
+        app:iconSpaceReserved="false">
+
+        <androidx.preference.SwitchPreference
+            android:key="daily_check_in_preference"
+            app:iconSpaceReserved="false"
+            android:title="Daily Check-In Notification" />
+
+        <androidx.preference.SwitchPreference
+            android:key="daily_cheers_preference"
+            app:iconSpaceReserved="false"
+            android:title="Daily Cheers Notification" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <!--
+    <androidx.preference.PreferenceCategory android:title=getString(R.string.stats_summary)
+        app:iconSpaceReserved="false">
+
+        <androidx.preference.SwitchPreference
+            android:key="daily_summary_preference"
+            app:iconSpaceReserved="false"
+            android:title="Today's Summary Notification" />
+
+        <androidx.preference.SwitchPreference
+            android:key="daily_summary_preference"
+            app:iconSpaceReserved="false"
+            android:title="Yesterday's Summary Notification" />
+
+        <androidx.preference.SwitchPreference
+            android:key="daily_summary_preference"
+            app:iconSpaceReserved="false"
+            android:title="Weekly Summary Notification" />
+
+        <androidx.preference.SwitchPreference
+            android:key="daily_summary_preference"
+            app:iconSpaceReserved="false"
+            android:title="Monthly Summary Notification" />
+
+    </androidx.preference.PreferenceCategory>-->
+
+</androidx.preference.PreferenceScreen>

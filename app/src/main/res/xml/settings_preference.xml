@@ -1,0 +1,90 @@
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.preference.PreferenceCategory android:title="Profile">
+        <androidx.preference.PreferenceScreen
+            android:fontFamily="@font/source_sans_pro"
+            android:icon="@drawable/ic_profile_outline_black"
+            android:key="preference_profile_screen"
+            android:title="@string/preference_profile_title">
+
+        </androidx.preference.PreferenceScreen>
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory android:title="App Settings">
+
+        <androidx.preference.ListPreference
+            android:defaultValue="@string/preference_unit_title"
+            android:dialogTitle="Units of Measurement"
+            android:entries="@array/preference_unit_entries"
+            android:entryValues="@array/preference_unit_entry_values"
+            android:fontFamily="@font/source_sans_pro"
+            android:icon="@drawable/ic_measurement"
+            android:key="preference_unit"
+            android:title="@string/preference_unit_title" />
+
+        <androidx.preference.PreferenceScreen
+            android:fontFamily="@font/source_sans_pro"
+            android:icon="@drawable/ic_notification_outline_black"
+            android:key="preference_notifications_screen"
+            android:title="@string/preference_notifications_title">
+
+        <androidx.preference.SwitchPreferenceCompat
+            android:fontFamily="@font/source_sans_pro"
+            android:icon="@drawable/ic_appusage"
+            android:key="preference_phone_usage_permission"
+            android:summary="Enable phone usage access"
+            android:title="Access to Phone Usage Data" />
+
+        </androidx.preference.PreferenceScreen>
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory android:title="Data Settings">
+        <Preference
+            android:fontFamily="@font/source_sans_pro"
+            android:icon="@drawable/ic_link"
+            android:key="preference_apps_and_services"
+            android:summary=""
+            android:title="@string/preference_apps_and_services_title" />
+
+        <Preference
+            android:fontFamily="@font/source_sans_pro"
+            android:key="preference_surveys"
+            android:summary=""
+            android:icon="@drawable/ic_survey_outline_black"
+            android:title="Surveys" />
+        <Preference
+            android:fontFamily="@font/source_sans_pro"
+            android:key="preference_edit_activities"
+            android:summary=""
+            android:icon="@drawable/ic_edit_outline_black"
+            android:title="Edit Activities" />
+        <Preference
+            android:fontFamily="@font/source_sans_pro"
+            android:key="preference_sync"
+            android:icon="@drawable/ic_refresh"
+            android:summary=""
+            android:title="Sync" />
+    </androidx.preference.PreferenceCategory>
+
+
+    <androidx.preference.PreferenceCategory android:title="About">
+
+        <Preference
+            android:title="Support"
+            android:summary=""
+            android:icon="@drawable/ic_support_outline_black">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="mailto:shepherdhealth3000@gmail.com">
+                <extra
+                    android:name="android.intent.extra.SUBJECT"
+                    android:value="Inquiry"/>
+                <extra
+                    android:name="android.intent.extra.TEXT"
+                    android:value=""/>
+        </intent>
+        </Preference>
+
+    </androidx.preference.PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>

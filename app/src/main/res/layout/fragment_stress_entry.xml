@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:seekarc="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/fragment_stress_entry_entry_prompt_textview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_weight="2"
+        android:gravity="center"
+        android:text="@string/stress_prompt"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="6">
+
+        <RelativeLayout
+            android:id="@+id/fragment_stress_entry_seekarc_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="240dp"
+            android:layout_centerHorizontal="true">
+
+            <com.ivorybridge.moabi.ui.views.SeekArc
+                android:id="@+id/fragment_stress_entry_seekarc"
+                android:layout_width="220dp"
+                android:layout_height="220dp"
+                android:paddingLeft="16dp"
+                android:paddingTop="16dp"
+                android:paddingRight="16dp"
+                seekarc:progressColor="@color/colorPrimary"
+                seekarc:rotation="180"
+                seekarc:roundEdges="true"
+                seekarc:startAngle="60"
+                seekarc:sweepAngle="240"
+                seekarc:touchInside="false" />
+
+            <ImageView
+                android:id="@+id/fragment_stress_entry_thumb_imageview"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_thumb_up_black"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/fragment_stress_entry_stresslevel_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="75dp"
+                android:text="0"
+                android:textColor="@color/black"
+                android:textSize="34sp"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:layout_width="196dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="36dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/chart_label_none"
+                    android:textSize="14sp" />
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/chart_label_max"
+                    android:textSize="16sp" />
+
+            </RelativeLayout>
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/fragment_stress_entry_submitbutton"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="-6dp"
+        android:layout_marginBottom="-22dp"
+        android:layout_weight="2"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:paddingStart="-16dp"
+        android:paddingEnd="-16dp"
+        android:text="@string/submit_title"
+        android:textSize="14sp" />
+
+</LinearLayout>

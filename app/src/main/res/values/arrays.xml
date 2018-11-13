@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="fitbit_activities">
+        <item>Steps</item>
+        <item>Distance</item>
+        <item>Sleep</item>
+        <item>Active Minutes</item>
+        <item>Sedentary Minutes</item>
+        <item>Calories</item>
+        <item>Floors</item>
+    </string-array>
+
+    <string-array name="googlefit_activities">
+        <item>Steps</item>
+        <item>Distance</item>
+        <item>Active Minutes</item>
+        <item>Sedentary Minutes</item>
+        <item>Calories</item>
+    </string-array>
+
+    <string-array name="built_in_fitness_activities">
+        <item>Steps</item>
+        <item>Distance</item>
+        <item>Active Minutes</item>
+        <item>Sedentary Minutes</item>
+        <item>Calories</item>
+    </string-array>
+
+    <!-- Preference -->
+    <string-array name="preference_unit_entries">
+        <item>kilometers/kilograms/°C</item>
+        <item>miles/pounds/°F</item>
+    </string-array>
+
+    <string-array name="preference_unit_entry_values">
+        <item>kilometers/kilograms/°C</item>
+        <item>miles/pounds/°F</item>
+    </string-array>
+
+    <!-- Spinner in Stats-->
+
+    <string-array name="spinner_inputs_list">
+        <item>Fitbit</item>
+        <item>Google Fit</item>
+        <item>Mood/Energy</item>
+        <item>App Usage</item>
+        <item>Activity</item>
+        <item>Timed Activity</item>
+    </string-array>
+
+    <string-array name="moodandenergy_seekbar_array">
+        <item>Poor (1.0)</item>
+        <item>Good (3.0)</item>
+    </string-array>
+
+    <string-array name="stress_seekbar_array">
+        <item>None (0)</item>
+        <item>Max (10)</item>
+    </string-array>
+
+    <string-array name="overall_review_seekbar_array">
+        <item>Terrible (1)</item>
+        <item>Excellent (5)</item>
+    </string-array>
+
+    <string-array name="depression_seekbar_array">
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>Min</item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>Mld</item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>Mod</item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>M. Sev</item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>Sev</item>
+    </string-array>
+
+    <string-array name="anxiety_seekbar_array">
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>Min</item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>Mld</item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>Mod</item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>Sev</item>
+    </string-array>
+
+    <!--
+    <string-array name="pain_seekbar_array">
+        <item>None</item>
+        <item>2</item>
+        <item>4</item>
+        <item>6</item>
+        <item>8</item>
+        <item>Max</item>
+    </string-array>-->
+
+    <string-array name="pain_seekbar_array">
+        <item>None</item>
+        <item>Max</item>
+    </string-array>
+
+    <string-array name="sex_array">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+
+
+</resources>

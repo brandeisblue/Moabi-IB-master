@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginBottom="24dp"
+    android:layout_marginEnd="8dp">
+
+    <TextView
+        android:id="@+id/rv_item_insight_body_average_item_title_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/average_title"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <com.warkiz.widget.IndicatorStayLayout
+        android:id="@+id/rv_item_insight_body_average_item_seekbar_layout"
+        android:layout_below="@id/rv_item_insight_body_average_item_title_textview"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.warkiz.widget.IndicatorSeekBar
+            android:id="@+id/rv_item_insight_body_average_item_seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:isb_indicator_color="#b1000000"
+            app:isb_indicator_text_color="@color/white"
+            app:isb_indicator_text_size="14sp"
+            app:isb_progress_value_float="true"
+            app:isb_seek_smoothly="true"
+            app:isb_show_indicator="rectangle"
+            app:isb_show_tick_texts="true"
+            app:isb_thumb_color="@color/colorPrimaryDark"
+            app:isb_thumb_text_color="@color/colorPrimary"
+            app:isb_tick_texts_color="@color/black"
+            app:isb_ticks_count="2"
+            app:isb_track_progress_color="@color/colorPrimary"
+            app:isb_user_seekable="false" />
+    </com.warkiz.widget.IndicatorStayLayout>
+</RelativeLayout>

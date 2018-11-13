@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/activity_make_entry_container"
+    tools:context=".ui.activity.MakeEntryActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="112dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/activity_make_entry_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            app:contentInsetStart="0dp"
+            app:titleEnabled="false"
+            app:layout_scrollFlags="enterAlways">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageButton
+                    android:id="@+id/activity_make_entry_toolbar_backbutton"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:layout_marginStart="16dp"
+                    app:srcCompat="@drawable/ic_arrow_back"
+                    android:tint="@color/black" />
+
+                <ImageButton
+                    android:id="@+id/activity_make_entry_toolbar_checkbutton"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:layout_marginEnd="16dp"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_check"
+                    android:tint="@color/black" />
+
+            </RelativeLayout>
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/activity_make_entry_sliding_tabs"
+            style="@style/CustomTabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            app:layout_scrollFlags="enterAlways"
+            app:tabGravity="fill"
+            app:tabMode="fixed">
+        </com.google.android.material.tabs.TabLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/activity_make_entry_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:background="@android:color/white" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

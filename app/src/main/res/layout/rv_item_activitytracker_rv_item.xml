@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rv_item_activitytracker_item_relativelayout"
+    android:layout_width="match_parent"
+    android:layout_height="324dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp">
+
+    <RelativeLayout
+        android:id="@+id/rv_item_activitytracker_item_progress_relativelayout"
+        android:layout_width="match_parent"
+        android:layout_height="216dp"
+        android:layout_marginBottom="8dp">
+
+        <LinearLayout
+            android:id="@+id/rv_item_activitytracker_item_device_description_linearlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="16dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="2dp"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/rv_item_activitytracker_item_device_description_imageview"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="4dp"
+                app:srcCompat="@drawable/ic_link" />
+
+            <TextView
+                android:id="@+id/rv_item_activitytracker_item_device_description_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:text="@string/tracker_loading_status_prompt"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rv_item_activitytracker_item_lastsynctime_linearlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="16dp"
+            android:layout_below="@id/rv_item_activitytracker_item_device_description_linearlayout"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/rv_item_activitytracker_item_lastsynctime_refresh_image"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="2dp"
+                android:alpha="0.6"
+                app:srcCompat="@drawable/ic_refresh" />
+
+            <TextView
+                android:id="@+id/rv_item_activitytracker_item_lastsynctime_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/rv_item_activitytracker_item_first_activity_relativelayout"
+            android:layout_width="wrap_content"
+            android:layout_height="216dp"
+            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <com.ivorybridge.moabi.ui.views.SeekArc
+                android:id="@+id/rv_item_activitytracker_item_first_activity_progressbar"
+                android:layout_width="204dp"
+                android:layout_height="204dp"
+                android:layout_centerInParent="true"
+                android:layout_marginBottom="4dp"
+                android:paddingStart="8dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="8dp"
+                android:rotation="180"
+                app:arcWidth="2dp"
+                app:enabled="false"
+                app:max="10000"
+                app:progress="0"
+                app:progressColor="@color/fitbit_blue"
+                app:progressWidth="6dp"
+                app:roundEdges="true"
+                app:startAngle="40"
+                app:sweepAngle="280"
+                app:touchInside="false" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="horizontal"
+                    android:gravity="center_horizontal">
+
+                    <TextView
+                        android:id="@+id/rv_item_activitytracker_item_first_activity_status_textview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/black"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="  /"
+                        android:layout_gravity="center_vertical"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/rv_item_activitytracker_item_first_activity_goal_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="0"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/rv_item_activitytracker_item_first_activity_name_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="76dp"
+        android:layout_below="@id/rv_item_activitytracker_item_progress_relativelayout"
+        android:layout_marginStart="36dp"
+        android:layout_marginEnd="36dp"
+        android:gravity="center">
+
+        <LinearLayout
+            android:id="@+id/rv_item_activitytracker_item_second_activity_linearlayout"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/rv_item_activitytracker_item_second_activity_status_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/rv_item_activitytracker_item_second_activity_unit_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/unit_step_sing"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="24dp"
+            android:background="@color/transparent_gray" />
+
+        <LinearLayout
+            android:id="@+id/rv_item_activitytracker_item_third_activity_linearlayout"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/rv_item_activitytracker_item_third_activity_status_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/rv_item_activitytracker_item_third_activity_unit_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/unit_distance_si"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="24dp"
+            android:background="@color/transparent_gray" />
+
+        <LinearLayout
+            android:id="@+id/rv_item_activitytracker_item_fourth_activity_linearlayout"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/rv_item_activitytracker_item_fourth_activity_status_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/rv_item_activitytracker_item_fourth_activity_unit_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/unit_time_sing"/>
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

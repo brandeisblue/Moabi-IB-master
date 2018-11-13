@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <info.hoang8f.android.segmented.SegmentedGroup xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/fragment_stats_nontracker_radiogroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        segmentedgroup:sc_border_width="1dp"
+        segmentedgroup:sc_checked_text_color="@color/white"
+        segmentedgroup:sc_corner_radius="0dp"
+        segmentedgroup:sc_tint_color="@color/black">
+
+        <RadioButton
+            android:id="@+id/fragment_stats_nontracker_week_button"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:text="Week" />
+
+        <RadioButton
+            android:id="@+id/fragment_stats_nontracker_month_button"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="Month" />
+
+        <RadioButton
+            android:id="@+id/fragment_stats_nontracker_sixmonths_button"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="6 Months" />
+
+        <RadioButton
+            android:id="@+id/fragment_stats_nontracker_year_button"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="Year" />
+    </info.hoang8f.android.segmented.SegmentedGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:paddingTop="68dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="4">
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/fragment_stats_nontracker_linechart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+              ></com.github.mikephil.charting.charts.LineChart>
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/fragment_stats_nontracker_barchart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+               ></com.github.mikephil.charting.charts.BarChart>
+
+            <com.ivorybridge.moabi.util.wordcloud.WordCloud
+                android:id="@+id/fragment_stats_nontracker_wordcloud"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:autoSizeMinTextSize="12sp"
+                app:autoSizeMaxTextSize="56sp"
+                android:gravity="center"
+                ></com.ivorybridge.moabi.util.wordcloud.WordCloud>
+        </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/fragment_stats_nontracker_stats_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@id/fragment_stats_nontracker_radiogroup"
+            android:layout_marginTop="16dp"
+            android:layout_weight="1">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/fragment_stats_nontracker_notabletrends_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@id/fragment_stats_nontracker_stats_recyclerview"
+            android:layout_marginTop="16dp"
+            android:layout_weight="1"></androidx.recyclerview.widget.RecyclerView>
+
+    </LinearLayout>
+</RelativeLayout>

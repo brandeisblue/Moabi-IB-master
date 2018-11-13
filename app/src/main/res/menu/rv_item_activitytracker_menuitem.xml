@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/rv_item_activitytracker_metric_checkbox"
+        android:title="Metric System"
+        android:checkable="true" />
+    <item
+        android:id="@+id/rv_item_activitytracker_us_checkbox"
+        android:title="U.S. System"
+        android:checkable="true" />
+</menu>

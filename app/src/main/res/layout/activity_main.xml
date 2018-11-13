@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/activity_main_framelayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:background="@color/white"></FrameLayout>
+
+    <View
+        android:id="@+id/activity_main_fabBGLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_white_transparent"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/activity_main_make_entry_linearlayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="132dp"
+        android:clipToPadding="false"
+        android:gravity="center_vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_rectangle_rounded_white"
+            android:clickable="true"
+            android:elevation="2dp"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:onClick="onClickMakeEntry"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:text="@string/fab_make_entry"
+            android:textColor="@color/black" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/activity_main_make_entry_fab1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:backgroundTint="@color/white"
+            android:clickable="true"
+            android:elevation="4dp"
+            android:focusable="true"
+            android:onClick="onClickMakeEntry"
+            app:rippleColor="@android:color/darker_gray"
+            android:tint="@color/black"
+            app:borderWidth="0dp"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_edit"
+            app:useCompatPadding="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/activity_main_track_activity_linearlayout2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="190dp"
+        android:clipToPadding="false"
+        app:layout_anchor="@id/activity_main_fab"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_anchorGravity="top"
+        android:gravity="center_vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_rectangle_rounded_white"
+            android:clickable="true"
+            android:elevation="2dp"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:onClick="onClickTrackActivity"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:text="@string/fab_track_activity"
+            android:textColor="@color/black" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/activity_main_track_activity_fab2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:backgroundTint="@color/white"
+            android:clickable="true"
+            android:elevation="4dp"
+            android:focusable="true"
+            app:rippleColor="@android:color/darker_gray"
+            android:onClick="onClickTrackActivity"
+            android:tint="@color/black"
+            app:borderWidth="0dp"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_stopwatch"
+            app:useCompatPadding="true" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/activity_main_edit_entry_types_linearlayout3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="248dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_rectangle_rounded_white"
+            android:clickable="true"
+            android:elevation="2dp"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:onClick="onClickEditEntryTypes"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:text="@string/fab_edit_entry_items"
+            android:textColor="@color/black" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/activity_main_edit_entry_types_fab3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:backgroundTint="@color/white"
+            android:clickable="true"
+            app:rippleColor="@android:color/darker_gray"
+            android:elevation="4dp"
+            android:focusable="true"
+            app:useCompatPadding="true"
+            android:onClick="onClickEditEntryTypes"
+            android:tint="@color/black"
+            app:borderWidth="0dp"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_edit_journal" />
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/activity_main_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="56dp"
+        app:rippleColor="@android:color/darker_gray"
+        android:backgroundTint="@color/white"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:elevation="6dp"
+        android:tint="@color/black"
+        android:visibility="visible"
+        app:useCompatPadding="true"
+        app:borderWidth="0dp"
+        app:fabSize="normal"
+        app:srcCompat="@drawable/ic_add_stock" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/activity_main_bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/white"
+        app:itemIconTint="@drawable/bottom_navigation_colors"
+        app:itemTextColor="@drawable/bottom_navigation_colors"
+        app:labelVisibilityMode="auto"
+        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
+        app:layout_insetEdge="bottom"
+        app:menu="@menu/bottom_navigation_items"></com.google.android.material.bottomnavigation.BottomNavigationView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

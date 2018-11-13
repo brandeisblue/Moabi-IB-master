@@ -1,0 +1,374 @@
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyDashes">
+    <string name="app_name">Moabi</string>
+
+    <!-- App Intro-->
+
+
+    <!-- Strings for sign-in activity -->
+    <string name="sign_in_cancelled">Sign-in was cancelled</string>
+    <string name="no_internet_connection">No internet connection\nTry again later.</string>
+    <string name="unknown_error">An error has occurred</string>
+    <string name="unknown_sign_in_response">Unknown response</string>
+    <string name="facebook_app_id">2065912553739218</string>
+    <string name="fb_login_protocol_scheme">fb2065912553739218</string>
+    <string name="facebook_application_id" translatable="false">@string/facebook_app_id</string>
+    <!-- Facebook Application ID, prefixed by 'fb'. Enables Chrome Custom tabs. -->
+    <string name="facebook_login_protocol_scheme" translatable="false">fb2065912553739218</string>
+
+    <!-- Display Titles -->
+    <string name="settings_notifications_title">Notifications</string>
+    <string name="settings_profile_title">Profile</string>
+    <string name="settings_title">Settings</string>
+    <string name="apps_and_services_title">Apps/Services</string>
+    <string name="edit_activity_title">Edit Activities</string>
+    <string name="surveys_title">Surveys</string>
+    <string name="mind_insight_title">Mind</string>
+    <string name="body_insight_title">Body</string>
+    <string name="average_title">Average</string>
+    <string name="best_day_title">Best Day</string>
+
+    <!-- Fragment Titles -->
+    <string name="fragment_today_title">Today</string>
+    <string name="fragment_insight_title">Insight</string>
+    <string name="fragment_stats_title">Stats</string>
+    <string name="fragment_settings_title">Settings</string>
+
+    <!--Empty view -->
+    <string name="empty_view_title">Exercise is Medicine</string>
+    <string name="empty_view_content">Activity benefits all age groups.\n<b>Track</b> your activity.\n<b>Get insight</b> into how it affects your\n<i>mood, stress, pain and more!</i></string>
+
+    <!-- Permission rationales -->
+    <string name="location_rationale"><b>Allow access your location?</b>\n\nYour location data is required to access Google Fit and weather data.</string>
+    <string name="fitbit_permission_title">Connect to Fitbit?</string>
+    <string name="fitbit_permission_prompt">By connecting Fitbit and Shepherd, you will see your <b>daily steps, active minutes, sedentary minutes, sleep</b> and much more.\n\nAlso, in three days, we will calculate how these stats affect you, including <b>moodAndEnergy, energy level and pain!</b></string>
+    <string name="googlefit_install_title">Install Google Fit?</string>
+    <string name="googlefit_install_prompt">Google Fit must be installed on this device to connect to Google Fit.</string>
+    <string name="googlefit_permission_title">Connect to Google Fit?</string>
+    <string name="googlefit_permission_prompt">Google Fit is an open platform that lets you control your fitness data from multiple apps and devices.\n\nBy connecting Google Fit and Shepherd, you will be able to see your <b>daily steps, distance, active minutes</b> and much more.\n\nAlso, in three days, we will calculate how these stats affect you, including <b>moodAndEnergy, energy level and pain!</b></string>
+    <string name="dialog_positive_text">Yes</string>
+    <string name="dialog_negative_text">No</string>
+    <string name="phone_usage_permission_title">"Data access must be enabled to track your app usage."</string>
+
+
+    <!-- Apps/Services strings -->
+    <string name="phone_usage_title">Phone Usage</string>
+    <string name="phone_usage_camel_case">phoneUsage</string>
+    <string name="phone_usage_description">Real-time phone usage data.</string>
+    <string name="timer_title">Timer</string>
+    <string name="timer_camel_case">timer</string>
+    <string name="timer_description"></string>
+    <string name="fitbit_title">Fitbit</string>
+    <string name="fitbit_camel_case">fitbit</string>
+    <string name="fitbit_description">Steps, distance, sleep, and more.</string>
+    <string name="googlefit_title">Google Fit</string>
+    <string name="googlefit_camel_case">googleFit</string>
+    <string name="googlefit_description">Steps, distance, active minutes and more.</string>
+    <string name="weather_title">Weather</string>
+    <string name="weather_camel_case">weather</string>
+    <string name="weather_description">Weather condition.</string>
+    <string name="moabi_tracker_title">Moabi</string>
+    <string name="moabi_tracker_camel_case">moabi</string>
+    <string name="moabi_tracker_description">Steps, distance, active minutes and more.</string>
+
+    <!-- Survey strings -->
+    <string name="baactivity_title">Activity</string>
+    <string name="baactivity_camel_case">6behavioralActivationActivity</string>
+    <string name="baactivity_desc">Record your day</string>
+    <string name="depression_phq9_title">Depression</string>
+    <string name="depression_phq9_camel_case">3depressionPhq9</string>
+    <string name="depression_phq9_dsc">Check your depression level</string>
+    <string name="anxiety_gad7_title">Anxiety</string>
+    <string name="anxiety_gad7_camel_case">4anxietyGad7</string>
+    <string name="anxiety_gad7_dsc">Check your anxiety level</string>
+    <string name="mood_and_energy_title">Mood &amp; Energy</string>
+    <string name="mood_and_energy_camel_case">1moodAndEnergy</string>
+    <string name="mood_and_energy_desc">Track your mood and energy level</string>
+    <string name="mood_title">Mood</string>
+    <string name="mood_camel_case">mood</string>
+    <string name="energy_title">Energy</string>
+    <string name="energy_camel_case">energy</string>
+    <string name="stress_title">Stress</string>
+    <string name="stress_camel_case">2stress</string>
+    <string name="stress_desc">Track your stress</string>
+    <string name="daily_review_title">Daily Review</string>
+    <string name="daily_review_camel_case">0dailyReview</string>
+    <string name="daily_review_desc">Review your day</string>
+    <string name="pain_title">Pain</string>
+    <string name="pain_camel_case">5pain</string>
+    <string name="pain_desc">Track your pain</string>
+
+    <!-- Date strings-->
+    <string name="day">Day</string>
+    <string name="week">Week</string>
+    <string name="month">Month</string>
+    <string name="six_months">6 Months</string>
+    <string name="year">Year</string>
+    <string name="today">Today</string>
+    <string name="this_week">This Week</string>
+    <string name="this_month">This Month</string>
+
+    <!-- Floating action button strings -->
+    <string name="fab_make_entry">Make entry</string>
+    <string name="fab_track_activity">Track activity</string>
+    <string name="fab_edit_connected_services">Edit connected services</string>
+    <string name="fab_edit_entry_items">Edit entry items</string>
+
+    <!-- Empty view -->
+    <string name="empty_view_action_button">Click to start tracking</string>
+
+    <!-- Shared Preference -->
+    <string name="com.ivorybridge.moabi.FITBIT_SHARED_PREFERENCE_KEY">FITBIT_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.BUILT_IN_FITNESS_SHARED_PREFERENCE_KEY" translatable="false">BUILT_IN_FITNESS_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.GOOGLEFIT_SHARED_PREFERENCE_KEY" translatable="false">GOOGLEFIT_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.APP_USAGE_SHARED_PREFERENCE_KEY" translatable="false">APP_USAGE_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.WEATHER_SHARED_PREFERENCE_KEY" translatable="false">WEATHER_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.MOOD_AND_ENERGY_SHARED_PREFERENCE_KEY" translatable="false">MOOD_AND_ENERGY_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.STRESS_SHARED_PREFERENCE_KEY" translatable="false">STRESS_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.BA_ACTIVITY_SHARED_PREFERENCE_KEY" translatable="false">BA_ACTIVITY_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.TIMED_ACTIVITY_SHARED_PREFERENCE_KEY" translatable="false">TIMED_ACTIVITY_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.MIND_INSIGHT_SHARED_PREFERENCE_KEY" translatable="false">MIND_INSIGHT_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.BODY_INSIGHT_SHARED_PREFERENCE_KEY" translatable="false">BODY_INSIGHT_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.USER_GOAL_SHARED_PREFERENCE_KEY" translatable="false">USER_GOAL_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.UNIT_SHARED_PREFERENCE_KEY" translatable="false">UNIT_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.DAILY_REVIEW_SHARED_PREFERENCE_KEY" translatable="false">DAILY_REVIEW_SHARED_PREFERENCE_KEY</string>
+    <string name="com.ivorybridge.moabi.PHQ9_SHARED_PREFERENCE_KEY" translatable="false">PHQ9_SHARED_PREFERENCE_KEY</string>
+    <string name="com.ivorybridge.moabi.GAD7_SHARED_PREFERENCE_KEY" translatable="false">GAD7_SHARED_PREFERENCE_KEY</string>
+    <string name="com.ivorybridge.moabi.FIRST_ACTIVITY_TO_DISPLAY_KEY" translatable="false">FIRST_ACTIVITY_TO_DISPLAY</string>
+    <string name="com.ivorybridge.moabi.SECOND_ACTIVITY_TO_DISPLAY_KEY" translatable="false">SECOND_ACTIVITY_TO_DISPLAY</string>
+    <string name="com.ivorybridge.moabi.THIRD_ACTIVITY_TO_DISPLAY_KEY" translatable="false">THIRD_ACTIVITY_TO_DISPLAY</string>
+    <string name="com.ivorybridge.moabi.FOURTH_ACTIVITY_TO_DISPLAY_KEY" translatable="false">FOURTH_ACTIVITY_TO_DISPLAY</string>
+    <string name="com.ivorybridge.mobai.TIME_RANGE_KEY" translatable="false">TIME_RANGE_DAY</string>
+    <string name="com.ivorybridge.mobai.UNIT_KEY" translatable="false">UNIT</string>
+    <string name="com.ivorybridge.mobai.NOTIFICATION_SHARED_PREFERENCE" translatable="false">NOTIFICATION_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.mobai.LAST_ACCESSED_FRAGMENT_IN_MAIN_ACTIVITY_SHARED_PREFERENCE_KEY" translatabe="false">LAST_ACCESSED_FRAGMENT_IN_MAIN_ACTIVITY_SHARED_PREFERENCE_KEY</string>
+
+    <!-- Notification channels -->
+    <string name="CHRONOMETER_NOTIF_CHANNEL_ID">CHRONOMETER_NOTIF_CHANNEL_ID</string>
+    <string name="USER_GOAL_NOTIF_CHANNEL_ID">USER_GOAL_NOTIF_CHANNEL_ID</string>
+    <string name="MOTION_SENSOR_NOTIF_CHANNEL_ID">MOTION_SENSOR_NOTIF_CHANNEL_ID</string>
+
+    <!-- Preference -->
+    <string name="preference_unit_title">Unit</string>
+    <string name="preference_profile_title">Profile</string>
+    <string name="preference_notifications_title">Notifications</string>
+    <string name="preference_apps_and_services_title">Apps/Services</string>
+    <string name="preference_surveys_title">Surveys</string>
+    <string name="preference_edit_activities_title">Edit Activities</string>
+    <string name="preference_unit_si_title">SI</string>
+    <string name="preference_unit_usc_title">USC</string>
+    <string name="preference_unit_si_summary">kilometers/kilograms/°C</string>
+    <string name="preference_unit_usc_summary">miles/pounds/°F</string>
+    <string name="preference_fitness_tracker_notification">pref_fitness_tracker_notification</string>
+    <string name="preference_timer_notification">pref_timer_notification</string>
+    <string name="preference_personal_goal_notification">pref_personal_goal_notification</string>
+    <string name="preference_daily_check_in_notification">pref_daily_check_in_notification</string>
+    <string name="preference_daily_cheers_notification">pref_daily_cheers_notification</string>
+
+    <!-- Unit -->
+    <string name="unit_step_sing">step</string>
+    <string name="unit_step_plur">steps</string>
+    <string name="unit_time_sing">min</string>
+    <string name="unit_time_plur">min</string>
+    <string name="unit_hour_sing">h</string>
+    <string name="unit_hour_plur">h</string>
+    <string name="unit_floor_sing">floor</string>
+    <string name="unit_floor_plur">floors</string>
+    <string name="unit_distance_si">km</string>
+    <string name="unit_distance_usc">mi</string>
+    <string name="unit_weight_si">kg</string>
+    <string name="unit_weight_usc">lbs</string>
+    <string name="unit_temp_si">°C</string>
+    <string name="unit_temp_usc">°F</string>
+    <string name="unit_precip_si">mm</string>
+    <string name="unit_precip_usc">in</string>
+    <string name="unit_percent">%</string>
+    <string name="unit_calories">Cal</string>
+    <string name="unit_activity_sing">time</string>
+    <string name="unit_activity_plur">times</string>
+
+    <!-- Insight -->
+    <string name="insight_best_and_worst_title">Best &amp; Worst</string>
+    <string name="insight_top3_title">Top3 Factors</string>
+    <string name="correlation">related</string>
+    <string name="recommendation_prompt">Recommended: </string>
+
+    <!-- Activity -->
+    <string name="activity_steps_title">Steps</string>
+    <string name="activity_active_minutes_title">Active Minutes</string>
+    <string name="activity_sedentary_minutes_title">Sedentary Minutes</string>
+    <string name="activity_sleep_title">Sleep</string>
+    <string name="activity_distance_title">Distance</string>
+    <string name="activity_calories_title">Calories</string>
+    <string name="activity_floors_title">Floors</string>
+    <string name="activity_steps_camel_case">steps</string>
+    <string name="activity_active_minutes_camel_case">activeMinutes</string>
+    <string name="activity_sedentary_minutes_camel_case">sedentaryMinutes</string>
+    <string name="activity_sleep_camel_case">sleep</string>
+    <string name="activity_distance_camel_case">distance</string>
+    <string name="activity_calories_camel_case">calories</string>
+    <string name="activity_floors_camel_case">floors</string>
+    <string name="activity_phone_usage_camel_case">Phone Usage</string>
+    <string name="activity_edu_career_title">Education/Career</string>
+    <string name="activity_relationships_title">Relationships</string>
+    <string name="activity_rec_interests_title">Recreation/Interests</string>
+    <string name="activity_mind_body_spirit_title">Mind/Body/Spirituality</string>
+    <string name="activity_daily_responsibility_title">Daily Responsibilities</string>
+    <string name="activity_unknown_title">Unknown</string>
+
+    <!-- Weather -->
+    <string name="humidity_title">Humidity</string>
+    <string name="temperature_title">Temperature</string>
+    <string name="precipitation_title">Precipitation</string>
+    <string name="humidity_camel_case">humidity</string>
+    <string name="temperature_camel_case">temperature</string>
+    <string name="precipitation_camel_case">precipitation</string>
+
+    <!-- Action -->
+    <string name="save_title">Save</string>
+    <string name="reset_title">Reset</string>
+    <string name="exit_title">Exit</string>
+    <string name="stop_title">Stop</string>
+    <string name="pause_title">Pause</string>
+    <string name="start_title">Start</string>
+    <string name="edit_title">Edit</string>
+    <string name="done_title">Done</string>
+    <string name="cancel_title">Cancel</string>
+    <string name="go_to_settings_title">Go to settings</string>
+    <string name="dismiss_title">Dismiss</string>
+    <string name="dont_ask_again_title">Don\'t ask again.</string>
+    <string name="continue_as_a_guest_title">Continue as a guest</string>
+    <string name="sign_in_title">Sign in</string>
+    <string name="submit_title">Submit</string>
+
+    <!-- Insight -->
+    <string name="insight_summary_fitbit">Summary (Fitbit)</string>
+    <string name="insight_summary_googlefit">Summary (Google Fit)</string>
+    <string name="insight_summary_moabi">Summary (Moabi)</string>
+    <string name="insight_summary_phone_usage">Summary (Phone Usage)</string>
+    <string name="insight_summary_activity">Summary (Moabi)</string>
+    <string name="insight_summary_mood">Summary (Mood)</string>
+    <string name="insight_summary_energy">Summary (Energy)</string>
+    <string name="insight_summary_daily_review">Summary (Daily Review)</string>
+    <string name="insight_summary_stress">Summary (Stress)</string>
+    <string name="insight_summary_depression">Summary (Depression)</string>
+    <string name="insight_summary_anxiety">Summary (Anxiety)</string>
+    <string name="insight_mind_x_moabi">Mind X Moabi</string>
+    <string name="insight_mind_x_fitbit">Mind X Fitbit</string>
+    <string name="insight_mind_x_googlefit">Mind X Google Fit</string>
+    <string name="insight_mind_x_phone_usage">Mind X Phone Usage</string>
+    <string name="insight_mind_x_weather">Mind X Weather</string>
+    <string name="insight_mind_x_activity">Mind X Activity</string>
+    <string name="insight_mind_x_timer">Mind X Timer</string>
+
+    <!-- Stats -->
+    <string name="stats_summary">Summary</string>
+
+    <!-- Mood -->
+    <string name="mood_alert">Alert</string>
+    <string name="mood_excited">Excited</string>
+    <string name="mood_happy">Happy</string>
+    <string name="mood_calm">Calm</string>
+    <string name="mood_tired">Tired</string>
+    <string name="mood_bored">Bored</string>
+    <string name="mood_unhappy">Unhappy</string>
+    <string name="mood_tense">Tense</string>
+    <string name="mood_okay">Okay</string>
+
+    <!-- Daily Review -->
+    <string name="daily_review_prompt">How was your day?</string>
+    <string name="daily_review_terrible">Terrible</string>
+    <string name="daily_review_bad">Bad</string>
+    <string name="daily_review_okay">Okay</string>
+    <string name="daily_review_good">Good</string>
+    <string name="daily_review_excellent">Excellent</string>
+
+    <!-- Stress -->
+    <string name="stress_prompt">How much stress do you feel?</string>
+
+    <!-- Surveys -->
+    <string name="survey_incomplete_questions">questions </string>
+    <string name="survey_incomplete_survey_prompt">Incomplete Survey</string>
+    <string name="survey_missing_questions">Missing</string>
+    <string name="survey_ignore_prompt">Ignore</string>
+    <string name="survey_okay_prompt">Okay</string>
+    <string name="survey_activity_prompt">What have you been up to?</string>
+    <string name="survey_mood_and_energy_prompt">How are you today?</string>
+    <string name="survey_result_prompt">Result</string>
+    <string name="survey_phq9_your_depression_level">Your depression level is </string>
+    <string name="survey_phq9_level_min">minimal.</string>
+    <string name="survey_phq9_level_mild">mild.</string>
+    <string name="survey_phq9_level_moderate">moderate.</string>
+    <string name="survey_phq9_level_moderately_severe">moderately severe.</string>
+    <string name="survey_phq9_level_severe">severe.</string>
+    <string name="survey_phq9_minimal_suggestion">You may not need any treatment.</string>
+    <string name="survey_phq9_mild_suggestion">Continue to watch your symptoms. If symptoms worsen, consult with a health professional.</string>
+    <string name="survey_phq9_moderate_suggestion">Closely watch your symptoms. You may want to consider consulting with a health professional.</string>
+    <string name="survey_phq9_moderately_severe_suggestion">Have you sought professional help yet? You may require active treatment with medication or psychotherapy.</string>
+    <string name="survey_phq9_severe_suggestion">Active treatment with medication or psychotherapy is strongly recommended. Seek professional help as soon as you can.</string>
+    <string name="survey_phq9_suicidality_cheer">Remember, you are never alone.</string>
+    <string name="survey_phq9_suicidality_hotline_nationality_us">If you are in the U.S., free and confidential support is available 24/7 from</string>
+    <string name="survey_phq9_suicidality_hotline_nationality_us_number">1-800-273-8255</string>
+    <string name="survey_gad7_your_anxiety_level">Your anxiety level is </string>
+    <string name="survey_gad7_level_min">minimal.</string>
+    <string name="survey_gad7_level_mild">mild.</string>
+    <string name="survey_gad7_level_moderate">moderate.</string>
+    <string name="survey_gad7_level_severe">severe.</string>
+    <string name="survey_gad7_minimal_suggestion">You may not need any treatment.</string>
+    <string name="survey_gad7_mild_suggestion">Continue to watch your symptoms. If symptoms worsen, consult with a health professional.</string>
+    <string name="survey_gad7_moderate_suggestion">Closely watch your symptoms. You may want to consider consulting with a health professional.</string>
+    <string name="survey_gad7_severe_suggestion">Active treatment with medication or psychotherapy is strongly recommended. Seek professional help as soon as you can.</string>
+
+
+    <!-- Chart -->
+    <string name="chart_no_entry">No entry</string>
+    <string name="chart_date_today">Today</string>
+    <string name="chart_avg_abbr">avg.</string>
+    <string name="chart_label_poor">Poor</string>
+    <string name="chart_label_good">Good</string>
+    <string name="chart_label_max">Max</string>
+    <string name="chart_label_none">None</string>
+    <string name="chart_label_excellent">Excellent</string>
+    <string name="chart_label_terrible">Terrible</string>
+    <string name="chart_mild_abbr">Mld</string>
+    <string name="chart_min_abbr">Min</string>
+    <string name="chart_moderate_abbr">Mod</string>
+    <string name="chart_moderately_severe_abbr">M.Sv</string>
+    <string name="chart_severe_abbr">Sev</string>
+
+    <!-- Tracker Texts -->
+    <string name="tracker_choose_four_activities_prompt">Choose four activities</string>
+    <string name="tracker_please_choose_four_activities_prompt">Please choose four activities</string>
+    <string name="tracker_loading_status_prompt">Loading...</string>
+    <string name="timer_edit_text_prompt">What are you up to?</string>
+
+    <!-- GAD7 Questions -->
+    <string name="gad7_question_1">1. Feeling nervous, anxious, or on edge</string>
+    <string name="gad7_question_2">2. Not being able to stop or control worrying</string>
+    <string name="gad7_question_3">3. Worrying too much about different things</string>
+    <string name="gad7_question_4">4. Trouble relaxing</string>
+    <string name="gad7_question_5">5. Being so restless that it\'s hard to sit still</string>
+    <string name="gad7_question_6">6. Becoming easily annoyed or irritable</string>
+    <string name="gad7_question_7">7. Feeling afraid as if something awful might happen</string>
+    <string name="gad7_option_1">1. Not at all</string>
+    <string name="gad7_option_2">2. Several days</string>
+    <string name="gad7_option_3">3. More than half the days</string>
+    <string name="gad7_option_4">4. Nearly every day</string>
+
+
+    <!-- PHQ9 Questions -->
+    <string name="phq9_question_1">1. Little Interst or pleasure in doing things?</string>
+    <string name="phq9_question_2">2. Feeling down, depressed, or hopeless?</string>
+    <string name="phq9_question_3">3. Trouble falling or staying asleep, or sleeping too much?</string>
+    <string name="phq9_question_4">4. Feeling tired or having little energy?</string>
+    <string name="phq9_question_5">5. Poor appetite or overeating?</string>
+    <string name="phq9_question_6">6. Feeling bad about yourself — or that you are a failure or have let yourself or your family down?</string>
+    <string name="phq9_question_7">7. Trouble concentrating on things, such as reading the newspaper or watching television?</string>
+    <string name="phq9_question_8">8. Moving or speaking so slowly that other people could have noticed? Or so fidgety or restless that you have been moving a lot more than usual?</string>
+    <string name="phq9_question_9">9. Thoughts that you would be better off dead, or thoughts of hurting yourself in some way?</string>
+
+    <!-- Profile -->
+    <string name="profile_sex_title">Sex</string>
+    <string name="profile_date_of_birth_title">Date of Birth</string>
+    <string name="profile_height_title">Height</string>
+    <string name="profile_weight_title">Weight</string>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="28dp"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/rv_item_stats_meansandsum_item_activitytype_textview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:paddingStart="24dp"
+        android:gravity="center_vertical">
+
+    </TextView>
+
+    <TextView
+        android:id="@+id/rv_item_stats_meansandsum_item_means_textview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="7812" />
+
+    <TextView
+        android:id="@+id/rv_item_stats_meansandsum_item_sum_textview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="2032" />
+
+</LinearLayout>
