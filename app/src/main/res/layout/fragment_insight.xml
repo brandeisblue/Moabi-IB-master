@@ -4,6 +4,7 @@
     android:id="@+id/fragment_insight_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -17,13 +18,14 @@
             android:layout_height="56dp"
             app:contentInsetStartWithNavigation="8dp"
             app:tabGravity="fill"
-            app:tabMode="fixed"></com.google.android.material.tabs.TabLayout>
+            app:tabMode="fixed"/>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/fragment_insight_viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="72dp"
         android:background="@android:color/white"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 

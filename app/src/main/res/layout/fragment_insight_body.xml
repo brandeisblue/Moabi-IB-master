@@ -85,9 +85,8 @@
         android:id="@+id/fragment_insight_body_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="56dp"
+        android:layout_marginTop="24dp"
         android:layout_below="@id/fragment_insight_body_chipgroup"/>
 </RelativeLayout>

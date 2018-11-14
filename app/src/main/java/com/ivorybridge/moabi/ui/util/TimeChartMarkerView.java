@@ -29,6 +29,10 @@ public class TimeChartMarkerView extends MarkerView {
     private int numOfDays;
     private Context context;
 
+    private TimeChartMarkerView(Context context, int layoutResource) {
+        super(context, layoutResource);
+    }
+
     public TimeChartMarkerView(Context context, int layoutResource, Map<String, Long> AppUsageNameRankMap) {
         super(context, layoutResource);
         this.context = context;
@@ -45,6 +49,7 @@ public class TimeChartMarkerView extends MarkerView {
         this.formattedTime = new FormattedTime();
         this.entryDatesList = entryDatesList;
         this.numOfDays = numOfDays;
+        this.context = context;
         setChartView(chart);
     }
 

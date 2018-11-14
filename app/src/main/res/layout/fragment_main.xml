@@ -36,6 +36,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_clear"
+                    android:contentDescription="Weather condition image"
                     android:layout_gravity="center_vertical"
                     />
 
@@ -78,8 +79,8 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/fragment_main_vertical_recyclerview"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="56dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"></androidx.recyclerview.widget.RecyclerView>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -371,4 +371,7 @@
     <string name="profile_date_of_birth_title">Date of Birth</string>
     <string name="profile_height_title">Height</string>
     <string name="profile_weight_title">Weight</string>
+
+    <!-- Phone Usage-->
+    <string name="phone_usage_total_title">Total</string>
 </resources>
