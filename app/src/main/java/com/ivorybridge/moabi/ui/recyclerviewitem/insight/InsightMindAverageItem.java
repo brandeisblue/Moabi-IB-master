@@ -65,38 +65,39 @@ public class InsightMindAverageItem extends AbstractItem<InsightMindAverageItem,
                 String[] tickTexts = itemView.getContext().getResources().getStringArray(R.array.moodandenergy_seekbar_array);
                 seekBar.setTickCount(2);
                 seekBar.customTickTexts(tickTexts);
-                seekBar.setMin(1);
-                seekBar.setMax(3);
-                seekBar.setProgress((float) item.average);
+                seekBar.setMin(0);
+                seekBar.setMax(100);
+                seekBar.setProgress((float) (item.average - 1f) / 2 * 100);
             } else if (item.inputType.equals(itemView.getContext().getString(R.string.stress_camel_case))) {
                 String[] tickTexts = itemView.getContext().getResources().getStringArray(R.array.stress_seekbar_array);
                 seekBar.setTickCount(2);
                 seekBar.customTickTexts(tickTexts);
                 seekBar.setMin(0);
-                seekBar.setMax(10);
-                seekBar.setProgress((float) item.average);
+                seekBar.setMax(100);
+                seekBar.setProgress((float) item.average / 10f * 100);
             } else if (item.inputType.equals(itemView.getContext().getString(R.string.daily_review_camel_case))) {
                 String[] tickTexts = itemView.getContext().getResources().getStringArray(R.array.overall_review_seekbar_array);
                 seekBar.setTickCount(2);
                 seekBar.customTickTexts(tickTexts);
-                seekBar.setMin(1);
-                seekBar.setMax(5);
-                seekBar.setProgress((float) item.average);
+                seekBar.setMin(0);
+                seekBar.setMax(100);
+                seekBar.setProgress((float) (item.average - 1f) / 4 * 100);
             } else if (item.inputType.equals(itemView.getContext().getString(R.string.depression_phq9_camel_case))) {
                 String[] tickTexts = itemView.getContext().getResources().getStringArray(R.array.depression_seekbar_array);
                 seekBar.setTickCount(28);
                 seekBar.customTickTexts(tickTexts);
                 seekBar.setMin(0);
-                seekBar.setMax(27);
-                seekBar.setProgress((float) item.average);
+                seekBar.setMax(100);
+                seekBar.setProgress((float) item.average / 27 * 100);
             } else if (item.inputType.equals(itemView.getContext().getString(R.string.anxiety_gad7_camel_case))) {
                 String[] tickTexts = itemView.getContext().getResources().getStringArray(R.array.anxiety_seekbar_array);
                 seekBar.setTickCount(22);
                 seekBar.customTickTexts(tickTexts);
                 seekBar.setMin(0);
-                seekBar.setMax(21);
-                seekBar.setProgress((float) item.average);
+                seekBar.setMax(100);
+                seekBar.setProgress((float) item.average / 21 * 100);
             }
+            seekBar.setIndicatorTextFormat("${PROGRESS} " + "%");
             Log.i(TAG, "Progress is " + (float) item.average);
             Log.i(TAG, "Seekbar is at " + seekBar.getProgressFloat());
         }

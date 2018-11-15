@@ -161,7 +161,7 @@ public class Phq9Item extends AbstractItem<Phq9Item, Phq9Item.ViewHolder> {
                         } else {
                             itemSPEditor.putString(itemView.getContext()
                                             .getString(R.string.com_ivorybridge_mobai_TIME_RANGE_KEY),
-                                    itemView.getContext().getString(R.string.this_week));
+                                    itemView.getContext().getString(R.string.this_month));
                             itemSPEditor.commit();
                             configureData(item, 31);
                         }
@@ -367,7 +367,7 @@ public class Phq9Item extends AbstractItem<Phq9Item, Phq9Item.ViewHolder> {
                     xAxis.setAxisMaximum(1440);
                     xAxis.setAxisMinimum(-0.5f);
                     xAxis.setLabelCount(4, true);
-                    xAxis.setDrawAxisLine(true);
+                    xAxis.setDrawAxisLine(false);
                     lineChart.setDragEnabled(false);
                     xAxis.setGranularity(1f);
                     xAxis.setGranularityEnabled(true);
@@ -386,7 +386,7 @@ public class Phq9Item extends AbstractItem<Phq9Item, Phq9Item.ViewHolder> {
                     xAxis.setAxisMaximum(numOfDays);
                     xAxis.setDrawGridLines(false);
                     lineChart.setDragEnabled(false);
-                    xAxis.setDrawAxisLine(true);
+                    xAxis.setDrawAxisLine(false);
                     xAxis.setTextSize(12);
                     if (itemView.getContext() != null) {
                         xAxis.setAxisLineColor(ContextCompat.getColor(itemView.getContext(), R.color.transparent_gray));

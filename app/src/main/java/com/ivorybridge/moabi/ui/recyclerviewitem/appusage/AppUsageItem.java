@@ -20,6 +20,7 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.model.GradientColor;
 import com.github.mikephil.charting.utils.EntryXComparator;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.ivorybridge.moabi.R;
@@ -239,10 +240,11 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             xAxis.setTextSize(10f);
             xAxis.setTypeface(tf);
             //xAxis.setLabelCount(5, true);
-            xAxis.setDrawAxisLine(true);
+            xAxis.setDrawAxisLine(false);
             xAxis.setGranularity(1f);
             xAxis.setGranularityEnabled(true);
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            xAxis.setDrawAxisLine(false);
             xAxis.setLabelRotationAngle(0f);
             xAxis.setValueFormatter(new IAxisValueFormatter() {
                 @Override
@@ -275,6 +277,11 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
                     return convertToTimeString(value);
                 }
             });
+            int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white);
+            int startColor2 = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
+            List<GradientColor> gradientColors = new ArrayList<>();
+            gradientColors.add(new GradientColor(startColor1, startColor2));
+            AppUsageDataSet.setGradientColors(gradientColors);
             BarData barData = new BarData(AppUsageDataSet);
             barData.setValueTextSize(12f);
             barData.setBarWidth(0.4f);
@@ -356,7 +363,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             xAxis.setAxisMinimum(0.5f);
             xAxis.setTextSize(10f);
             //xAxis.setLabelCount(5, true);
-            xAxis.setDrawAxisLine(true);
+            xAxis.setDrawAxisLine(false);
             xAxis.setGranularity(1f);
             xAxis.setGranularityEnabled(true);
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -386,6 +393,11 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             BarDataSet AppUsageDataSet = new BarDataSet(AppUsageBarEntries, "Digital BAActivityFavorited");
             AppUsageDataSet.setDrawValues(false);
             AppUsageDataSet.setColor(itemView.getContext().getColor(R.color.colorPrimary));
+            int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white);
+            int startColor2 = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
+            List<GradientColor> gradientColors = new ArrayList<>();
+            gradientColors.add(new GradientColor(startColor1, startColor2));
+            AppUsageDataSet.setGradientColors(gradientColors);
             BarData barData = new BarData(AppUsageDataSet);
             barData.setValueTextSize(12f);
             barData.setBarWidth(0.4f);
@@ -418,6 +430,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             YAxis rightAxis = barChart.getAxisRight();
             leftAxis.setTypeface(tf);
             leftAxis.setTextColor(Color.DKGRAY);
+            leftAxis.setDrawAxisLine(false);
             leftAxis.setEnabled(true);
             leftAxis.setDrawGridLines(false);
             //leftAxis.setAxisMaximum(3);
@@ -426,7 +439,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             //leftAxis.setGranularity(1f);
             //leftAxis.setGranularityEnabled(true);
             leftAxis.setLabelCount(3, true);
-            leftAxis.setDrawAxisLine(true);
+            leftAxis.setDrawAxisLine(false);
             leftAxis.setSpaceMax(40f);
             //leftAxis.setSpaceMin(10f);
             leftAxis.setValueFormatter(new IAxisValueFormatter() {

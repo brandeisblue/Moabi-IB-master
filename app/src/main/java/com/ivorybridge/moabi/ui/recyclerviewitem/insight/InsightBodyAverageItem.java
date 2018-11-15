@@ -1,5 +1,7 @@
 package com.ivorybridge.moabi.ui.recyclerviewitem.insight;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.TextView;
 
@@ -37,7 +39,6 @@ public class InsightBodyAverageItem extends AbstractItem<InsightBodyAverageItem,
     }
 
 
-
     @Override
     public int getType() {
         return R.id.insight_body_average_item;
@@ -61,6 +62,7 @@ public class InsightBodyAverageItem extends AbstractItem<InsightBodyAverageItem,
         TextView textView;
         @BindView(R.id.rv_item_insight_body_average_item_seekbar)
         IndicatorSeekBar seekBar;
+        private SharedPreferences unitSharedPreferences;
 
         public ViewHolder(View view) {
             super(view);
@@ -70,11 +72,18 @@ public class InsightBodyAverageItem extends AbstractItem<InsightBodyAverageItem,
         @Override
         public void bindView(final InsightBodyAverageItem item, List<Object> payloads) {
             if (item.activitySummaryMap != null) {
+                unitSharedPreferences = itemView.getContext().getSharedPreferences(
+                        itemView.getContext().getString(
+                                R.string.com_ivorybridge_moabi_UNIT_SHARED_PREFERENCE_KEY),
+                        Context.MODE_PRIVATE);
+                String unit = unitSharedPreferences.getString(itemView.getContext()
+                        .getString(R.string.com_ivorybridge_mobai_UNIT_KEY),
+                        itemView.getContext().getString(R.string.preference_unit_si_title));
                 double lowest = 0;
                 double highest = 0;
                 double total = 0;
                 int i = 0;
-                for (Map.Entry<String, Double> entry: item.activitySummaryMap.entrySet()) {
+                for (Map.Entry<String, Double> entry : item.activitySummaryMap.entrySet()) {
                     if (i == 0) {
                         lowest = entry.getValue();
                         highest = entry.getValue();
@@ -91,19 +100,33 @@ public class InsightBodyAverageItem extends AbstractItem<InsightBodyAverageItem,
                 }
                 seekBar.setMin((float) lowest);
                 seekBar.setMax((float) highest);
-                seekBar.setProgress((float) total / item.activitySummaryMap.size());
+                float average = (float) total / item.activitySummaryMap.size();
+                seekBar.setProgress(average);
+                String unitString = itemView.getContext().getString(R.string.unit_time_sing);
                 if (item.inputType.equals(itemView.getContext().getString(R.string.activity_steps_title))) {
-                    seekBar.setIndicatorTextFormat("${PROGRESS} steps");
+                    if (average == 1) {
+                        unitString = itemView.getContext().getString(R.string.unit_step_sing);
+                    } else {
+                        unitString = itemView.getContext().getString(R.string.unit_step_plur);
+                    }
                 } else if (item.inputType.contains("Minutes") || item.inputType.equals(itemView.getContext().getString(R.string.activity_sleep_title))) {
-                    seekBar.setIndicatorTextFormat("${PROGRESS} mins");
+                    unitString = itemView.getContext().getString(R.string.unit_time_sing);
                 } else if (item.inputType.equals(itemView.getContext().getString(R.string.activity_distance_title))) {
-                    seekBar.setIndicatorTextFormat("${PROGRESS} km");
+                    if (unit.equals(itemView.getContext().getString(R.string.preference_unit_si_title))) {
+                        unitString = itemView.getContext().getString(R.string.unit_distance_si);
+                    } else {
+                        unitString = itemView.getContext().getString(R.string.unit_distance_usc);
+                    }
                 } else if (item.inputType.equals(itemView.getContext().getString(R.string.activity_calories_title))) {
-                    seekBar.setIndicatorTextFormat("${PROGRESS} Cal");
+                    unitString = itemView.getContext().getString(R.string.unit_calories);
                 } else if (item.inputType.equals(itemView.getContext().getString(R.string.activity_floors_title))) {
-                    seekBar.setIndicatorTextFormat("${PROGRESS} floors");
+                    if (average == 1) {
+                        unitString = itemView.getContext().getString(R.string.unit_floor_sing);
+                    } else {
+                        unitString = itemView.getContext().getString(R.string.unit_floor_plur);
+                    }
                 }
-
+                seekBar.setIndicatorTextFormat("${PROGRESS} " + unitString);
             } else {
                 seekBar.setProgress((float) item.average);
             }

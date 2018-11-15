@@ -50,18 +50,18 @@
     </string-array>
 
     <string-array name="moodandenergy_seekbar_array">
-        <item>Poor (1.0)</item>
-        <item>Good (3.0)</item>
+        <item>Poor</item>
+        <item>Good</item>
     </string-array>
 
     <string-array name="stress_seekbar_array">
-        <item>None (0)</item>
-        <item>Max (10)</item>
+        <item>None</item>
+        <item>Max</item>
     </string-array>
 
     <string-array name="overall_review_seekbar_array">
-        <item>Terrible (1)</item>
-        <item>Excellent (5)</item>
+        <item>Terrible</item>
+        <item>Excellent</item>
     </string-array>
 
     <string-array name="depression_seekbar_array">

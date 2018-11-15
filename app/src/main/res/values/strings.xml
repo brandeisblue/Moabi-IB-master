@@ -123,6 +123,8 @@
     <string name="com.ivorybridge.moabi.APP_USAGE_SHARED_PREFERENCE_KEY" translatable="false">APP_USAGE_SHARED_PREFERENCE</string>
     <string name="com.ivorybridge.moabi.WEATHER_SHARED_PREFERENCE_KEY" translatable="false">WEATHER_SHARED_PREFERENCE</string>
     <string name="com.ivorybridge.moabi.MOOD_AND_ENERGY_SHARED_PREFERENCE_KEY" translatable="false">MOOD_AND_ENERGY_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.MOOD_SHARED_PREFERENCE_KEY" translatable="false">MOOD_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.moabi.ENERGY_SHARED_PREFERENCE_KEY" translatable="false">ENERGY_SHARED_PREFERENCE</string>
     <string name="com.ivorybridge.moabi.STRESS_SHARED_PREFERENCE_KEY" translatable="false">STRESS_SHARED_PREFERENCE</string>
     <string name="com.ivorybridge.moabi.BA_ACTIVITY_SHARED_PREFERENCE_KEY" translatable="false">BA_ACTIVITY_SHARED_PREFERENCE</string>
     <string name="com.ivorybridge.moabi.TIMED_ACTIVITY_SHARED_PREFERENCE_KEY" translatable="false">TIMED_ACTIVITY_SHARED_PREFERENCE</string>

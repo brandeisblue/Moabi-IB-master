@@ -20,6 +20,7 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.model.GradientColor;
 import com.github.mikephil.charting.utils.EntryXComparator;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.ivorybridge.moabi.R;
@@ -243,7 +244,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
                         xAxis.setTextSize(10f);
                         xAxis.setTypeface(tf);
                         //xAxis.setLabelCount(6, true);
-                        xAxis.setDrawAxisLine(true);
+                        xAxis.setDrawAxisLine(false);
                         xAxis.setGranularity(1f);
                         xAxis.setGranularityEnabled(true);
                         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -279,6 +280,11 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
                                 return convertToTimeString(value);
                             }
                         });
+                        int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white);
+                        int startColor2 = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
+                        List<GradientColor> gradientColors = new ArrayList<>();
+                        gradientColors.add(new GradientColor(startColor1, startColor2));
+                        timedActivityDataSet.setGradientColors(gradientColors);
                         BarData barData = new BarData(timedActivityDataSet);
                         barData.setValueTextSize(12f);
                         barData.setBarWidth(0.4f);
@@ -379,7 +385,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
                         xAxis.setTypeface(tf);
                         xAxis.setTextColor(Color.DKGRAY);
                         //xAxis.setLabelCount(6, true);
-                        xAxis.setDrawAxisLine(true);
+                        xAxis.setDrawAxisLine(false);
                         xAxis.setGranularity(1f);
                         xAxis.setGranularityEnabled(true);
                         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -419,6 +425,11 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
                                 return convertToTimeString(value);
                             }
                         });
+                        int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white);
+                        int startColor2 = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
+                        List<GradientColor> gradientColors = new ArrayList<>();
+                        gradientColors.add(new GradientColor(startColor1, startColor2));
+                        timedActivityDataSet.setGradientColors(gradientColors);
                         BarData barData = new BarData(timedActivityDataSet);
                         barData.setValueTextSize(12f);
                         barData.setBarWidth(0.4f);
@@ -469,7 +480,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
             //leftAxis.setGranularity(1f);
             //leftAxis.setGranularityEnabled(true);
             leftAxis.setLabelCount(3, true);
-            leftAxis.setDrawAxisLine(true);
+            leftAxis.setDrawAxisLine(false);
             leftAxis.setSpaceMax(40f);
             //leftAxis.setSpaceMin(10f);
             leftAxis.setValueFormatter(new IAxisValueFormatter() {

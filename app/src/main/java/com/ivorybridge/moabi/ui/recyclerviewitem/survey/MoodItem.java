@@ -111,7 +111,7 @@ public class MoodItem extends AbstractItem<MoodItem, MoodItem.ViewHolder> {
         public void bindView(final MoodItem item, List<Object> payloads) {
             Log.i(TAG, "MoodItem is created");
             itemSharedPreferences = itemView.getContext().getSharedPreferences(
-                    itemView.getContext().getString(R.string.com_ivorybridge_moabi_MOOD_AND_ENERGY_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
+                    itemView.getContext().getString(R.string.com_ivorybridge_moabi_MOOD_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
             itemSPEditor = itemSharedPreferences.edit();
             formattedTime = new FormattedTime();
             if (item.mFragment != null) {
@@ -160,7 +160,7 @@ public class MoodItem extends AbstractItem<MoodItem, MoodItem.ViewHolder> {
                         } else {
                             itemSPEditor.putString(itemView.getContext()
                                             .getString(R.string.com_ivorybridge_mobai_TIME_RANGE_KEY),
-                                    itemView.getContext().getString(R.string.this_week));
+                                    itemView.getContext().getString(R.string.this_month));
                             itemSPEditor.commit();
                             configureData(item, 31);
                         }
@@ -367,7 +367,7 @@ public class MoodItem extends AbstractItem<MoodItem, MoodItem.ViewHolder> {
                     xAxis.setAxisMaximum(1440);
                     xAxis.setAxisMinimum(-0.5f);
                     xAxis.setLabelCount(4, true);
-                    xAxis.setDrawAxisLine(true);
+                    xAxis.setDrawAxisLine(false);
                     lineChart.setDragEnabled(false);
                     xAxis.setGranularity(1f);
                     xAxis.setGranularityEnabled(true);
@@ -388,7 +388,7 @@ public class MoodItem extends AbstractItem<MoodItem, MoodItem.ViewHolder> {
                     xAxis.setAxisMaximum(numOfDays);
                     xAxis.setDrawGridLines(false);
                     lineChart.setDragEnabled(false);
-                    xAxis.setDrawAxisLine(true);
+                    xAxis.setDrawAxisLine(false);
                     xAxis.setSpaceMin(0.5f);
                     xAxis.setSpaceMax(0.5f);
                     xAxis.setTextSize(12);

@@ -3,9 +3,6 @@ package com.ivorybridge.moabi.ui.recyclerviewitem.insight;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Paint;
-import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +18,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.model.GradientColor;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.ui.util.ImageBarChartRenderer;
 import com.ivorybridge.moabi.ui.util.NumeralChartMarkerView;
@@ -120,7 +118,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             xAxis.setTypeface(tf);
             xAxis.setDrawGridLines(false);
             barChart.setDragEnabled(false);
-            xAxis.setDrawAxisLine(true);
+            xAxis.setDrawAxisLine(false);
             xAxis.setSpaceMin(0.5f);
             xAxis.setSpaceMax(0.5f);
             xAxis.setTextSize(12);
@@ -171,8 +169,13 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             rightAxis.setEnabled(false);
 
             BarDataSet set = new BarDataSet(barEntries, "");
+            int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white);
+            int startColor2 = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
+            List<GradientColor> gradientColors = new ArrayList<>();
+            gradientColors.add(new GradientColor(startColor1, startColor2));
+            set.setGradientColors(gradientColors);
             set.setAxisDependency(YAxis.AxisDependency.LEFT);
-            set.setColor(ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary));
+            //set.setColor(ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary));
 
             //set.setLineWidth(1f);
             //Log.i(TAG, set.toString());
@@ -199,6 +202,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             barChart.setFitBars(true);
             barChart.setData(barData);
 
+            /*
             int height = barChart.getHeight();
             Paint paint = barChart.getRenderer().getPaintRender();
             int[] colors = new int[]{ContextCompat.getColor(itemView.getContext(), R.color.colorPrimaryDark), ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary),
@@ -208,7 +212,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             LinearGradient linearGradient = new LinearGradient(0, 0, 0, height,
                     colors, positions,
                     Shader.TileMode.REPEAT);
-            paint.setShader(linearGradient);
+            paint.setShader(linearGradient);*/
 
             Bitmap bestBitmap = BitmapFactory.decodeResource(itemView.getResources(), R.drawable.ic_star_filled);
             barChart.setRenderer(new ImageBarChartRenderer(barChart, barChart.getAnimator(), barChart.getViewPortHandler(), bestBitmap, bestValue));

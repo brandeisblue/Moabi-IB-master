@@ -111,7 +111,7 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
         public void bindView(final EnergyItem item, List<Object> payloads) {
             Log.i(TAG, "EnergyItem is created");
             moodAndEnergySharedPreferences = itemView.getContext().getSharedPreferences(
-                    itemView.getContext().getString(R.string.com_ivorybridge_moabi_MOOD_AND_ENERGY_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
+                    itemView.getContext().getString(R.string.com_ivorybridge_moabi_ENERGY_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
             moodAndEnergySPEditor = moodAndEnergySharedPreferences.edit();
             formattedTime = new FormattedTime();
             if (item.mFragment != null) {
@@ -160,7 +160,7 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
                         } else {
                             moodAndEnergySPEditor.putString(itemView.getContext()
                                             .getString(R.string.com_ivorybridge_mobai_TIME_RANGE_KEY),
-                                    itemView.getContext().getString(R.string.this_week));
+                                    itemView.getContext().getString(R.string.this_month));
                             moodAndEnergySPEditor.commit();
                             configureData(item, 31);
                         }
@@ -366,7 +366,7 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
                     xAxis.setAxisMaximum(1440);
                     xAxis.setAxisMinimum(-0.5f);
                     xAxis.setLabelCount(4, true);
-                    xAxis.setDrawAxisLine(true);
+                    xAxis.setDrawAxisLine(false);
                     lineChart.setDragEnabled(false);
                     xAxis.setGranularity(1f);
                     xAxis.setGranularityEnabled(true);
@@ -385,7 +385,7 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
                     xAxis.setAxisMaximum(numOfDays);
                     xAxis.setDrawGridLines(false);
                     lineChart.setDragEnabled(false);
-                    xAxis.setDrawAxisLine(true);
+                    xAxis.setDrawAxisLine(false);
                     xAxis.setTextSize(12);
                     if (itemView.getContext() != null) {
                         xAxis.setAxisLineColor(ContextCompat.getColor(itemView.getContext(), R.color.transparent_gray));

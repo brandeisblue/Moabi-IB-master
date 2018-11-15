@@ -734,7 +734,7 @@ public class StatsNonTrackerFragment extends Fragment {
             //xAxis.setAxisMinimum(0f);
             barChart.setDragEnabled(false);
             //xAxis.setLabelCount(7, true);
-            xAxis.setDrawAxisLine(true);
+            xAxis.setDrawAxisLine(false);
             //xAxis.setXOffset(0.5f);
             xAxis.setSpaceMin(0.5f);
             xAxis.setSpaceMax(0.5f);
@@ -2264,7 +2264,7 @@ public class StatsNonTrackerFragment extends Fragment {
             //xAxis.setAxisMinimum(0f);
             lineChart.setDragEnabled(false);
             //xAxis.setLabelCount(7, true);
-            xAxis.setDrawAxisLine(true);
+            xAxis.setDrawAxisLine(false);
             //xAxis.setXOffset(0.5f);
             xAxis.setSpaceMin(0.5f);
             xAxis.setSpaceMax(0.5f);

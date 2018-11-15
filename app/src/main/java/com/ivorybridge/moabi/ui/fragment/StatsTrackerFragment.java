@@ -2215,7 +2215,7 @@ public class StatsTrackerFragment extends Fragment {
             //xAxis.setAxisMinimum(0f);
             barChart.setDragEnabled(false);
             //xAxis.setLabelCount(7, true);
-            xAxis.setDrawAxisLine(true);
+            xAxis.setDrawAxisLine(false);
             //xAxis.setXOffset(0.5f);
             xAxis.setSpaceMin(0.5f);
             xAxis.setSpaceMax(0.5f);
