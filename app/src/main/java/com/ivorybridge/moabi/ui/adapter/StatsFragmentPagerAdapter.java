@@ -39,7 +39,8 @@ public class StatsFragmentPagerAdapter extends FragmentPagerAdapter {
                 inputsInUseList.get(position).equals("111" + context.getString(R.string.googlefit_camel_case)) ||
                 inputsInUseList.get(position).equals("000" + context.getString(R.string.moabi_tracker_camel_case)) ||
                 inputsInUseList.get(position).equals("999" + context.getString(R.string.weather_camel_case)) ||
-                inputsInUseList.get(position).equals("208" + context.getString(R.string.timer_camel_case))) {
+                inputsInUseList.get(position).equals("208" + context.getString(R.string.timer_camel_case)) ||
+                inputsInUseList.get(position).equals("210" + context.getString(R.string.phone_usage_camel_case))) {
             StatsTrackerFragment fragment = new StatsTrackerFragment();
             fragment.setArguments(bundle);
             return fragment;

@@ -20,18 +20,23 @@ import com.google.android.material.chip.ChipGroup;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.entity.appusage.AppUsage;
 import com.ivorybridge.moabi.database.entity.appusage.AppUsageSummary;
+import com.ivorybridge.moabi.database.entity.baactivity.BAActivityEntry;
 import com.ivorybridge.moabi.database.entity.builtinfitness.BuiltInActivitySummary;
 import com.ivorybridge.moabi.database.entity.fitbit.FitbitActivitySummary;
 import com.ivorybridge.moabi.database.entity.fitbit.FitbitDailySummary;
 import com.ivorybridge.moabi.database.entity.fitbit.FitbitSleepSummary;
 import com.ivorybridge.moabi.database.entity.googlefit.GoogleFitSummary;
+import com.ivorybridge.moabi.database.entity.stats.InsightSummaryActivityMediatorLiveData;
 import com.ivorybridge.moabi.database.entity.stats.InsightSummaryBuiltInFitnessMediatorLiveData;
 import com.ivorybridge.moabi.database.entity.stats.InsightSummaryFitbitMediatorLiveData;
 import com.ivorybridge.moabi.database.entity.stats.InsightSummaryGoogleFitMediatorLiveData;
 import com.ivorybridge.moabi.database.entity.stats.InsightSummaryPhoneUsageMediatorLiveData;
+import com.ivorybridge.moabi.database.entity.stats.InsightSummaryTimerMediatorLiveData;
 import com.ivorybridge.moabi.database.entity.stats.SimpleRegressionSummary;
+import com.ivorybridge.moabi.database.entity.timedactivity.TimedActivitySummary;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.repository.AppUsageRepository;
+import com.ivorybridge.moabi.repository.TimedActivityRepository;
 import com.ivorybridge.moabi.ui.adapter.IconSpinnerAdapter;
 import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightBestAndWorstItem;
 import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightBodyAverageItem;
@@ -39,12 +44,13 @@ import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightRecommendationIt
 import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightTopThreeItem;
 import com.ivorybridge.moabi.util.FormattedTime;
 import com.ivorybridge.moabi.viewmodel.AppUsageViewModel;
+import com.ivorybridge.moabi.viewmodel.BAActivityViewModel;
 import com.ivorybridge.moabi.viewmodel.BuiltInFitnessViewModel;
 import com.ivorybridge.moabi.viewmodel.DataInUseViewModel;
 import com.ivorybridge.moabi.viewmodel.FitbitViewModel;
 import com.ivorybridge.moabi.viewmodel.GoogleFitViewModel;
-import com.ivorybridge.moabi.viewmodel.MoodAndEnergyViewModel;
 import com.ivorybridge.moabi.viewmodel.RegressionSummaryViewModel;
+import com.ivorybridge.moabi.viewmodel.TimedActivityViewModel;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IItem;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
@@ -92,13 +98,15 @@ public class InsightBodyFragment extends Fragment {
     RadioButton yearButton;
     @BindView(R.id.fragment_insight_body_chipgroup)
     ChipGroup chipGroup;
-    private MoodAndEnergyViewModel moodAndEnergyViewModel;
     private GoogleFitViewModel googleFitViewModel;
     private RegressionSummaryViewModel regressionSummaryViewModel;
     private DataInUseViewModel dataInUseViewModel;
     private BuiltInFitnessViewModel builtInFitnessViewModel;
     private FitbitViewModel fitbitViewModel;
     private AppUsageViewModel appUsageViewModel;
+    private BAActivityViewModel activityViewModel;
+    private TimedActivityRepository timedActivityRepository;
+    private TimedActivityViewModel timedActivityViewModel;
     private FormattedTime formattedTime;
     private Long startOfMonth;
     private Long now;
@@ -110,6 +118,7 @@ public class InsightBodyFragment extends Fragment {
     private Long APPUSAGE = 7L;
     private Long MOABI = 4L;
     private Long ACTIVITY = 8L;
+    private Long TIMER = 9L;
     private int numOfDays = 7;
     private SharedPreferences bodyInsightPreferences;
     private FastAdapter<IItem> recyclerAdapter;
@@ -135,13 +144,14 @@ public class InsightBodyFragment extends Fragment {
                 getString(R.string.com_ivorybridge_moabi_BODY_INSIGHT_SHARED_PREFERENCE_KEY),
                 Context.MODE_PRIVATE);
         yesterday = formattedTime.convertStringYYYYMMDDToLong(formattedTime.getYesterdaysDateAsYYYYMMDD());
-        moodAndEnergyViewModel = ViewModelProviders.of(this).get(MoodAndEnergyViewModel.class);
         googleFitViewModel = ViewModelProviders.of(this).get(GoogleFitViewModel.class);
         appUsageViewModel = ViewModelProviders.of(this).get(AppUsageViewModel.class);
         dataInUseViewModel = ViewModelProviders.of(this).get(DataInUseViewModel.class);
         regressionSummaryViewModel = ViewModelProviders.of(this).get(RegressionSummaryViewModel.class);
         fitbitViewModel = ViewModelProviders.of(this).get(FitbitViewModel.class);
         builtInFitnessViewModel = ViewModelProviders.of(this).get(BuiltInFitnessViewModel.class);
+        activityViewModel = ViewModelProviders.of(this).get(BAActivityViewModel.class);
+        timedActivityViewModel = ViewModelProviders.of(this).get(TimedActivityViewModel.class);
         recyclerAdapter = new FastAdapter<>();
         averageItemItemAdapter = new ItemAdapter<>();
         bestAndAverageItemItemAdapter = new ItemAdapter<>();
@@ -204,9 +214,11 @@ public class InsightBodyFragment extends Fragment {
                             activitiesSet.add("7 App Usage");
                         } else if (inputInUse.getName().equals(getString(R.string.moabi_tracker_camel_case))) {
                             activitiesSet.add("4 Moabi");
-                        } /*else if (inputInUse.getName().equals(getString(R.string.baactivity_camel_case))) {
+                        } else if (inputInUse.getName().equals(getString(R.string.baactivity_camel_case))) {
                             activitiesSet.add("8 Activity");
-                        }*/
+                        } else if (inputInUse.getName().equals(getString(R.string.timer_camel_case))) {
+                            activitiesSet.add("9 Timer");
+                        }
                     }
                     Log.i(TAG, activitiesSet.toString());
                     if (activitiesSet.size() > 0) {
@@ -225,10 +237,13 @@ public class InsightBodyFragment extends Fragment {
                             } else if (activitiesArray[i].equals("4 Moabi")) {
                                 activitiesArray[i] = getString(R.string.insight_summary_moabi);
                                 imagesArray[i] = R.drawable.ic_logo_monogram_colored;
-                            } /*else if (activitiesArray[i].equals("8 Activity")) {
-                                activitiesArray[i] = "Summary (Activity)";
-                                imagesArray[i] = R.drawable.ic_logo_monogram_colored;
-                            }*/
+                            } else if (activitiesArray[i].equals("8 Activity")) {
+                                activitiesArray[i] = getString(R.string.insight_summary_activity);
+                                imagesArray[i] = R.drawable.ic_physical_activity_black;
+                            } else if (activitiesArray[i].equals("9 Timer")) {
+                                activitiesArray[i] = getString(R.string.insight_summary_timer);
+                                imagesArray[i] = R.drawable.ic_stopwatch;
+                            }
                         }
                         if (activitiesArray != null && getContext() != null) {
                             int spinnerSelection = bodyInsightPreferences.getInt("body_insight_spinner_selection", 0);
@@ -254,13 +269,12 @@ public class InsightBodyFragment extends Fragment {
                                     } else if (activitiesArray[position].equals(getString(R.string.insight_summary_moabi))) {
                                         inputType = MOABI;
                                         configureChipGroups();
-                                        //configureSummary(ENERGY, numberOfDays);
-                                        //displayAllInsights(MINDXFITBIT, numberOfDays);
                                     } else if (activitiesArray[position].equals(getString(R.string.insight_summary_activity))) {
                                         inputType = ACTIVITY;
                                         configureChipGroups();
-                                        //configureSummary(ENERGY, numberOfDays);
-                                        //displayAllInsights(MINDXFITBIT, numberOfDays);
+                                    } else if (activitiesArray[position].equals(getString(R.string.insight_summary_timer))) {
+                                        inputType = TIMER;
+                                        configureChipGroups();
                                     }
                                 }
 
@@ -442,123 +456,132 @@ public class InsightBodyFragment extends Fragment {
             });
         } else if (inputType.equals(ACTIVITY)) {
             chipGroup.removeAllViews();
-            Chip step = new Chip(getContext());
-            step.setText(getString(R.string.activity_steps_title));
-            step.setTextAppearanceResource(R.style.ChipTextStyle);
-            step.setCheckable(true);
-            step.setCheckedIconVisible(false);
-            Chip activeMins = new Chip(getContext());
-            activeMins.setText(getString(R.string.activity_active_minutes_title));
-            activeMins.setTextAppearanceResource(R.style.ChipTextStyle);
-            activeMins.setCheckable(true);
-            activeMins.setCheckedIconVisible(false);
-            Chip calories = new Chip(getContext());
-            calories.setText(getString(R.string.activity_calories_title));
-            calories.setTextAppearanceResource(R.style.ChipTextStyle);
-            calories.setCheckable(true);
-            calories.setCheckedIconVisible(false);
-            Chip distance = new Chip(getContext());
-            distance.setText(getString(R.string.activity_distance_title));
-            distance.setTextAppearanceResource(R.style.ChipTextStyle);
-            distance.setCheckable(true);
-            distance.setCheckedIconVisible(false);
-            Chip sedentaryMins = new Chip(getContext());
-            sedentaryMins.setText(getString(R.string.activity_sedentary_minutes_title));
-            sedentaryMins.setTextAppearanceResource(R.style.ChipTextStyle);
-            sedentaryMins.setCheckable(true);
-            sedentaryMins.setCheckedIconVisible(false);
-            chipGroup.addView(activeMins);
-            chipGroup.addView(calories);
-            chipGroup.addView(distance);
-            chipGroup.addView(sedentaryMins);
-            chipGroup.addView(step);
-            activeMins.setChecked(true);
-            configureSummary(getString(R.string.activity_active_minutes_title), numOfDays);
-            chipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(ChipGroup chipGroup, int i) {
-                    Chip checkedChip = chipGroup.findViewById(chipGroup.getCheckedChipId());
-                    if (checkedChip != null) {
-                        Boolean isChecked = checkedChip.isChecked();
-                        if (isChecked) {
-                            configureSummary(checkedChip.getText().toString(), numOfDays);
-                        }
-                    }
-                }
-            });
-        } else if (inputType.equals(APPUSAGE)) {
-            if (getActivity() != null) {
-                appUsageRepository = new AppUsageRepository(getActivity().getApplication());
+            activityViewModel.getActivityEntries(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                    formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                    formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())).observe(
+                    getViewLifecycleOwner(), new Observer<List<BAActivityEntry>>() {
+                        @Override
+                        public void onChanged(List<BAActivityEntry> baActivityEntries) {
+                            if (baActivityEntries != null) {
+                                Set<String> activities = new TreeSet<>();
+                                Map<String, Long> dataMap = new LinkedHashMap<>();
+                                Handler handler = new Handler();
 
-                chipGroup.removeAllViews();
-                Set<Long> dates = new TreeSet<>();
-                Set<String> apps = new TreeSet<>();
-                Handler handler = new Handler();
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        List<AppUsageSummary> appUsageSummaries = appUsageRepository.getAllNow(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
-                                formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                                formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
-                        if (appUsageSummaries != null && appUsageSummaries.size() > 0) {
-                            for (AppUsageSummary appUsageSummary : appUsageSummaries) {
-                                Log.i(TAG, formattedTime.convertLongToYYYYMMDD(appUsageSummary.getDateInLong()));
-                                dates.add(appUsageSummary.getDateInLong());
-                            }
-                            Long start = ((TreeSet<Long>) dates).first();
-                            Long end = ((TreeSet<Long>) dates).last();
-                            Long numDays = TimeUnit.MILLISECONDS.toDays(end - start);
-                            //Log.i(TAG, "Start: " + appUsageSummaries.get(0).getDate() + ", End: " + appUsageSummaries.get(appUsageSummaries.size() - 1).getDate());
-                            Log.i(TAG, "Num of Days: " + TimeUnit.MILLISECONDS.toDays(end - start));
-                            for (AppUsageSummary appUsageSummary : appUsageSummaries) {
-                                Log.i(TAG, formattedTime.convertLongToYYYYMMDD(appUsageSummary.getDateInLong()));
-                                List<AppUsage> appUsages = appUsageSummary.getActivities();
-                                for (AppUsage appUsage : appUsages) {
-                                    if (TimeUnit.MILLISECONDS.toMinutes(appUsage.getTotalTime()) > 5 * numDays) {
-                                        apps.add(appUsage.getAppName());
-                                    }
-                                }
-                            }
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    int i = 0;
-                                    int indexOfTotal = 0;
-                                    for (String name : apps) {
-                                        Chip chip = new Chip(getContext());
-                                        chip.setText(name);
-                                        chip.setTextAppearanceResource(R.style.ChipTextStyle);
-                                        chip.setCheckable(true);
-                                        chip.setCheckedIconVisible(false);
-                                        chipGroup.addView(chip);
-                                        if (name.equals("Total")) {
-                                            indexOfTotal = i;
-                                        } else {
-                                            i++;
-                                        }
-                                    }
-                                    Chip total = (Chip) chipGroup.getChildAt(indexOfTotal);
-                                    total.setChecked(true);
-                                    configureSummary(getString(R.string.phone_usage_total_title), numOfDays);
-                                    chipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
-                                        @Override
-                                        public void onCheckedChanged(ChipGroup chipGroup, int i) {
-                                            Chip checkedChip = chipGroup.findViewById(chipGroup.getCheckedChipId());
-                                            if (checkedChip != null) {
-                                                Boolean isChecked = checkedChip.isChecked();
-                                                if (isChecked) {
-                                                    configureSummary(checkedChip.getText().toString(), numOfDays);
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (baActivityEntries != null && baActivityEntries.size() > 0) {
+                                            for (BAActivityEntry baActivityEntry : baActivityEntries) {
+                                                Log.i(TAG, formattedTime.convertLongToYYYYMMDD(baActivityEntry.getDateInLong()));
+                                                if (dataMap.get(baActivityEntry.getName()) != null) {
+                                                    Long count = dataMap.get(baActivityEntry.getName());
+                                                    dataMap.put(baActivityEntry.getName(), count + 1L);
+                                                } else {
+                                                    dataMap.put(baActivityEntry.getName(), 1L);
                                                 }
+                                                activities.add(baActivityEntry.getName());
                                             }
+
+                                            handler.post(new Runnable() {
+                                                @Override
+                                                public void run() {
+
+                                                    for (String name : activities) {
+                                                        Chip chip = new Chip(getContext());
+                                                        chip.setText(name);
+                                                        chip.setTextAppearanceResource(R.style.ChipTextStyle);
+                                                        chip.setCheckable(true);
+                                                        chip.setCheckedIconVisible(false);
+                                                        chipGroup.addView(chip);
+                                                    }
+                                                    Chip first = (Chip) chipGroup.getChildAt(0);
+                                                    first.setChecked(true);
+                                                    configureSummary(first.getText().toString(), numOfDays);
+                                                    chipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
+                                                        @Override
+                                                        public void onCheckedChanged(ChipGroup chipGroup, int i) {
+                                                            Chip checkedChip = chipGroup.findViewById(chipGroup.getCheckedChipId());
+                                                            if (checkedChip != null) {
+                                                                Boolean isChecked = checkedChip.isChecked();
+                                                                if (isChecked) {
+                                                                    configureSummary(checkedChip.getText().toString(), numOfDays);
+                                                                }
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            });
                                         }
-                                    });
-                                }
-                            });
+                                    }
+                                }).start();
+                            }
                         }
                     }
-                }).start();
-            }
+            );
+        } else if (inputType.equals(TIMER)) {
+            chipGroup.removeAllViews();
+            timedActivityViewModel.getAll(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                    formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                    formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())).observe(
+                    getViewLifecycleOwner(), new Observer<List<TimedActivitySummary>>() {
+                        @Override
+                        public void onChanged(List<TimedActivitySummary> summaries) {
+                            if (summaries != null) {
+                                Set<String> activities = new TreeSet<>();
+                                Map<String, Long> dataMap = new LinkedHashMap<>();
+                                Handler handler = new Handler();
+
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (summaries != null && summaries.size() > 0) {
+                                            for (TimedActivitySummary entry : summaries) {
+                                                Log.i(TAG, formattedTime.convertLongToYYYYMMDD(entry.getDateInLong()));
+                                                if (dataMap.get(entry.getInputName()) != null) {
+                                                    Long old = dataMap.get(entry.getInputName());
+                                                    dataMap.put(entry.getInputName(), old + TimeUnit.MILLISECONDS.toMinutes(entry.getDuration()));
+                                                } else {
+                                                    dataMap.put(entry.getInputName(), TimeUnit.MILLISECONDS.toMinutes(entry.getDuration()));
+                                                }
+                                                activities.add(entry.getInputName());
+                                            }
+
+                                            handler.post(new Runnable() {
+                                                @Override
+                                                public void run() {
+
+                                                    for (String name : activities) {
+                                                        Chip chip = new Chip(getContext());
+                                                        chip.setText(name);
+                                                        chip.setTextAppearanceResource(R.style.ChipTextStyle);
+                                                        chip.setCheckable(true);
+                                                        chip.setCheckedIconVisible(false);
+                                                        chipGroup.addView(chip);
+                                                    }
+                                                    Chip first = (Chip) chipGroup.getChildAt(0);
+                                                    first.setChecked(true);
+                                                    configureSummary(first.getText().toString(), numOfDays);
+                                                    chipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
+                                                        @Override
+                                                        public void onCheckedChanged(ChipGroup chipGroup, int i) {
+                                                            Chip checkedChip = chipGroup.findViewById(chipGroup.getCheckedChipId());
+                                                            if (checkedChip != null) {
+                                                                Boolean isChecked = checkedChip.isChecked();
+                                                                if (isChecked) {
+                                                                    configureSummary(checkedChip.getText().toString(), numOfDays);
+                                                                }
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    }
+                                }).start();
+                            }
+                        }
+                    }
+            );
         }
     }
 
@@ -593,7 +616,7 @@ public class InsightBodyFragment extends Fragment {
                                         for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
                                             if (simpleRegressionSummary.getDepVarTypeString().equals(getString(R.string.fitbit_camel_case)) && activity.replace(" ", "").toLowerCase().trim().equals(simpleRegressionSummary.getDepVar().toLowerCase())) {
                                                 if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals("Total")) {
+                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
                                                         sortedList.add(simpleRegressionSummary);
                                                         //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
                                                     } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) > 5) {
@@ -741,7 +764,7 @@ public class InsightBodyFragment extends Fragment {
                                         for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
                                             if (simpleRegressionSummary.getDepVarTypeString().equals(getString(R.string.googlefit_camel_case)) && activity.replace(" ", "").toLowerCase().trim().equals(simpleRegressionSummary.getDepVar().toLowerCase())) {
                                                 if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals("Total")) {
+                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
                                                         sortedList.add(simpleRegressionSummary);
                                                         //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
                                                     } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) > 5) {
@@ -891,7 +914,7 @@ public class InsightBodyFragment extends Fragment {
                                         for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
                                             if (simpleRegressionSummary.getDepVarTypeString().equals(getString(R.string.moabi_tracker_camel_case)) && activity.replace(" ", "").toLowerCase().trim().equals(simpleRegressionSummary.getDepVar().toLowerCase())) {
                                                 if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals("Total")) {
+                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
                                                         sortedList.add(simpleRegressionSummary);
                                                         //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
                                                     } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) > 5) {
@@ -1025,7 +1048,7 @@ public class InsightBodyFragment extends Fragment {
                                         for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
                                             if (simpleRegressionSummary.getDepVarTypeString().equals(getString(R.string.phone_usage_camel_case))) {
                                                 if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals("Total")) {
+                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
                                                         sortedList.add(simpleRegressionSummary);
                                                     } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) > 5) {
                                                         sortedList.add(simpleRegressionSummary);
@@ -1058,6 +1081,244 @@ public class InsightBodyFragment extends Fragment {
                                                 dataByDayMap.put(formattedDate, oldData + (double) TimeUnit.MILLISECONDS.toMinutes(appUsage.getTotalTime()));
                                             }
                                         }
+                                    }
+                                    int i = 0;
+                                    float bestValue = 0;
+                                    for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
+                                        float entryValue = 0;
+                                        total += entry.getValue();
+                                        if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
+                                            entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
+                                        }
+                                        if (entryValue > bestValue) {
+                                            bestValue = entryValue;
+                                        }
+                                        barEntries.add(new BarEntry(i, entryValue));
+                                        entryDatesList.add(entry.getKey());
+                                        i++;
+                                    }
+
+                                    Log.i(TAG, barEntries.toString());
+                                    Log.i(TAG, dataByDayMap.toString());
+                                    Log.i(TAG, countByDayMap.toString());
+                                    double average = total / listListPair.first.size();
+                                    final float finalValueToPass = bestValue;
+
+                                    Log.i(TAG, activitySummaryMap.toString());
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            averageItemItemAdapter.clear();
+                                            bestAndAverageItemItemAdapter.clear();
+                                            topThreeItemItemAdapter.clear();
+                                            recommendationItemItemAdapter.clear();
+                                            InsightBodyAverageItem averageItem = new InsightBodyAverageItem(activity, activitySummaryMap);
+                                            averageItemItemAdapter.add(averageItem);
+                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(barEntries, entryDatesList, average, finalValueToPass);
+                                            bestAndAverageItemItemAdapter.add(bestAndWorstItem);
+                                            if (sortedList.size() > 0) {
+                                                if (getActivity() != null) {
+                                                    topThreeItemItemAdapter.add(
+                                                            new InsightTopThreeItem(
+                                                                    InsightBodyFragment.this,
+                                                                    getString(R.string.mood_camel_case), sortedList));
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            }).start();
+                        }
+                    }
+                }
+            });
+        } else if (inputType.equals(ACTIVITY)) {
+            InsightSummaryActivityMediatorLiveData insightSummaryActivityMediatorLiveData =
+                    new InsightSummaryActivityMediatorLiveData(activityViewModel.getActivityEntries(
+                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())),
+                            regressionSummaryViewModel.getAllBodySummaries(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                                    now, numOfDays));
+            insightSummaryActivityMediatorLiveData.observe(getViewLifecycleOwner(), new Observer<Pair<List<BAActivityEntry>, List<SimpleRegressionSummary>>>() {
+                @Override
+                public void onChanged(@Nullable Pair<List<BAActivityEntry>, List<SimpleRegressionSummary>> listListPair) {
+                    if (listListPair != null && listListPair.first != null && listListPair.second != null) {
+                        if (listListPair.first.size() > 0) {
+                            Handler handler = new Handler();
+                            Map<String, Double> activitySummaryMap = new LinkedHashMap<>();
+                            final List<String> entryDatesList = new ArrayList<>();
+                            final List<BarEntry> barEntries = new ArrayList<>();
+                            Map<String, Double> dataByDayMap = new LinkedHashMap<>();
+                            Map<String, Long> countByDayMap = new LinkedHashMap<>();
+                            final List<SimpleRegressionSummary> simpleRegressionSummaries = new ArrayList<>();
+                            final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (listListPair.second.size() > 0) {
+                                        simpleRegressionSummaries.addAll(listListPair.second);
+                                        Collections.sort(simpleRegressionSummaries, new SimpleRegressionSummary.BestFitComparator());
+                                        for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
+                                            if (simpleRegressionSummary.getDepVarTypeString().equals(getString(R.string.baactivity_camel_case))) {
+                                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
+                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
+                                                        sortedList.add(simpleRegressionSummary);
+                                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) > 5) {
+                                                        sortedList.add(simpleRegressionSummary);
+                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                                    }
+                                                } else {
+                                                    sortedList.add(simpleRegressionSummary);
+                                                }
+                                                //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
+                                            }
+                                        }
+                                    }
+                                    for (int i = 1; i <= numOfDays; i++) {
+                                        String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                                        String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
+                                        //Log.i(TAG, date);
+                                        dataByDayMap.put(date, 0d);
+                                        countByDayMap.put(date, 0L);
+                                    }
+                                    double total = 0;
+                                    for (BAActivityEntry entry : listListPair.first) {
+                                        String yyyyMMDDDate = formattedTime.convertLongToYYYYMMDD(entry.getDateInLong());
+                                        if (entry.getName().equals(activity)) {
+                                            if (activitySummaryMap.get(yyyyMMDDDate) != null) {
+                                                Double count = activitySummaryMap.get(yyyyMMDDDate);
+                                                activitySummaryMap.put(yyyyMMDDDate, count + 1d);
+                                            } else {
+                                                activitySummaryMap.put(yyyyMMDDDate, 1d);
+                                            }
+                                        }
+                                    }
+                                    for (Map.Entry<String, Double> entry: activitySummaryMap.entrySet()) {
+                                        String eeeDate = formattedTime.convertStringYYYYMMDDToEEE(entry.getKey());
+                                        Long oldCount = countByDayMap.get(eeeDate);
+                                        countByDayMap.put(eeeDate, oldCount + 1L);
+                                        Double oldData = dataByDayMap.get(eeeDate);
+                                        dataByDayMap.put(eeeDate, oldData + entry.getValue());
+                                    }
+                                    int i = 0;
+                                    float bestValue = 0;
+                                    for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
+                                        float entryValue = 0;
+                                        total += entry.getValue();
+                                        if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
+                                            entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
+                                        }
+                                        if (entryValue > bestValue) {
+                                            bestValue = entryValue;
+                                        }
+                                        barEntries.add(new BarEntry(i, entryValue));
+                                        entryDatesList.add(entry.getKey());
+                                        i++;
+                                    }
+
+                                    Log.i(TAG, barEntries.toString());
+                                    Log.i(TAG, dataByDayMap.toString());
+                                    Log.i(TAG, countByDayMap.toString());
+                                    double average = total / listListPair.first.size();
+                                    final float finalValueToPass = bestValue;
+
+                                    Log.i(TAG, activitySummaryMap.toString());
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            averageItemItemAdapter.clear();
+                                            bestAndAverageItemItemAdapter.clear();
+                                            topThreeItemItemAdapter.clear();
+                                            recommendationItemItemAdapter.clear();
+                                            InsightBodyAverageItem averageItem = new InsightBodyAverageItem(activity, activitySummaryMap);
+                                            averageItemItemAdapter.add(averageItem);
+                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(barEntries, entryDatesList, average, finalValueToPass);
+                                            bestAndAverageItemItemAdapter.add(bestAndWorstItem);
+                                            if (sortedList.size() > 0) {
+                                                if (getActivity() != null) {
+                                                    topThreeItemItemAdapter.add(
+                                                            new InsightTopThreeItem(
+                                                                    InsightBodyFragment.this,
+                                                                    getString(R.string.mood_camel_case), sortedList));
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            }).start();
+                        }
+                    }
+                }
+            });
+        } else if (inputType.equals(TIMER)) {
+            InsightSummaryTimerMediatorLiveData insightSummaryTimerMediatorLiveData =
+                    new InsightSummaryTimerMediatorLiveData(timedActivityViewModel.getAll(
+                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())),
+                            regressionSummaryViewModel.getAllBodySummaries(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                                    now, numOfDays));
+            insightSummaryTimerMediatorLiveData.observe(getViewLifecycleOwner(), new Observer<Pair<List<TimedActivitySummary>, List<SimpleRegressionSummary>>>() {
+                @Override
+                public void onChanged(@Nullable Pair<List<TimedActivitySummary>, List<SimpleRegressionSummary>> listListPair) {
+                    if (listListPair != null && listListPair.first != null && listListPair.second != null) {
+                        if (listListPair.first.size() > 0) {
+                            Handler handler = new Handler();
+                            Map<String, Double> activitySummaryMap = new LinkedHashMap<>();
+                            final List<String> entryDatesList = new ArrayList<>();
+                            final List<BarEntry> barEntries = new ArrayList<>();
+                            Map<String, Double> dataByDayMap = new LinkedHashMap<>();
+                            Map<String, Long> countByDayMap = new LinkedHashMap<>();
+                            final List<SimpleRegressionSummary> simpleRegressionSummaries = new ArrayList<>();
+                            final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (listListPair.second.size() > 0) {
+                                        simpleRegressionSummaries.addAll(listListPair.second);
+                                        Collections.sort(simpleRegressionSummaries, new SimpleRegressionSummary.BestFitComparator());
+                                        for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
+                                            if (simpleRegressionSummary.getDepVarTypeString().equals(getString(R.string.timer_camel_case))) {
+                                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
+                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
+                                                        sortedList.add(simpleRegressionSummary);
+                                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) > 5) {
+                                                        sortedList.add(simpleRegressionSummary);
+                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                                    }
+                                                } else {
+                                                    sortedList.add(simpleRegressionSummary);
+                                                }
+                                                //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
+                                            }
+                                        }
+                                    }
+                                    for (int i = 1; i <= numOfDays; i++) {
+                                        String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                                        String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
+                                        //Log.i(TAG, date);
+                                        dataByDayMap.put(date, 0d);
+                                        countByDayMap.put(date, 0L);
+                                    }
+                                    double total = 0;
+                                    for (TimedActivitySummary entry : listListPair.first) {
+                                        String yyyyMMDDDate = formattedTime.convertLongToYYYYMMDD(entry.getDateInLong());
+                                        if (entry.getInputName().equals(activity)) {
+                                            if (activitySummaryMap.get(yyyyMMDDDate) != null) {
+                                                Double old = activitySummaryMap.get(yyyyMMDDDate);
+                                                activitySummaryMap.put(yyyyMMDDDate, old + TimeUnit.MILLISECONDS.toMinutes(entry.getDuration()));
+                                            } else {
+                                                activitySummaryMap.put(yyyyMMDDDate, (double) TimeUnit.MILLISECONDS.toMinutes(entry.getDuration()));
+                                            }
+                                        }
+                                    }
+                                    for (Map.Entry<String, Double> entry: activitySummaryMap.entrySet()) {
+                                        String eeeDate = formattedTime.convertStringYYYYMMDDToEEE(entry.getKey());
+                                        Long oldCount = countByDayMap.get(eeeDate);
+                                        countByDayMap.put(eeeDate, oldCount + 1L);
+                                        Double oldData = dataByDayMap.get(eeeDate);
+                                        dataByDayMap.put(eeeDate, oldData + entry.getValue());
                                     }
                                     int i = 0;
                                     float bestValue = 0;

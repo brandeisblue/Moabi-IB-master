@@ -348,7 +348,7 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
                 indepVarTextView.setText("use " + independentVar);
                 recommendedGoalTextView.setText(recommendedGoal);
                 currentGoalTextView.setText(averageActivityLevel);
-                if (independentVar.contains("Total")) {
+                if (independentVar.contains(itemView.getContext().getString(R.string.phone_usage_total_title))) {
                     indepVarTextView.setText("use phone");
                 }
                 if (Double.compare(recommendedGoalDouble, averageActivityLevelDouble) < 0) {

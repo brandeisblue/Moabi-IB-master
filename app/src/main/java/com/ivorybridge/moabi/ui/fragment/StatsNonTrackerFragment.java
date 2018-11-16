@@ -482,7 +482,7 @@ public class StatsNonTrackerFragment extends Fragment {
                                     if (appUsageSummary.getDate().equals(date)) {
                                         List<AppUsage> appUsageList = appUsageSummary.getActivities();
                                         for (AppUsage appUsage : appUsageList) {
-                                            if (appUsage.getAppName().equals("Total")) {
+                                            if (appUsage.getAppName().equals(getString(R.string.phone_usage_total_title))) {
                                                 entries.put(appUsageSummary.getDate(), appUsage.getTotalTime());
                                                 barEntries.add(new BarEntry(i, appUsage.getTotalTime()));
                                                 total += appUsage.getTotalTime();
@@ -563,7 +563,7 @@ public class StatsNonTrackerFragment extends Fragment {
                                     if (YYYW.equals(formattedTime.convertLongToYYYYW(appUsageSummary.getDateInLong()))) {
                                         List<AppUsage> appUsages = appUsageSummary.getActivities();
                                         for (AppUsage appUsage : appUsages) {
-                                            if (appUsage.getAppName().equals("Total")) {
+                                            if (appUsage.getAppName().equals(getString(R.string.phone_usage_total_title))) {
                                                 weeklyTotal += appUsage.getTotalTime();
                                             }
                                         }
@@ -646,7 +646,7 @@ public class StatsNonTrackerFragment extends Fragment {
                                     if (YYYYMM.equals(formattedTime.convertLongToYYYYMM(appUsageSummary.getDateInLong()))) {
                                         List<AppUsage> appUsages = appUsageSummary.getActivities();
                                         for (AppUsage appUsage : appUsages) {
-                                            if (appUsage.getAppName().equals("Total")) {
+                                            if (appUsage.getAppName().equals(getString(R.string.phone_usage_total_title))) {
                                                 monthlyTotal += appUsage.getTotalTime();
                                             }
                                         }

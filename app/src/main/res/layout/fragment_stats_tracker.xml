@@ -91,7 +91,7 @@
                 android:layout_height="36dp"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Total"
+                android:text="@string/phone_usage_total_title"
                 android:textColor="@color/black" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

@@ -239,6 +239,12 @@ public class FormattedTime {
         return df.format(date);
     }
 
+    public String convertLongToEEE(Long time) {
+        Date date = new Date(time);
+        DateFormat df = new SimpleDateFormat("EEE", Locale.US);
+        return df.format(date);
+    }
+
     public String convertStringHMToHMMAA(String date) {
         DateFormat df = new SimpleDateFormat("h:m", Locale.US);
         DateFormat df2 = new SimpleDateFormat("h:mm aa", Locale.US);

@@ -33,6 +33,8 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.ivorybridge.moabi.R;
+import com.ivorybridge.moabi.database.entity.appusage.AppUsage;
+import com.ivorybridge.moabi.database.entity.appusage.AppUsageSummary;
 import com.ivorybridge.moabi.database.entity.builtinfitness.BuiltInActivitySummary;
 import com.ivorybridge.moabi.database.entity.fitbit.FitbitActivitySummary;
 import com.ivorybridge.moabi.database.entity.fitbit.FitbitDailySummary;
@@ -40,10 +42,13 @@ import com.ivorybridge.moabi.database.entity.fitbit.FitbitSleepSummary;
 import com.ivorybridge.moabi.database.entity.googlefit.GoogleFitSummary;
 import com.ivorybridge.moabi.database.entity.timedactivity.TimedActivitySummary;
 import com.ivorybridge.moabi.database.entity.weather.WeatherDailySummary;
+import com.ivorybridge.moabi.repository.AppUsageRepository;
+import com.ivorybridge.moabi.repository.TimedActivityRepository;
 import com.ivorybridge.moabi.ui.adapter.IconSpinnerAdapter;
 import com.ivorybridge.moabi.ui.recyclerviewitem.stats.MeansAndSumItem;
 import com.ivorybridge.moabi.ui.util.FitnessTrackerBarChartMarkerView;
 import com.ivorybridge.moabi.util.FormattedTime;
+import com.ivorybridge.moabi.viewmodel.AppUsageViewModel;
 import com.ivorybridge.moabi.viewmodel.BuiltInFitnessViewModel;
 import com.ivorybridge.moabi.viewmodel.FitbitViewModel;
 import com.ivorybridge.moabi.viewmodel.GoogleFitViewModel;
@@ -58,6 +63,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -110,6 +116,9 @@ public class StatsTrackerFragment extends Fragment {
     private BuiltInFitnessViewModel builtInFitnessViewModel;
     private WeatherViewModel weatherViewModel;
     private TimedActivityViewModel timedActivityViewModel;
+    private AppUsageViewModel phoneUsageViewModel;
+    private TimedActivityRepository timedActivityRepository;
+    private AppUsageRepository appUsageRepository;
     private FormattedTime formattedTime;
     private FastAdapter<IItem> statsRecyclerAdapter;
     private ItemAdapter<MeansAndSumItem> meansAndSumItemAdapter;
@@ -120,6 +129,7 @@ public class StatsTrackerFragment extends Fragment {
     private SharedPreferences builtInFitnessSharedPreferences;
     private SharedPreferences weatherSharedPreferences;
     private SharedPreferences timedActivitySharedPreferences;
+    private SharedPreferences phoneUsageSharedPreferences;
     private Context context;
 
     @Override
@@ -149,6 +159,8 @@ public class StatsTrackerFragment extends Fragment {
                 getString(R.string.com_ivorybridge_moabi_WEATHER_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
         timedActivitySharedPreferences = context.getSharedPreferences(
                 getString(R.string.com_ivorybridge_moabi_TIMED_ACTIVITY_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
+        phoneUsageSharedPreferences = context.getSharedPreferences(
+                getString(R.string.com_ivorybridge_moabi_APP_USAGE_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
         radioGroup.setTintColor(ContextCompat.getColor(context, R.color.colorPrimary), Color.WHITE);
         radioGroup.setUnCheckedTintColor(Color.WHITE, Color.BLACK);
         fitbitViewModel = ViewModelProviders.of(this).get(FitbitViewModel.class);
@@ -156,6 +168,7 @@ public class StatsTrackerFragment extends Fragment {
         builtInFitnessViewModel = ViewModelProviders.of(this).get(BuiltInFitnessViewModel.class);
         weatherViewModel = ViewModelProviders.of(this).get(WeatherViewModel.class);
         timedActivityViewModel = ViewModelProviders.of(this).get(TimedActivityViewModel.class);
+        phoneUsageViewModel = ViewModelProviders.of(this).get(AppUsageViewModel.class);
         statsRecyclerAdapter = new FastAdapter<>();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(context,
@@ -217,92 +230,92 @@ public class StatsTrackerFragment extends Fragment {
                                     FitbitActivitySummary activitySummary = dailySummary.getActivitySummary();
                                     FitbitSleepSummary sleepSummary = dailySummary.getSleepSummary();
                                     if (activitySummary.getSummary().getFairlyActiveMinutes() != null && activitySummary.getSummary().getVeryActiveMinutes() != null) {
-                                        if (activitySummaryMap.get(getString(R.string.activity_active_minutes_camel_case)) != null) {
-                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_active_minutes_camel_case));
+                                        if (activitySummaryMap.get(getString(R.string.activity_active_minutes_title)) != null) {
+                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_active_minutes_title));
                                             if (old != null) {
-                                                activitySummaryMap.put(getString(R.string.activity_active_minutes_camel_case), old + activitySummary.getSummary().getFairlyActiveMinutes() + activitySummary.getSummary().getVeryActiveMinutes());
+                                                activitySummaryMap.put(getString(R.string.activity_active_minutes_title), old + activitySummary.getSummary().getFairlyActiveMinutes() + activitySummary.getSummary().getVeryActiveMinutes());
                                             }
                                         } else {
                                             Long activeMins = activitySummary.getSummary().getFairlyActiveMinutes() + activitySummary.getSummary().getVeryActiveMinutes();
-                                            activitySummaryMap.put(getString(R.string.activity_active_minutes_camel_case), activeMins);
+                                            activitySummaryMap.put(getString(R.string.activity_active_minutes_title), activeMins);
                                         }
                                     } else {
-                                        activitySummaryMap.put(getString(R.string.activity_active_minutes_camel_case), 0L);
+                                        activitySummaryMap.put(getString(R.string.activity_active_minutes_title), 0L);
                                     }
                                     if (activitySummary.getSummary().getCaloriesOut() != null) {
-                                        if (activitySummaryMap.get(getString(R.string.activity_calories_camel_case)) != null) {
-                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_calories_camel_case));
+                                        if (activitySummaryMap.get(getString(R.string.activity_calories_title)) != null) {
+                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_calories_title));
                                             if (old != null) {
-                                                activitySummaryMap.put(getString(R.string.activity_calories_camel_case), old + activitySummary.getSummary().getCaloriesOut());
+                                                activitySummaryMap.put(getString(R.string.activity_calories_title), old + activitySummary.getSummary().getCaloriesOut());
                                             }
                                         } else {
-                                            activitySummaryMap.put(getString(R.string.activity_calories_camel_case), activitySummary.getSummary().getCaloriesOut());
+                                            activitySummaryMap.put(getString(R.string.activity_calories_title), activitySummary.getSummary().getCaloriesOut());
                                         }
                                     } else {
-                                        activitySummaryMap.put(getString(R.string.activity_calories_camel_case), 0L);
+                                        activitySummaryMap.put(getString(R.string.activity_calories_title), 0L);
                                     }
                                     if (activitySummary.getSummary().getDistances().get(0) != null && activitySummary.getSummary().getDistances().get(0).getDistance() != null) {
-                                        if (activitySummaryMap.get(getString(R.string.activity_distance_camel_case)) != null) {
-                                            Double old = (Double) activitySummaryMap.get(getString(R.string.activity_distance_camel_case));
+                                        if (activitySummaryMap.get(getString(R.string.activity_distance_title)) != null) {
+                                            Double old = (Double) activitySummaryMap.get(getString(R.string.activity_distance_title));
                                             if (old != null) {
-                                                activitySummaryMap.put(getString(R.string.activity_distance_camel_case), old + activitySummary.getSummary().getDistances().get(0).getDistance());
+                                                activitySummaryMap.put(getString(R.string.activity_distance_title), old + activitySummary.getSummary().getDistances().get(0).getDistance());
                                             }
                                         } else {
                                             Double distance = activitySummary.getSummary().getDistances().get(0).getDistance();
-                                            activitySummaryMap.put(getString(R.string.activity_distance_camel_case), distance);
+                                            activitySummaryMap.put(getString(R.string.activity_distance_title), distance);
                                         }
                                     } else {
-                                        activitySummaryMap.put(getString(R.string.activity_distance_camel_case), 0f);
+                                        activitySummaryMap.put(getString(R.string.activity_distance_title), 0f);
                                     }
 
                                     if (activitySummary.getSummary().getFloors() != null) {
-                                        if (activitySummaryMap.get(getString(R.string.activity_floors_camel_case)) != null) {
-                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_floors_camel_case));
+                                        if (activitySummaryMap.get(getString(R.string.activity_floors_title)) != null) {
+                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_floors_title));
                                             if (old != null) {
-                                                activitySummaryMap.put(getString(R.string.activity_floors_camel_case), old + activitySummary.getSummary().getFloors());
+                                                activitySummaryMap.put(getString(R.string.activity_floors_title), old + activitySummary.getSummary().getFloors());
                                             }
                                         } else {
-                                            activitySummaryMap.put(getString(R.string.activity_floors_camel_case), activitySummary.getSummary().getFloors());
+                                            activitySummaryMap.put(getString(R.string.activity_floors_title), activitySummary.getSummary().getFloors());
                                         }
                                     } else {
-                                        activitySummaryMap.put(getString(R.string.activity_floors_camel_case), 0L);
+                                        activitySummaryMap.put(getString(R.string.activity_floors_title), 0L);
                                     }
                                     if (activitySummary.getSummary().getSedentaryMinutes() != null) {
-                                        if (activitySummaryMap.get(getString(R.string.activity_sedentary_minutes_camel_case)) != null) {
-                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_sedentary_minutes_camel_case));
+                                        if (activitySummaryMap.get(getString(R.string.activity_sedentary_minutes_title)) != null) {
+                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_sedentary_minutes_title));
                                             if (old != null) {
-                                                activitySummaryMap.put(getString(R.string.activity_sedentary_minutes_camel_case), old + activitySummary.getSummary().getSedentaryMinutes());
+                                                activitySummaryMap.put(getString(R.string.activity_sedentary_minutes_title), old + activitySummary.getSummary().getSedentaryMinutes());
                                             }
                                         } else {
-                                            activitySummaryMap.put(getString(R.string.activity_sedentary_minutes_camel_case), activitySummary.getSummary().getSedentaryMinutes());
+                                            activitySummaryMap.put(getString(R.string.activity_sedentary_minutes_title), activitySummary.getSummary().getSedentaryMinutes());
                                         }
                                     } else {
-                                        activitySummaryMap.put(getString(R.string.activity_sedentary_minutes_camel_case), 0L);
+                                        activitySummaryMap.put(getString(R.string.activity_sedentary_minutes_title), 0L);
                                     }
 
                                     if (sleepSummary.getSummary().getTotalMinutesAsleep() != null) {
-                                        if (activitySummaryMap.get(getString(R.string.activity_sleep_camel_case)) != null) {
-                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_sleep_camel_case));
+                                        if (activitySummaryMap.get(getString(R.string.activity_sleep_title)) != null) {
+                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_sleep_title));
                                             if (old != null) {
-                                                activitySummaryMap.put(getString(R.string.activity_sleep_camel_case), old + sleepSummary.getSummary().getTotalMinutesAsleep());
+                                                activitySummaryMap.put(getString(R.string.activity_sleep_title), old + sleepSummary.getSummary().getTotalMinutesAsleep());
                                             }
                                         } else {
-                                            activitySummaryMap.put(getString(R.string.activity_sleep_camel_case), sleepSummary.getSummary().getTotalMinutesAsleep());
+                                            activitySummaryMap.put(getString(R.string.activity_sleep_title), sleepSummary.getSummary().getTotalMinutesAsleep());
                                         }
                                     } else {
-                                        activitySummaryMap.put(getString(R.string.activity_sleep_camel_case), 0L);
+                                        activitySummaryMap.put(getString(R.string.activity_sleep_title), 0L);
                                     }
                                     if (activitySummary.getSummary().getSteps() != null) {
-                                        if (activitySummaryMap.get(getString(R.string.activity_steps_camel_case)) != null) {
-                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_steps_camel_case));
+                                        if (activitySummaryMap.get(getString(R.string.activity_steps_title)) != null) {
+                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_steps_title));
                                             if (old != null) {
-                                                activitySummaryMap.put(getString(R.string.activity_steps_camel_case), old + activitySummary.getSummary().getSteps());
+                                                activitySummaryMap.put(getString(R.string.activity_steps_title), old + activitySummary.getSummary().getSteps());
                                             }
                                         } else {
-                                            activitySummaryMap.put(getString(R.string.activity_steps_camel_case), activitySummary.getSummary().getSteps());
+                                            activitySummaryMap.put(getString(R.string.activity_steps_title), activitySummary.getSummary().getSteps());
                                         }
                                     } else {
-                                        activitySummaryMap.put(getString(R.string.activity_steps_camel_case), 0L);
+                                        activitySummaryMap.put(getString(R.string.activity_steps_title), 0L);
                                     }
 
                                 }
@@ -321,25 +334,25 @@ public class StatsTrackerFragment extends Fragment {
                                             String[] activitiesArray = activitiesSet.toArray(new String[0]);
                                             int[] imagesArray = new int[activitiesSet.size()];
                                             for (int i = 0; i < activitiesArray.length; i++) {
-                                                if (activitiesArray[i].equals(getString(R.string.activity_steps_camel_case))) {
+                                                if (activitiesArray[i].equals(getString(R.string.activity_steps_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_steps_title);
                                                     imagesArray[i] = R.drawable.ic_steps_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_calories_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_calories_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_calories_title);
                                                     imagesArray[i] = R.drawable.ic_calories_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_floors_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_floors_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_floors_title);
                                                     imagesArray[i] = R.drawable.ic_floors_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_sedentary_minutes_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_sedentary_minutes_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_sedentary_minutes_title);
                                                     imagesArray[i] = R.drawable.ic_sedentary_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_active_minutes_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_active_minutes_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_active_minutes_title);
                                                     imagesArray[i] = R.drawable.ic_active_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_distance_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_distance_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_distance_title);
                                                     imagesArray[i] = R.drawable.ic_distance_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_sleep_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_sleep_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_sleep_title);
                                                     imagesArray[i] = R.drawable.ic_sleep_black;
                                                 } else if (activitiesArray[i].equals("0 Summary")) {
@@ -406,21 +419,49 @@ public class StatsTrackerFragment extends Fragment {
                                 for (GoogleFitSummary dailySummary : googleFitSummaries) {
                                     List<GoogleFitSummary.Summary> summaries = dailySummary.getSummaries();
                                     for (GoogleFitSummary.Summary summary : summaries) {
-
                                         String name = summary.getName();
-                                        /*//name = name.substring(0, 1).toUpperCase() + name.substring(1);
-                                        if (name.equals("Activeminutes")) {
-                                            name = getString(R.string.activity_active_minutes_camel_case);
+                                        if (name.equals(getString(R.string.activity_steps_camel_case))) {
+                                            String title = getString(R.string.activity_steps_title);
+                                            if (activitySummaryMap.get(title) != null) {
+                                                Double old = (Double) activitySummaryMap.get(title);
+                                                activitySummaryMap.put(title, old + summary.getValue());
+                                            } else {
+                                                activitySummaryMap.put(title, summary.getValue());
+                                            }
+                                        } else if (name.equals(getString(R.string.activity_active_minutes_camel_case))) {
+                                            String title = getString(R.string.activity_active_minutes_title);
+                                            if (activitySummaryMap.get(title) != null) {
+                                                Double old = (Double) activitySummaryMap.get(title);
+                                                activitySummaryMap.put(title, old + summary.getValue());
+                                            } else {
+                                                activitySummaryMap.put(title, summary.getValue());
+                                            }
+                                        } else if (name.equals(getString(R.string.activity_sedentary_minutes_camel_case))) {
+                                            String title = getString(R.string.activity_sedentary_minutes_title);
+                                            if (activitySummaryMap.get(title) != null) {
+                                                Double old = (Double) activitySummaryMap.get(title);
+                                                activitySummaryMap.put(title, old + summary.getValue());
+                                            } else {
+                                                activitySummaryMap.put(title, summary.getValue());
+                                            }
+                                        } else if (name.equals(getString(R.string.activity_distance_camel_case))) {
+                                            String title = getString(R.string.activity_distance_title);
+                                            if (activitySummaryMap.get(title) != null) {
+                                                Double old = (Double) activitySummaryMap.get(title);
+                                                activitySummaryMap.put(title, old + summary.getValue());
+                                            } else {
+                                                activitySummaryMap.put(title, summary.getValue());
+                                            }
+                                        } else if (name.equals(getString(R.string.activity_calories_camel_case))) {
+                                            String title = getString(R.string.activity_calories_title);
+                                            if (activitySummaryMap.get(title) != null) {
+                                                Double old = (Double) activitySummaryMap.get(title);
+                                                activitySummaryMap.put(title, old + summary.getValue());
+                                            } else {
+                                                activitySummaryMap.put(title, summary.getValue());
+                                            }
                                         }
-                                        if (name.equals("Sedentaryminutes")) {
-                                            name = getString(R.string.activity_sedentary_minutes_camel_case);
-                                        }*/
-                                        if (activitySummaryMap.get(name) != null) {
-                                            Double old = (Double) activitySummaryMap.get(name);
-                                            activitySummaryMap.put(name, old + summary.getValue());
-                                        } else {
-                                            activitySummaryMap.put(name, summary.getValue());
-                                        }
+
                                     }
                                 }
                                 Log.i(TAG, activitySummaryMap.toString());
@@ -436,25 +477,25 @@ public class StatsTrackerFragment extends Fragment {
                                             String[] activitiesArray = activitiesSet.toArray(new String[0]);
                                             int[] imagesArray = new int[activitiesSet.size()];
                                             for (int i = 0; i < activitiesArray.length; i++) {
-                                                if (activitiesArray[i].equals(getString(R.string.activity_steps_camel_case))) {
+                                                if (activitiesArray[i].equals(getString(R.string.activity_steps_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_steps_title);
                                                     imagesArray[i] = R.drawable.ic_steps_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_calories_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_calories_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_calories_title);
                                                     imagesArray[i] = R.drawable.ic_calories_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_floors_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_floors_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_floors_title);
                                                     imagesArray[i] = R.drawable.ic_floors_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_sedentary_minutes_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_sedentary_minutes_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_sedentary_minutes_title);
                                                     imagesArray[i] = R.drawable.ic_sedentary_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_active_minutes_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_active_minutes_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_active_minutes_title);
                                                     imagesArray[i] = R.drawable.ic_active_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_distance_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_distance_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_distance_title);
                                                     imagesArray[i] = R.drawable.ic_distance_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_sleep_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_sleep_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_sleep_title);
                                                     imagesArray[i] = R.drawable.ic_sleep_black;
                                                 } else if (activitiesArray[i].equals("0 Summary")) {
@@ -523,66 +564,66 @@ public class StatsTrackerFragment extends Fragment {
                             public void run() {
                                 for (BuiltInActivitySummary dailySummary : activitySummaries) {
                                     if (dailySummary.getActiveMinutes() != null) {
-                                        if (activitySummaryMap.get(getString(R.string.activity_active_minutes_camel_case)) != null) {
-                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_active_minutes_camel_case));
+                                        if (activitySummaryMap.get(getString(R.string.activity_active_minutes_title)) != null) {
+                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_active_minutes_title));
                                             if (old != null) {
-                                                activitySummaryMap.put(getString(R.string.activity_active_minutes_camel_case), old + TimeUnit.MILLISECONDS.toMinutes(dailySummary.getActiveMinutes()));
+                                                activitySummaryMap.put(getString(R.string.activity_active_minutes_title), old + TimeUnit.MILLISECONDS.toMinutes(dailySummary.getActiveMinutes()));
                                             }
                                         } else {
                                             Long activeMins = TimeUnit.MILLISECONDS.toMinutes(dailySummary.getActiveMinutes());
-                                            activitySummaryMap.put(getString(R.string.activity_active_minutes_camel_case), activeMins);
+                                            activitySummaryMap.put(getString(R.string.activity_active_minutes_title), activeMins);
                                         }
                                     } else {
-                                        activitySummaryMap.put(getString(R.string.activity_active_minutes_camel_case), 0L);
+                                        activitySummaryMap.put(getString(R.string.activity_active_minutes_title), 0L);
                                     }
                                     if (dailySummary.getCalories() != null) {
-                                        if (activitySummaryMap.get(getString(R.string.activity_calories_camel_case)) != null) {
-                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_calories_camel_case));
+                                        if (activitySummaryMap.get(getString(R.string.activity_calories_title)) != null) {
+                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_calories_title));
                                             if (old != null) {
-                                                activitySummaryMap.put(getString(R.string.activity_calories_camel_case), old + dailySummary.getCalories().longValue());
+                                                activitySummaryMap.put(getString(R.string.activity_calories_title), old + dailySummary.getCalories().longValue());
                                             }
                                         } else {
-                                            activitySummaryMap.put(getString(R.string.activity_calories_camel_case), dailySummary.getCalories().longValue());
+                                            activitySummaryMap.put(getString(R.string.activity_calories_title), dailySummary.getCalories().longValue());
                                         }
                                     } else {
-                                        activitySummaryMap.put(getString(R.string.activity_calories_camel_case), 0L);
+                                        activitySummaryMap.put(getString(R.string.activity_calories_title), 0L);
                                     }
                                     if (dailySummary.getDistance() != null) {
-                                        if (activitySummaryMap.get(getString(R.string.activity_distance_camel_case)) != null) {
-                                            Double old = (Double) activitySummaryMap.get(getString(R.string.activity_distance_camel_case));
+                                        if (activitySummaryMap.get(getString(R.string.activity_distance_title)) != null) {
+                                            Double old = (Double) activitySummaryMap.get(getString(R.string.activity_distance_title));
                                             if (old != null) {
-                                                activitySummaryMap.put(getString(R.string.activity_distance_camel_case), old + dailySummary.getDistance() / 1000);
+                                                activitySummaryMap.put(getString(R.string.activity_distance_title), old + dailySummary.getDistance() / 1000);
                                             }
                                         } else {
                                             Double distance = dailySummary.getDistance() / 1000;
-                                            activitySummaryMap.put(getString(R.string.activity_distance_camel_case), distance);
+                                            activitySummaryMap.put(getString(R.string.activity_distance_title), distance);
                                         }
                                     } else {
-                                        activitySummaryMap.put(getString(R.string.activity_distance_camel_case), 0f);
+                                        activitySummaryMap.put(getString(R.string.activity_distance_title), 0f);
                                     }
                                     if (dailySummary.getSedentaryMinutes() != null) {
-                                        if (activitySummaryMap.get(getString(R.string.activity_sedentary_minutes_camel_case)) != null) {
-                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_sedentary_minutes_camel_case));
+                                        if (activitySummaryMap.get(getString(R.string.activity_sedentary_minutes_title)) != null) {
+                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_sedentary_minutes_title));
                                             if (old != null) {
-                                                activitySummaryMap.put(getString(R.string.activity_sedentary_minutes_camel_case), old + TimeUnit.MILLISECONDS.toMinutes(dailySummary.getSedentaryMinutes()));
+                                                activitySummaryMap.put(getString(R.string.activity_sedentary_minutes_title), old + TimeUnit.MILLISECONDS.toMinutes(dailySummary.getSedentaryMinutes()));
                                             }
                                         } else {
-                                            activitySummaryMap.put(getString(R.string.activity_sedentary_minutes_camel_case), TimeUnit.MILLISECONDS.toMinutes(dailySummary.getSedentaryMinutes()));
+                                            activitySummaryMap.put(getString(R.string.activity_sedentary_minutes_title), TimeUnit.MILLISECONDS.toMinutes(dailySummary.getSedentaryMinutes()));
                                         }
                                     } else {
-                                        activitySummaryMap.put(getString(R.string.activity_sedentary_minutes_camel_case), 0L);
+                                        activitySummaryMap.put(getString(R.string.activity_sedentary_minutes_title), 0L);
                                     }
                                     if (dailySummary.getSteps() != null) {
-                                        if (activitySummaryMap.get(getString(R.string.activity_steps_camel_case)) != null) {
-                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_steps_camel_case));
+                                        if (activitySummaryMap.get(getString(R.string.activity_steps_title)) != null) {
+                                            Long old = (Long) activitySummaryMap.get(getString(R.string.activity_steps_title));
                                             if (old != null) {
-                                                activitySummaryMap.put(getString(R.string.activity_steps_camel_case), old + dailySummary.getSteps());
+                                                activitySummaryMap.put(getString(R.string.activity_steps_title), old + dailySummary.getSteps());
                                             }
                                         } else {
-                                            activitySummaryMap.put(getString(R.string.activity_steps_camel_case), dailySummary.getSteps());
+                                            activitySummaryMap.put(getString(R.string.activity_steps_title), dailySummary.getSteps());
                                         }
                                     } else {
-                                        activitySummaryMap.put(getString(R.string.activity_steps_camel_case), 0L);
+                                        activitySummaryMap.put(getString(R.string.activity_steps_title), 0L);
                                     }
 
                                 }
@@ -601,19 +642,19 @@ public class StatsTrackerFragment extends Fragment {
                                             String[] activitiesArray = activitiesSet.toArray(new String[0]);
                                             int[] imagesArray = new int[activitiesSet.size()];
                                             for (int i = 0; i < activitiesArray.length; i++) {
-                                                if (activitiesArray[i].equals(getString(R.string.activity_steps_camel_case))) {
+                                                if (activitiesArray[i].equals(getString(R.string.activity_steps_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_steps_title);
                                                     imagesArray[i] = R.drawable.ic_steps_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_calories_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_calories_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_calories_title);
                                                     imagesArray[i] = R.drawable.ic_calories_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_sedentary_minutes_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_sedentary_minutes_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_sedentary_minutes_title);
                                                     imagesArray[i] = R.drawable.ic_sedentary_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_active_minutes_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_active_minutes_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_active_minutes_title);
                                                     imagesArray[i] = R.drawable.ic_active_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.activity_distance_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.activity_distance_title))) {
                                                     activitiesArray[i] = getString(R.string.activity_distance_title);
                                                     imagesArray[i] = R.drawable.ic_distance_black;
                                                 } else if (activitiesArray[i].equals("0 Summary")) {
@@ -678,26 +719,26 @@ public class StatsTrackerFragment extends Fragment {
                             @Override
                             public void run() {
                                 for (WeatherDailySummary dailySummary : summaries) {
-                                    if (activitySummaryMap.get(getString(R.string.precipitation_camel_case)) != null) {
-                                        double old = (Double) activitySummaryMap.get(getString(R.string.precipitation_camel_case));
-                                        activitySummaryMap.put(getString(R.string.precipitation_camel_case), old + dailySummary.getTotalPrecipmm());
+                                    if (activitySummaryMap.get(getString(R.string.precipitation_title)) != null) {
+                                        double old = (Double) activitySummaryMap.get(getString(R.string.precipitation_title));
+                                        activitySummaryMap.put(getString(R.string.precipitation_title), old + dailySummary.getTotalPrecipmm());
                                     } else {
                                         double value = (Double) dailySummary.getTotalPrecipmm();
-                                        activitySummaryMap.put(getString(R.string.precipitation_camel_case), value);
+                                        activitySummaryMap.put(getString(R.string.precipitation_title), value);
                                     }
-                                    if (activitySummaryMap.get(getString(R.string.temperature_camel_case)) != null) {
-                                        double old = (Double) activitySummaryMap.get(getString(R.string.temperature_camel_case));
-                                        activitySummaryMap.put(getString(R.string.temperature_camel_case), old + dailySummary.getAvgTempC());
+                                    if (activitySummaryMap.get(getString(R.string.temperature_title)) != null) {
+                                        double old = (Double) activitySummaryMap.get(getString(R.string.temperature_title));
+                                        activitySummaryMap.put(getString(R.string.temperature_title), old + dailySummary.getAvgTempC());
                                     } else {
                                         double value = (Double) dailySummary.getAvgTempC();
-                                        activitySummaryMap.put(getString(R.string.temperature_camel_case), value);
+                                        activitySummaryMap.put(getString(R.string.temperature_title), value);
                                     }
-                                    if (activitySummaryMap.get(getString(R.string.humidity_camel_case)) != null) {
-                                        double old = (Double) activitySummaryMap.get(getString(R.string.humidity_camel_case));
-                                        activitySummaryMap.put(getString(R.string.humidity_camel_case), old + dailySummary.getAvgHumidity());
+                                    if (activitySummaryMap.get(getString(R.string.humidity_title)) != null) {
+                                        double old = (Double) activitySummaryMap.get(getString(R.string.humidity_title));
+                                        activitySummaryMap.put(getString(R.string.humidity_title), old + dailySummary.getAvgHumidity());
                                     } else {
                                         double value = (Double) dailySummary.getAvgHumidity();
-                                        activitySummaryMap.put(getString(R.string.humidity_camel_case), value);
+                                        activitySummaryMap.put(getString(R.string.humidity_title), value);
                                     }
                                 }
 
@@ -715,13 +756,13 @@ public class StatsTrackerFragment extends Fragment {
                                             String[] activitiesArray = activitiesSet.toArray(new String[0]);
                                             int[] imagesArray = new int[activitiesSet.size()];
                                             for (int i = 0; i < activitiesArray.length; i++) {
-                                                if (activitiesArray[i].equals(getString(R.string.precipitation_camel_case))) {
+                                                if (activitiesArray[i].equals(getString(R.string.precipitation_title))) {
                                                     activitiesArray[i] = getString(R.string.precipitation_title);
                                                     imagesArray[i] = R.drawable.ic_precipitation_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.temperature_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.temperature_title))) {
                                                     activitiesArray[i] = getString(R.string.temperature_title);
                                                     imagesArray[i] = R.drawable.ic_temperature_black;
-                                                } else if (activitiesArray[i].equals(getString(R.string.humidity_camel_case))) {
+                                                } else if (activitiesArray[i].equals(getString(R.string.humidity_title))) {
                                                     activitiesArray[i] = getString(R.string.humidity_title);
                                                     imagesArray[i] = R.drawable.ic_humidity;
                                                 } else if (activitiesArray[i].equals("0 Summary")) {
@@ -774,93 +815,220 @@ public class StatsTrackerFragment extends Fragment {
                 }
             });
         } else if (inputType.equals(getString(R.string.timer_camel_case))) {
-            timedActivityViewModel.getAll(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                    formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())).observe(this, new Observer<List<TimedActivitySummary>>() {
-                @Override
-                public void onChanged(@Nullable List<TimedActivitySummary> summaries) {
-                    if (summaries != null) {
-                        meansAndSumItemAdapter.clear();
-                        Map<String, Object> activitySummaryMap = new LinkedHashMap<>();
-                        Set<String> dates = new LinkedHashSet<>();
-                        Handler handler = new Handler();
-                        new Thread(new Runnable() {
+            if (getActivity() != null) {
+                timedActivityRepository = new TimedActivityRepository(getActivity().getApplication());
+                meansAndSumItemAdapter.clear();
+                Map<String, Object> activitySummaryMap = new LinkedHashMap<>();
+                Set<String> dates = new LinkedHashSet<>();
+                Set<String> activitiesSet = new TreeSet<>();
+                Map<String, Long> countMap = new HashMap<>();
+                Handler handler = new Handler();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<TimedActivitySummary> summaries = timedActivityRepository.getAllNow(
+                                formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                        formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                                formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                        if (summaries != null) {
+                            for (TimedActivitySummary summary : summaries) {
+                                String name = summary.getInputName().trim();
+                                name = name.substring(0, 1).toUpperCase() + name.substring(1);
+                                if (activitySummaryMap.get(name) != null) {
+                                    Long duration = (Long) activitySummaryMap.get(name);
+                                    activitySummaryMap.put(name, duration + summary.getDuration());
+                                } else {
+                                    activitySummaryMap.put(name, summary.getDuration());
+                                }
+                                if (countMap.get(name) != null) {
+                                    Long count = countMap.get(name);
+                                    countMap.put(name, count + 1L);
+                                } else {
+                                    countMap.put(name, 1L);
+                                }
+                                dates.add(summary.getDate());
+                            }
+                            Log.i(TAG, activitySummaryMap.toString());
+
+                            for (Map.Entry<String, Object> activity : activitySummaryMap.entrySet()) {
+                                activitiesSet.add(activity.getKey());
+                            }
+                            activitiesSet.add("0 Summary");
+                            Log.i(TAG, activitiesSet.toString());
+                        }
+                        handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                for (TimedActivitySummary summary : summaries) {
-                                    String name = summary.getInputName().trim();
-                                    name = name.substring(0, 1).toUpperCase() + name.substring(1);
-                                    if (activitySummaryMap.get(name) != null) {
-                                        Long duration = (Long) activitySummaryMap.get(name);
-                                        activitySummaryMap.put(name, duration + summary.getDuration());
-                                    } else {
-                                        activitySummaryMap.put(name, summary.getDuration());
+                                if (activitiesSet.size() > 0) {
+                                    String[] activitiesArray = activitiesSet.toArray(new String[0]);
+                                    int[] imagesArray = new int[activitiesSet.size()];
+                                    for (int i = 0; i < activitiesArray.length; i++) {
+                                        if (activitiesArray[i].equals("0 Summary")) {
+                                            activitiesArray[i] = getString(R.string.stats_summary);
+                                            imagesArray[i] = R.drawable.ic_summary_black;
+                                        }
                                     }
-                                    dates.add(summary.getDate());
-                                }
-                                Log.i(TAG, activitySummaryMap.toString());
-                                Set<String> activitiesSet = new TreeSet<>();
-                                for (Map.Entry<String, Object> activity : activitySummaryMap.entrySet()) {
-                                    activitiesSet.add(activity.getKey());
-                                }
-                                activitiesSet.add("0 Summary");
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (activitiesSet.size() > 0) {
-                                            String[] activitiesArray = activitiesSet.toArray(new String[0]);
-                                            int[] imagesArray = new int[activitiesSet.size()];
-                                            for (int i = 0; i < activitiesArray.length; i++) {
-                                                if (activitiesArray[i].equals("0 Summary")) {
-                                                    activitiesArray[i] = getString(R.string.stats_summary);
-                                                    imagesArray[i] = R.drawable.ic_summary_black;
+                                    Log.i(TAG, Arrays.toString(activitiesArray));
+
+                                    if (activitiesArray != null && context != null) {
+                                        int spinnerSelection = 0;
+                                        IconSpinnerAdapter iconSpinnerAdapter = new IconSpinnerAdapter(context, activitiesArray, imagesArray);
+                                        spinner.setAdapter(iconSpinnerAdapter);
+                                        spinner.setSelection(spinnerSelection);
+                                        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                            @Override
+                                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                                Log.i(TAG, activitiesArray[position] + " is selected");
+                                                SharedPreferences.Editor editor = timedActivitySharedPreferences.edit();
+                                                editor.putInt("stats_spinner_selection", position);
+                                                editor.apply();
+                                                if (activitiesArray[position].equals(getString(R.string.stats_summary))) {
+                                                    //setSummaryData(activitySummaryMap, dates.size());
+                                                    setFlexibleSummaryData(activitySummaryMap, countMap);
+                                                    totalTextView.setVisibility(View.VISIBLE);
+                                                    averageTextView.setVisibility(View.VISIBLE);
+                                                } else {
+                                                    if (numOfDays == 7 || numOfDays == 31) {
+                                                        setDailyBarChart(activitiesArray[position], numOfDays);
+                                                    } else if (numOfDays == 180) {
+                                                        setWeeklyBarChart(activitiesArray[position], numOfDays);
+                                                    } else {
+                                                        setMonthlyBarChart(activitiesArray[position], numOfDays);
+                                                    }
+                                                    totalTextView.setVisibility(View.GONE);
+                                                    averageTextView.setVisibility(View.GONE);
                                                 }
                                             }
-                                            Log.i(TAG, Arrays.toString(activitiesArray));
 
-                                            if (activitiesArray != null && context != null) {
-                                                int spinnerSelection = timedActivitySharedPreferences.getInt("stats_spinner_selection", 0);
-                                                IconSpinnerAdapter iconSpinnerAdapter = new IconSpinnerAdapter(context, activitiesArray, imagesArray);
-                                                spinner.setAdapter(iconSpinnerAdapter);
-                                                spinner.setSelection(spinnerSelection);
-                                                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                                    @Override
-                                                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                                        Log.i(TAG, activitiesArray[position] + " is selected");
-                                                        SharedPreferences.Editor editor = timedActivitySharedPreferences.edit();
-                                                        editor.putInt("stats_spinner_selection", position);
-                                                        editor.apply();
-                                                        if (activitiesArray[position].equals(getString(R.string.stats_summary))) {
-                                                            setSummaryData(activitySummaryMap, dates.size());
-                                                            totalTextView.setVisibility(View.VISIBLE);
-                                                            averageTextView.setVisibility(View.VISIBLE);
-                                                        } else {
-                                                            if (numOfDays == 7 || numOfDays == 31) {
-                                                                setDailyBarChart(activitiesArray[position], numOfDays);
-                                                            } else if (numOfDays == 180) {
-                                                                setWeeklyBarChart(activitiesArray[position], numOfDays);
-                                                            } else {
-                                                                setMonthlyBarChart(activitiesArray[position], numOfDays);
-                                                            }
-                                                            totalTextView.setVisibility(View.GONE);
-                                                            averageTextView.setVisibility(View.GONE);
-                                                        }
-                                                    }
+                                            @Override
+                                            public void onNothingSelected(AdapterView<?> parent) {
 
-                                                    @Override
-                                                    public void onNothingSelected(AdapterView<?> parent) {
-
-                                                    }
-                                                });
+                                            }
+                                        });
+                                    }
+                                }
+                                statsRecyclerView.setAdapter(statsRecyclerAdapter);
+                            }
+                        });
+                    }
+                }).start();
+            }
+        } else if (inputType.equals(getString(R.string.phone_usage_camel_case))) {
+            if (getActivity() != null) {
+                meansAndSumItemAdapter.clear();
+                appUsageRepository = new AppUsageRepository(getActivity().getApplication());
+                Map<String, Object> activitySummaryMap = new LinkedHashMap<>();
+                Set<String> dates = new LinkedHashSet<>();
+                Map<String, Long> dataMap = new LinkedHashMap<>();
+                Set<Long> datesInLong = new TreeSet<>();
+                Map<String, Long> countMap = new HashMap<>();
+                Handler handler = new Handler();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<AppUsageSummary> appUsageSummaries = appUsageRepository.getAllNow(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                                formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                        if (appUsageSummaries != null && appUsageSummaries.size() > 0) {
+                            for (AppUsageSummary appUsageSummary : appUsageSummaries) {
+                                Log.i(TAG, formattedTime.convertLongToYYYYMMDD(appUsageSummary.getDateInLong()));
+                                List<AppUsage> appUsages = appUsageSummary.getActivities();
+                                for (AppUsage appUsage : appUsages) {
+                                    if (dataMap.get(appUsage.getAppName()) != null) {
+                                        Long old = dataMap.get(appUsage.getAppName());
+                                        dataMap.put(appUsage.getAppName(), old + appUsage.getTotalTime());
+                                    } else {
+                                        dataMap.put(appUsage.getAppName(), appUsage.getTotalTime());
+                                    }
+                                    if (countMap.get(appUsage.getAppName()) != null) {
+                                        Long count = countMap.get(appUsage.getAppName());
+                                        countMap.put(appUsage.getAppName(), count + 1L);
+                                    } else {
+                                        countMap.put(appUsage.getAppName(), 1L);
+                                    }
+                                }
+                                datesInLong.add(appUsageSummary.getDateInLong());
+                            }
+                            Long start = ((TreeSet<Long>) datesInLong).first();
+                            Long end = ((TreeSet<Long>) datesInLong).last();
+                            Long numDays = TimeUnit.MILLISECONDS.toDays(end - start);
+                            //Log.i(TAG, "Start: " + appUsageSummaries.get(0).getDate() + ", End: " + appUsageSummaries.get(appUsageSummaries.size() - 1).getDate());
+                            Set<String> activitiesSet = new TreeSet<>();
+                            Log.i(TAG, "Num of Days: " + TimeUnit.MILLISECONDS.toDays(end - start));
+                            for (Map.Entry<String, Long> entry : dataMap.entrySet()) {
+                                if ((TimeUnit.MILLISECONDS.toMinutes(entry.getValue()) / numDays) > 5) {
+                                    if (entry.getKey().equals(getString(R.string.phone_usage_total_title))) {
+                                        activitiesSet.add("1" + getString(R.string.phone_usage_total_title));
+                                        activitySummaryMap.put(getString(R.string.phone_usage_total_title),
+                                                entry.getValue());
+                                    } else {
+                                        activitiesSet.add(entry.getKey());
+                                        activitySummaryMap.put(entry.getKey(), entry.getValue());
+                                    }
+                                }
+                            }
+                            activitiesSet.add("0 Summary");
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (activitiesSet.size() > 0) {
+                                        String[] activitiesArray = activitiesSet.toArray(new String[0]);
+                                        int[] imagesArray = new int[activitiesSet.size()];
+                                        for (int i = 0; i < activitiesArray.length; i++) {
+                                            if (activitiesArray[i].equals("0 Summary")) {
+                                                activitiesArray[i] = getString(R.string.stats_summary);
+                                                imagesArray[i] = R.drawable.ic_summary_black;
+                                            }
+                                            if (activitiesArray[i].equals("1" + getString(R.string.phone_usage_total_title))) {
+                                                activitiesArray[i] = getString(R.string.phone_usage_total_title);
                                             }
                                         }
-                                        statsRecyclerView.setAdapter(statsRecyclerAdapter);
+                                        Log.i(TAG, Arrays.toString(activitiesArray));
+
+                                        if (activitiesArray != null && context != null) {
+                                            int spinnerSelection = 0;
+                                            IconSpinnerAdapter iconSpinnerAdapter = new IconSpinnerAdapter(context, activitiesArray, imagesArray);
+                                            spinner.setAdapter(iconSpinnerAdapter);
+                                            spinner.setSelection(spinnerSelection);
+                                            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                                @Override
+                                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                                    Log.i(TAG, activitiesArray[position] + " is selected");
+                                                    SharedPreferences.Editor editor = phoneUsageSharedPreferences.edit();
+                                                    editor.putInt("stats_spinner_selection", position);
+                                                    editor.apply();
+                                                    if (activitiesArray[position].equals(getString(R.string.stats_summary))) {
+                                                        //setSummaryData(activitySummaryMap, dates.size());
+                                                        setFlexibleSummaryData(activitySummaryMap, countMap);
+                                                        totalTextView.setVisibility(View.VISIBLE);
+                                                        averageTextView.setVisibility(View.VISIBLE);
+                                                    } else {
+                                                        if (numOfDays == 7 || numOfDays == 31) {
+                                                            setDailyBarChart(activitiesArray[position], numOfDays);
+                                                        } else if (numOfDays == 180) {
+                                                            setWeeklyBarChart(activitiesArray[position], numOfDays);
+                                                        } else {
+                                                            setMonthlyBarChart(activitiesArray[position], numOfDays);
+                                                        }
+                                                        totalTextView.setVisibility(View.GONE);
+                                                        averageTextView.setVisibility(View.GONE);
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onNothingSelected(AdapterView<?> parent) {
+
+                                                }
+                                            });
+                                        }
                                     }
-                                });
-                            }
-                        }).start();
+                                    statsRecyclerView.setAdapter(statsRecyclerAdapter);
+                                }
+                            });
+                        }
                     }
-                }
-            });
+                }).start();
+            }
         }
     }
 
@@ -1348,6 +1516,94 @@ public class StatsTrackerFragment extends Fragment {
                     }
                 }
             });
+        } else if (inputType.equals(getString(R.string.phone_usage_camel_case))) {
+            Handler handler = new Handler();
+            styleBarChart();
+            List<String> entryDatesList = new ArrayList<>();
+            List<BarEntry> barEntries = new ArrayList<>();
+            Map<String, Long> entries = new LinkedHashMap<>();
+            List<AppUsageSummary> reverseOrderedList = new ArrayList<>();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if (getActivity() != null) {
+                        appUsageRepository = new AppUsageRepository(getActivity().getApplication());
+                        List<AppUsageSummary> summaries = appUsageRepository.getAllNow(
+                                formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                        formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                                formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                        if (summaries != null) {
+                            reverseOrderedList.addAll(summaries);
+                            Collections.reverse(reverseOrderedList);
+                        }
+                        String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                        for (int i = 1; i <= numOfDays; i++) {
+                            entryDatesList.add(formattedTime.getDateBeforeSpecifiedNumberOfDaysAsYYYYMMDD(lastEntryDate, numOfDays - i));
+                            //entries.put(formattedTime.getDateBeforeSpecifiedNumberOfDaysAsYYYYMMDD(lastEntryDate, numOfDays - i), 0L);
+                        }
+
+                        for (AppUsageSummary summary : reverseOrderedList) {
+                            List<AppUsage> activities = summary.getActivities();
+                            String date = summary.getDate();
+                            for (AppUsage appUsage : activities) {
+                                if (activity.equals(appUsage.getAppName())) {
+                                    Log.i(TAG, "Activity found");
+                                    if (entries.get(date) != null) {
+                                        Long old = entries.get(date);
+                                        entries.put(date,
+                                                old + TimeUnit.MILLISECONDS.toMinutes(appUsage.getTotalTime()));
+                                    } else {
+                                        entries.put(date,
+                                                TimeUnit.MILLISECONDS.toMinutes(appUsage.getTotalTime()));
+                                    }
+                                }
+                            }
+                        }
+                        Log.i(TAG, activity + ": " + entries.toString());
+                        // 1. iterate through the list and get the list of activities
+                        // 2. extract only the total from the list
+                        // 3. add each total to a map.
+
+                        int i = 0;
+                        float total = 0;
+                        int validEntryCounter = 0;
+
+                        for (String date : entryDatesList) {
+                            if (entries.get(date) != null) {
+                                Long time = entries.get(date);
+                                Log.i(TAG, date + ": " + time);
+                                total += time;
+                                barEntries.add(new BarEntry(i, time));
+                                validEntryCounter++;
+                            }
+                            i++;
+                            if (barEntries.size() < i) {
+                                barEntries.add(new BarEntry(i - 1, 0));
+                            }
+                        }
+                        if (validEntryCounter != 0) {
+                            final float average = total / validEntryCounter;
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    drawBarChart(barEntries, entryDatesList, activity, numOfDays, average);
+                                }
+                            });
+                        } else {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (reverseOrderedList.size() == 0) {
+                                        barChart.isEmpty();
+                                        barChart.clear();
+                                        barChart.invalidate();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }).start();
         }
     }
 
@@ -1750,6 +2006,179 @@ public class StatsTrackerFragment extends Fragment {
                     }
                 }
             });
+        } else if (inputType.equals(getString(R.string.timer_camel_case))) {
+            timedActivityViewModel.getAll(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                    formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())).observe(this, new Observer<List<TimedActivitySummary>>() {
+                @Override
+                public void onChanged(@Nullable List<TimedActivitySummary> summaries) {
+                    if (summaries != null) {
+                        styleBarChart();
+                        List<TimedActivitySummary> reverseOrderedList = summaries;
+                        List<String> entryDatesList = new ArrayList<>();
+                        List<BarEntry> barEntries = new ArrayList<>();
+                        Map<String, Long> entries = new LinkedHashMap<>();
+                        Collections.reverse(reverseOrderedList);
+
+                        if (reverseOrderedList.size() == 0) {
+                            barChart.isEmpty();
+                            barChart.clear();
+                            barChart.invalidate();
+                            return;
+                        }
+
+                        Handler handler = new Handler();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                int numOfWeeks = numOfDays / 7;
+
+                                String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                                for (int i = 1; i <= numOfWeeks; i++) {
+                                    entryDatesList.add(formattedTime.getDateBeforeSpecifiedNumberOfWeeksAsYYYYW(lastEntryDate, numOfWeeks - i));
+                                }
+
+                                for (TimedActivitySummary timedActivitySummary : reverseOrderedList) {
+                                    String name = timedActivitySummary.getInputName().trim();
+                                    name = name.substring(0, 1).toUpperCase() + name.substring(1);
+                                    Log.i(TAG, activity + ", " + name + ": " + timedActivitySummary.getDuration());
+                                    if (activity.equals(name)) {
+                                        Log.i(TAG, "Activity found");
+                                        String date = formattedTime.convertLongToYYYYW(timedActivitySummary.getDateInLong());
+                                        if (entries.get(date) != null) {
+                                            Long old = entries.get(date);
+                                            entries.put(date, old + timedActivitySummary.getDuration());
+                                        } else {
+                                            entries.put(date, timedActivitySummary.getDuration());
+                                        }
+                                    }
+                                }
+                                Log.i(TAG, activity + ": " + entries.toString());
+                                // 1. iterate through the list and get the list of activities
+                                // 2. extract only the total from the list
+                                // 3. add each total to a map.
+
+                                int i = 0;
+                                float total = 0;
+                                int validEntryCounter = 0;
+
+                                for (String date : entryDatesList) {
+                                    if (entries.get(date) != null) {
+                                        Long time = TimeUnit.MILLISECONDS.toMinutes(entries.get(date));
+                                        Log.i(TAG, date + ": " + time);
+                                        total += time;
+                                        barEntries.add(new BarEntry(i, time));
+                                        validEntryCounter++;
+                                    }
+                                    i++;
+                                    if (barEntries.size() < i) {
+                                        barEntries.add(new BarEntry(i - 1, 0));
+                                    }
+                                }
+
+
+                                if (validEntryCounter != 0) {
+                                    final float average = total / validEntryCounter;
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            drawBarChart(barEntries, entryDatesList, activity, numOfDays, average);
+                                        }
+                                    });
+                                }
+                            }
+                        }).start();
+                    }
+                }
+            });
+        } else if (inputType.equals(getString(R.string.phone_usage_camel_case))) {
+            Handler handler = new Handler();
+            styleBarChart();
+            List<String> entryDatesList = new ArrayList<>();
+            List<BarEntry> barEntries = new ArrayList<>();
+            Map<String, Long> entries = new LinkedHashMap<>();
+            List<AppUsageSummary> reverseOrderedList = new ArrayList<>();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if (getActivity() != null) {
+                        appUsageRepository = new AppUsageRepository(getActivity().getApplication());
+                        List<AppUsageSummary> summaries = appUsageRepository.getAllNow(
+                                formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                        formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                                formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                        if (summaries != null) {
+                            reverseOrderedList.addAll(summaries);
+                            Collections.reverse(reverseOrderedList);
+                        }
+                        int numOfWeeks = numOfDays / 7;
+
+                        String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                        for (int i = 1; i <= numOfWeeks; i++) {
+                            entryDatesList.add(formattedTime.getDateBeforeSpecifiedNumberOfWeeksAsYYYYW(lastEntryDate, numOfWeeks - i));
+                        }
+
+                        for (AppUsageSummary summary : reverseOrderedList) {
+                            List<AppUsage> activities = summary.getActivities();
+                            String date = formattedTime.convertLongToYYYYW(summary.getDateInLong());
+                            for (AppUsage appUsage : activities) {
+                                if (activity.equals(appUsage.getAppName())) {
+                                    Log.i(TAG, "Activity found");
+                                    if (entries.get(date) != null) {
+                                        Long old = entries.get(date);
+                                        entries.put(date,
+                                                old + TimeUnit.MILLISECONDS.toMinutes(appUsage.getTotalTime()));
+                                    } else {
+                                        entries.put(date,
+                                                TimeUnit.MILLISECONDS.toMinutes(appUsage.getTotalTime()));
+                                    }
+                                }
+                            }
+                        }
+                        Log.i(TAG, activity + ": " + entries.toString());
+                        // 1. iterate through the list and get the list of activities
+                        // 2. extract only the total from the list
+                        // 3. add each total to a map.
+
+                        int i = 0;
+                        float total = 0;
+                        int validEntryCounter = 0;
+
+                        for (String date : entryDatesList) {
+                            if (entries.get(date) != null) {
+                                Long time = entries.get(date);
+                                Log.i(TAG, date + ": " + time);
+                                total += time;
+                                barEntries.add(new BarEntry(i, time));
+                                validEntryCounter++;
+                            }
+                            i++;
+                            if (barEntries.size() < i) {
+                                barEntries.add(new BarEntry(i - 1, 0));
+                            }
+                        }
+                        if (validEntryCounter != 0) {
+                            final float average = total / validEntryCounter;
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    drawBarChart(barEntries, entryDatesList, activity, numOfDays, average);
+                                }
+                            });
+                        } else {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (reverseOrderedList.size() == 0) {
+                                        barChart.isEmpty();
+                                        barChart.clear();
+                                        barChart.invalidate();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }).start();
         }
     }
 
@@ -2154,6 +2583,181 @@ public class StatsTrackerFragment extends Fragment {
                     }
                 }
             });
+        } else if (inputType.equals(getString(R.string.timer_camel_case))) {
+            timedActivityViewModel.getAll(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                    formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())).observe(this, new Observer<List<TimedActivitySummary>>() {
+                @Override
+                public void onChanged(@Nullable List<TimedActivitySummary> summaries) {
+                    if (summaries != null) {
+                        styleBarChart();
+                        List<TimedActivitySummary> reverseOrderedList = summaries;
+                        List<String> entryDatesList = new ArrayList<>();
+                        List<BarEntry> barEntries = new ArrayList<>();
+                        Map<String, Long> entries = new LinkedHashMap<>();
+                        Collections.reverse(reverseOrderedList);
+
+                        if (reverseOrderedList.size() == 0) {
+                            barChart.isEmpty();
+                            barChart.clear();
+                            barChart.invalidate();
+                            return;
+                        }
+
+                        Handler handler = new Handler();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                int numOfMonths = numOfDays / 30;
+
+                                String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                                for (int i = 1; i <= numOfMonths; i++) {
+                                    entryDatesList.add(formattedTime.getDateBeforeSpecifiedNumberOfMonthsAsYYYYMM(lastEntryDate, numOfMonths - i));
+                                    entries.put(formattedTime.getDateBeforeSpecifiedNumberOfMonthsAsYYYYMM(lastEntryDate, numOfMonths - i), 0L);
+                                }
+
+                                for (TimedActivitySummary timedActivitySummary : reverseOrderedList) {
+                                    String name = timedActivitySummary.getInputName().trim();
+                                    name = name.substring(0, 1).toUpperCase() + name.substring(1);
+                                    Log.i(TAG, activity + ", " + name + ": " + timedActivitySummary.getDuration());
+                                    if (activity.equals(name)) {
+                                        Log.i(TAG, "Activity found");
+                                        String date = formattedTime.convertLongToYYYYMM(timedActivitySummary.getDateInLong());
+                                        if (entries.get(date) != null) {
+                                            Long old = entries.get(date);
+                                            entries.put(date, old + timedActivitySummary.getDuration());
+                                        } else {
+                                            entries.put(date, timedActivitySummary.getDuration());
+                                        }
+                                    }
+                                }
+                                Log.i(TAG, activity + ": " + entries.toString());
+                                // 1. iterate through the list and get the list of activities
+                                // 2. extract only the total from the list
+                                // 3. add each total to a map.
+
+                                int i = 0;
+                                float total = 0;
+                                int validEntryCounter = 0;
+
+                                for (String date : entryDatesList) {
+                                    if (entries.get(date) != null) {
+                                        Long time = TimeUnit.MILLISECONDS.toMinutes(entries.get(date));
+                                        Log.i(TAG, date + ": " + time);
+                                        total += time;
+                                        barEntries.add(new BarEntry(i, time));
+                                        validEntryCounter++;
+                                    }
+                                    i++;
+                                    if (barEntries.size() < i) {
+                                        barEntries.add(new BarEntry(i - 1, 0));
+                                    }
+                                }
+
+
+                                if (validEntryCounter != 0) {
+                                    final float average = total / validEntryCounter;
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            drawBarChart(barEntries, entryDatesList, activity, numOfDays, average);
+                                        }
+                                    });
+                                }
+                            }
+                        }).start();
+                    }
+                }
+            });
+        } else if (inputType.equals(getString(R.string.phone_usage_camel_case))) {
+            Handler handler = new Handler();
+            styleBarChart();
+            List<String> entryDatesList = new ArrayList<>();
+            List<BarEntry> barEntries = new ArrayList<>();
+            Map<String, Long> entries = new LinkedHashMap<>();
+            List<AppUsageSummary> reverseOrderedList = new ArrayList<>();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if (getActivity() != null) {
+                        appUsageRepository = new AppUsageRepository(getActivity().getApplication());
+                        List<AppUsageSummary> summaries = appUsageRepository.getAllNow(
+                                formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                        formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                                formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                        if (summaries != null) {
+                            reverseOrderedList.addAll(summaries);
+                            Collections.reverse(reverseOrderedList);
+                        }
+                        int numOfMonths = numOfDays / 30;
+
+                        String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                        for (int i = 1; i <= numOfMonths; i++) {
+                            entryDatesList.add(formattedTime.getDateBeforeSpecifiedNumberOfMonthsAsYYYYMM(lastEntryDate, numOfMonths - i));
+                            entries.put(formattedTime.getDateBeforeSpecifiedNumberOfMonthsAsYYYYMM(lastEntryDate, numOfMonths - i), 0L);
+                        }
+
+                        for (AppUsageSummary summary : reverseOrderedList) {
+                            List<AppUsage> activities = summary.getActivities();
+                            String date = formattedTime.convertLongToYYYYMM(summary.getDateInLong());
+                            for (AppUsage appUsage : activities) {
+                                if (activity.equals(appUsage.getAppName())) {
+                                    Log.i(TAG, "Activity found");
+                                    if (entries.get(date) != null) {
+                                        Long old = entries.get(date);
+                                        entries.put(date,
+                                                old + TimeUnit.MILLISECONDS.toMinutes(appUsage.getTotalTime()));
+                                    } else {
+                                        entries.put(date,
+                                                TimeUnit.MILLISECONDS.toMinutes(appUsage.getTotalTime()));
+                                    }
+                                }
+                            }
+                        }
+                        Log.i(TAG, activity + ": " + entries.toString());
+                        // 1. iterate through the list and get the list of activities
+                        // 2. extract only the total from the list
+                        // 3. add each total to a map.
+
+                        int i = 0;
+                        float total = 0;
+                        int validEntryCounter = 0;
+
+                        for (String date : entryDatesList) {
+                            if (entries.get(date) != null) {
+                                Long time = entries.get(date);
+                                Log.i(TAG, date + ": " + time);
+                                total += time;
+                                barEntries.add(new BarEntry(i, time));
+                                validEntryCounter++;
+                            }
+                            i++;
+                            if (barEntries.size() < i) {
+                                barEntries.add(new BarEntry(i - 1, 0));
+                            }
+                        }
+                        if (validEntryCounter != 0) {
+                            final float average = total / validEntryCounter;
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    drawBarChart(barEntries, entryDatesList, activity, numOfDays, average);
+                                }
+                            });
+                        } else {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (reverseOrderedList.size() == 0) {
+                                        barChart.isEmpty();
+                                        barChart.clear();
+                                        barChart.invalidate();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }).start();
         }
     }
 
@@ -2429,13 +3033,13 @@ public class StatsTrackerFragment extends Fragment {
             barChart.setVisibility(View.GONE);
             meansAndSumItemAdapter.clear();
             for (Map.Entry<String, Object> activity : activitySummaryMap.entrySet()) {
-                if (activity.getKey().equals(getString(R.string.activity_active_minutes_camel_case)) || activity.getKey().equals(getString(R.string.activity_sedentary_minutes_camel_case))) {
+                if (activity.getKey().equals(getString(R.string.activity_active_minutes_title)) || activity.getKey().equals(getString(R.string.activity_sedentary_minutes_title))) {
                     Double total = (Double) activity.getValue();
                     Long totalLong = total.longValue();
                     totalLong = TimeUnit.MILLISECONDS.toMinutes(totalLong);
                     Long means = totalLong / numOfDays;
                     meansAndSumItemAdapter.add(new MeansAndSumItem(activity.getKey(), means, totalLong));
-                } else if (activity.getKey().equals(getString(R.string.activity_distance_camel_case))) {
+                } else if (activity.getKey().equals(getString(R.string.activity_distance_title))) {
                     Double total = (Double) activity.getValue() / 1000;
                     Double means = total / numOfDays;
                     meansAndSumItemAdapter.add(new MeansAndSumItem(activity.getKey(), means, total));
@@ -2478,22 +3082,31 @@ public class StatsTrackerFragment extends Fragment {
                 }
             }
         }
+    }
+
+    private void setFlexibleSummaryData(Map<String, Object> activitySummaryMap, Map<String, Long> countMap) {
         if (inputType.equals(getString(R.string.timer_camel_case))) {
             Log.i(TAG, activitySummaryMap.toString());
             statsRecyclerView.setVisibility(View.VISIBLE);
             barChart.setVisibility(View.GONE);
             meansAndSumItemAdapter.clear();
             for (Map.Entry<String, Object> activity : activitySummaryMap.entrySet()) {
-                if (activity.getValue() instanceof Long) {
-                    Long total = (Long) activity.getValue();
-                    total = TimeUnit.MILLISECONDS.toMinutes(total);
-                    Long means = total / numOfDays;
-                    meansAndSumItemAdapter.add(new MeansAndSumItem(activity.getKey(), means, total));
-                } else {
-                    Double total = (Double) activity.getValue();
-                    Double means = total / numOfDays;
-                    meansAndSumItemAdapter.add(new MeansAndSumItem(activity.getKey(), means, total));
-                }
+                Long total = (Long) activity.getValue();
+                total = TimeUnit.MILLISECONDS.toMinutes(total);
+                Long means = total / countMap.get(activity.getKey());
+                meansAndSumItemAdapter.add(new MeansAndSumItem(activity.getKey(), means, total));
+            }
+        }
+        if (inputType.equals(getString(R.string.phone_usage_camel_case))) {
+            Log.i(TAG, activitySummaryMap.toString());
+            statsRecyclerView.setVisibility(View.VISIBLE);
+            barChart.setVisibility(View.GONE);
+            meansAndSumItemAdapter.clear();
+            for (Map.Entry<String, Object> activity : activitySummaryMap.entrySet()) {
+                Long total = (Long) activity.getValue();
+                total = TimeUnit.MILLISECONDS.toMinutes(total);
+                Long means = total / countMap.get(activity.getKey());
+                meansAndSumItemAdapter.add(new MeansAndSumItem(activity.getKey(), means, total));
             }
         }
     }

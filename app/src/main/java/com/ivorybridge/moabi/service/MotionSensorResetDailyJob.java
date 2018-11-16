@@ -44,6 +44,6 @@ public class MotionSensorResetDailyJob extends DailyJob {
     public static void scheduleJob() {
         DailyJob.schedule(new JobRequest.Builder(TAG),
                 TimeUnit.HOURS.toMillis(0),
-                TimeUnit.HOURS.toMillis(0) + TimeUnit.SECONDS.toMillis(1));
+                TimeUnit.HOURS.toMillis(0) + TimeUnit.SECONDS.toMillis(5));
     }
 }

@@ -200,7 +200,7 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
                 }
                 if (summary.getIndepVarType().equals(itemView.getContext().getString(R.string.phone_usage_camel_case))) {
                     top1ImageView.setImageResource(R.drawable.ic_appusage);
-                    if (summary.getIndepVar().equals("Total")) {
+                    if (summary.getIndepVar().equals(itemView.getContext().getString(R.string.phone_usage_total_title))) {
                         top1AvgNameTextView.setText("Using phone");
                     } else {
                         top1AvgNameTextView.setText("Using " + summary.getIndepVar());
@@ -343,7 +343,7 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
                         }
                         if (summary.getIndepVarType().equals(itemView.getContext().getString(R.string.phone_usage_camel_case))) {
                             top1ImageView.setImageResource(R.drawable.ic_appusage);
-                            if (summary.getIndepVar().equals("Total")) {
+                            if (summary.getIndepVar().equals(itemView.getContext().getString(R.string.phone_usage_total_title))) {
                                 top1AvgNameTextView.setText("Using phone");
                             } else {
                                 top1AvgNameTextView.setText("Using " + summary.getIndepVar());
@@ -475,7 +475,7 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
                         }
                         if (summary.getIndepVarType().equals(itemView.getContext().getString(R.string.phone_usage_camel_case))) {
                             top2ImageView.setImageResource(R.drawable.ic_appusage);
-                            if (summary.getIndepVar().equals("Total")) {
+                            if (summary.getIndepVar().equals(itemView.getContext().getString(R.string.phone_usage_total_title))) {
                                 top2AvgNameTextView.setText("Using phone");
                             } else {
                                 top2AvgNameTextView.setText("Using " + summary.getIndepVar());
@@ -642,7 +642,7 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
                     });
                     if (summary.getIndepVarType().equals(itemView.getContext().getString(R.string.phone_usage_camel_case))) {
                         //top1ImageView.setImageResource(R.drawable.ic_appusage);
-                        if (summary.getIndepVar().equals("Total")) {
+                        if (summary.getIndepVar().equals(itemView.getContext().getString(R.string.phone_usage_total_title))) {
                             indepVarAction = "Using phone";
                         } else {
                             indepVarAction = "Using " + summary.getIndepVar();

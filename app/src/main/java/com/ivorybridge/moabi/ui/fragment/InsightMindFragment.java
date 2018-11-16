@@ -421,7 +421,7 @@ public class InsightMindFragment extends Fragment {
                                         for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
                                             if (simpleRegressionSummary.getDepVar().equals(getString(R.string.mood_camel_case))) {
                                                 if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals("Total")) {
+                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
                                                         sortedList.add(simpleRegressionSummary);
                                                         //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
                                                     } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
@@ -537,7 +537,7 @@ public class InsightMindFragment extends Fragment {
                                         for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
                                             if (simpleRegressionSummary.getDepVar().equals(getString(R.string.energy_camel_case))) {
                                                 if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals("Total")) {
+                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
                                                         sortedList.add(simpleRegressionSummary);
                                                         //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
                                                     } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
@@ -653,7 +653,7 @@ public class InsightMindFragment extends Fragment {
                                         for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
                                             if (simpleRegressionSummary.getDepVar().equals(getString(R.string.stress_camel_case))) {
                                                 if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals("Total")) {
+                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
                                                         sortedList.add(simpleRegressionSummary);
                                                         //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
                                                     } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
@@ -769,7 +769,7 @@ public class InsightMindFragment extends Fragment {
                                         for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
                                             if (simpleRegressionSummary.getDepVar().equals(getString(R.string.daily_review_camel_case))) {
                                                 if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals("Total")) {
+                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
                                                         sortedList.add(simpleRegressionSummary);
                                                         //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
                                                     } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
@@ -885,7 +885,7 @@ public class InsightMindFragment extends Fragment {
                                         for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
                                             if (simpleRegressionSummary.getDepVar().equals(getString(R.string.depression_phq9_camel_case))) {
                                                 if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals("Total")) {
+                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
                                                         sortedList.add(simpleRegressionSummary);
                                                         //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
                                                     } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
@@ -1001,7 +1001,7 @@ public class InsightMindFragment extends Fragment {
                                         for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
                                             if (simpleRegressionSummary.getDepVar().equals(getString(R.string.anxiety_gad7_camel_case))) {
                                                 if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals("Total")) {
+                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
                                                         sortedList.add(simpleRegressionSummary);
                                                         //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
                                                     } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {

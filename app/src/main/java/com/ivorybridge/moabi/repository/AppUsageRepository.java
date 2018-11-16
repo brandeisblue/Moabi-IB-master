@@ -326,7 +326,7 @@ public class AppUsageRepository {
             Log.i(TAG, s.getAppName() + ": " + timeElapsed + " " + s.getTotalTime());
         }
         Stat totalUsageStat = new Stat();
-        totalUsageStat.setAppName("Total");
+        totalUsageStat.setAppName(application.getString(R.string.phone_usage_total_title));
         totalUsageStat.setTotalTime(totalUsageTime);
         finalStats.add(totalUsageStat);
         long startMinute = (start / (1000 * 60)) % 60;

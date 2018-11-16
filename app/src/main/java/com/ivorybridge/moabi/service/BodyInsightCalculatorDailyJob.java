@@ -14,6 +14,7 @@ import com.ivorybridge.moabi.repository.BuiltInFitnessRepository;
 import com.ivorybridge.moabi.repository.FitbitRepository;
 import com.ivorybridge.moabi.repository.GoogleFitRepository;
 import com.ivorybridge.moabi.repository.MoodAndEnergyRepository;
+import com.ivorybridge.moabi.repository.WeatherRepository;
 import com.ivorybridge.moabi.repository.statistics.PredictionsRepository;
 import com.ivorybridge.moabi.util.FormattedTime;
 
@@ -35,6 +36,7 @@ public class BodyInsightCalculatorDailyJob extends DailyJob {
     private GoogleFitRepository googleFitRepository;
     private AppUsageRepository appUsageRepository;
     private BuiltInFitnessRepository builtInFitnessRepository;
+    private WeatherRepository weatherRepository;
     private PredictionsRepository predictionsRepository;
 
     public BodyInsightCalculatorDailyJob(Application application) {
@@ -46,6 +48,7 @@ public class BodyInsightCalculatorDailyJob extends DailyJob {
         googleFitRepository = new GoogleFitRepository(application);
         appUsageRepository = new AppUsageRepository(application);
         builtInFitnessRepository = new BuiltInFitnessRepository(application);
+        weatherRepository = new WeatherRepository(application);
         predictionsRepository = new PredictionsRepository(application);
     }
 

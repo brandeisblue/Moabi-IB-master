@@ -247,7 +247,8 @@
     <string name="insight_summary_googlefit">Summary (Google Fit)</string>
     <string name="insight_summary_moabi">Summary (Moabi)</string>
     <string name="insight_summary_phone_usage">Summary (Phone Usage)</string>
-    <string name="insight_summary_activity">Summary (Moabi)</string>
+    <string name="insight_summary_activity">Summary (Activity)</string>
+    <string name="insight_summary_timer">Summary (Timer)</string>
     <string name="insight_summary_mood">Summary (Mood)</string>
     <string name="insight_summary_energy">Summary (Energy)</string>
     <string name="insight_summary_daily_review">Summary (Daily Review)</string>

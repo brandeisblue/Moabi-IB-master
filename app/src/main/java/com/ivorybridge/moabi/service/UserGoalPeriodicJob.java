@@ -243,7 +243,7 @@ public class UserGoalPeriodicJob extends Job {
                 List<AppUsage> summaries = today.getActivities();
                 for (AppUsage appUsage : summaries) {
                     if (appUsage.getAppName().equals(goalName)) {
-                        if (appUsage.getAppName().equals("Total")) {
+                        if (appUsage.getAppName().equals(application.getString(R.string.phone_usage_total_title))) {
                             goalName = application.getString(R.string.activity_phone_usage_camel_case);
                         }
                         progressLong = TimeUnit.MILLISECONDS.toMinutes(appUsage.getTotalTime());

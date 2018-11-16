@@ -189,12 +189,10 @@ public class FitbitRepository {
                                                             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                                                                 firebaseManager.getDaysWithDataRef().child(date).child(mApplication.getString(R.string.fitbit_camel_case)).setValue(true);
                                                             }
-
                                                         } else {
                                                             getAccessTokenWithRefreshToken(date);
                                                         }
                                                     }
-
                                                     @Override
                                                     public void onFailure(Call<List<FitbitDeviceStatusSummary>> call, Throwable t) {
                                                         getAccessTokenWithRefreshToken(date);
@@ -205,7 +203,6 @@ public class FitbitRepository {
                                         getAccessTokenWithRefreshToken(date);
                                     }
                                 }
-
                                 @Override
                                 public void onFailure(Call<FitbitSleepSummary> call, Throwable t) {
                                     getAccessTokenWithRefreshToken(date);
@@ -225,232 +222,7 @@ public class FitbitRepository {
                 });
             }
         }).start();
-
-        /*
-        firebaseManager.getFitbitCredentialRef().addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                FitbitDailySummary fitbitDailySummary = new FitbitDailySummary();
-                fitbitDailySummary.setDate(date);
-                fitbitDailySummary.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
-                fitbitDailySummary.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
-                AsyncTaskBoolean fitbitTaskSuccess = new AsyncTaskBoolean(mApplication.getString(R.string.fitbit_title));
-                if (dataSnapshot.child("access_token").getValue() != null) {
-                    final String accessToken = "Bearer "
-                            + (String) dataSnapshot.child("access_token").getValue();
-                    Call<FitbitActivitySummary> fitbitDailySummaryCall = fitbitService
-                            .getDailySummary(accessToken, date);
-                    fitbitDailySummaryCall.enqueue(new Callback<FitbitActivitySummary>() {
-                        @Override
-                        public void onResponse(@NotNull Call<FitbitActivitySummary> call,
-                                               @NotNull Response<FitbitActivitySummary> response) {
-                            Log.i(TAG, response.toString());
-                            // TODO - API call limit reached
-                            if (response.toString().contains("429")) {
-                                fitbitTaskSuccess.setResult(true);
-                                insertSuccess(fitbitTaskSuccess);
-                                Toast.makeText(mApplication.getApplicationContext(),
-                                        "Fitbit call limit reached.", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-                            //Log.i(TAG, "Summary Request Success: " + isSuccessful.getValue());
-                            if (response.isSuccessful()) {
-                                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                    firebaseManager.getFitbitRef().child(date).child("activitySummary").setValue(response.body());
-                                    firebaseManager.getFitbitLast30DaysRef().child(date).child("activitySummary").setValue(response.body());
-                                }
-                                fitbitDailySummary.setActivitySummary(response.body());
-                                if (response.body() != null) {
-                                    Log.i(TAG, response.body().toString());
-                                }
-                                Log.i(TAG, fitbitDailySummary.getActivitySummary().toString());
-                                Call<FitbitSleepSummary> fitbitSleepSummaryCall =
-                                        fitbitService.getSleepSummary(accessToken, date);
-                                fitbitSleepSummaryCall.enqueue(new Callback<FitbitSleepSummary>() {
-                                    @Override
-                                    public void onResponse(Call<FitbitSleepSummary> call,
-                                                           Response<FitbitSleepSummary> response) {
-                                        if (response.isSuccessful()) {
-                                            if (response.body() != null) {
-                                                Log.i(TAG, response.body().toString());
-                                                fitbitDailySummary.setSleepSummary(response.body());
-                                                Log.i(TAG, fitbitDailySummary.getSleepSummary().toString());
-                                            }
-                                            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                                firebaseManager.getFitbitRef().child(date)
-                                                        .child("sleep").setValue(response.body());
-                                                firebaseManager.getFitbitLast30DaysRef().child(date)
-                                                        .child("sleep").setValue(response.body());
-                                            }
-                                            Call<List<FitbitDeviceStatusSummary>> fitbitDeviceStatusCall
-                                                    = fitbitService.getDeviceStatus(accessToken);
-                                            fitbitDeviceStatusCall.enqueue(
-                                                    new Callback<List<FitbitDeviceStatusSummary>>() {
-                                                        @Override
-                                                        public void onResponse(Call<List<FitbitDeviceStatusSummary>> call,
-                                                                               Response<List<FitbitDeviceStatusSummary>> response) {
-                                                            if (response.isSuccessful()) {
-                                                                if (response.body() != null) {
-                                                                    Log.i(TAG, response.body().get(0).toString());
-                                                                    fitbitDailySummary.setDeviceStatusSummary(response.body().get(0));
-                                                                    Log.i(TAG, fitbitDailySummary.getDeviceStatusSummary().toString());
-                                                                    fitbitTaskSuccess.setResult(true);
-                                                                    insertSuccess(fitbitTaskSuccess);
-                                                                }
-                                                                if (date.equals(formattedTime.getCurrentDateAsYYYYMMDD())) {
-                                                                    firebaseManager.getFitbitTodayRef().child("device").setValue(response.body());
-                                                                }
-                                                                insert(fitbitDailySummary);
-                                                                InputHistory fitbitInput = new InputHistory();
-                                                                fitbitInput.setDate(date);
-                                                                fitbitInput.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
-                                                                fitbitInput.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
-                                                                fitbitInput.setInputType(mApplication.getString(R.string.fitbit_title));
-                                                                inputHistoryRepository.insert(fitbitInput);
-                                                                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                                                    firebaseManager.getDaysWithDataRef().child(date).child(mApplication.getString(R.string.fitbit_title)).setValue(true);
-                                                                }
-
-                                                            } else {
-                                                                getAccessTokenWithRefreshToken(date);
-                                                            }
-                                                        }
-
-                                                        @Override
-                                                        public void onFailure(Call<List<FitbitDeviceStatusSummary>> call, Throwable t) {
-                                                            getAccessTokenWithRefreshToken(date);
-                                                        }
-                                                    });
-                                        } else {
-                                            Log.i(TAG, response.toString());
-                                            getAccessTokenWithRefreshToken(date);
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<FitbitSleepSummary> call, Throwable t) {
-                                        getAccessTokenWithRefreshToken(date);
-                                    }
-                                });
-                                //TODO - chain sleep and device status calls here
-                            } else {
-                                getAccessTokenWithRefreshToken(date);
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<FitbitActivitySummary> call, Throwable t) {
-                            Log.i(TAG, t.getMessage());
-                            getAccessTokenWithRefreshToken(date);
-                        }
-                    });
-                } else {
-                    getAccessTokenWithRefreshToken(date);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });*/
     }
-
-    /*
-    public void downloadDataFromYesterday() {
-        firebaseManager.getFitbitIsConnectedRef().addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() != null) {
-                    Boolean isConnected = (Boolean) dataSnapshot.getValue();
-                    if (isConnected) {
-                        fetchYesterday();
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void fetchYesterday() {
-        firebaseManager.getFitbitCredentialRef().addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                final FitbitDailySummary fitbitDailySummary = new FitbitDailySummary();
-                fitbitDailySummary.setDate(formattedTime.getYesterdaysDateAsYYYYMMDD());
-                if (dataSnapshot.child("access_token").getValue() != null) {
-                    final String accessToken = "Bearer " + (String) dataSnapshot.child("access_token").getValue();
-                    Call<FitbitActivitySummary> fitbitDailySummaryCall = fitbitService.getDailySummary(accessToken, formattedTime.getYesterdaysDateAsYYYYMMDD());
-                    fitbitDailySummaryCall.enqueue(new Callback<FitbitActivitySummary>() {
-                        @Override
-                        public void onResponse(@NotNull Call<FitbitActivitySummary> call, @NotNull Response<FitbitActivitySummary> response) {
-                            Log.i(TAG, response.toString());
-                            if (response.isSuccessful()) {
-                                fitbitDailySummary.setActivitySummary(response.body());
-                                firebaseManager.getFitbitYesterdayRef().child("activitySummary").setValue(response.body());
-                                firebaseManager.getFitbitLast30DaysYesterdayRef().child("activitySummary").setValue(response.body());
-                                Call<FitbitSleepSummary> fitbitSleepSummaryCall = fitbitService.getSleepSummary(accessToken, formattedTime.getYesterdaysDateAsYYYYMMDD());
-                                fitbitSleepSummaryCall.enqueue(new Callback<FitbitSleepSummary>() {
-                                    @Override
-                                    public void onResponse(Call<FitbitSleepSummary> call, Response<FitbitSleepSummary> response) {
-                                        if (response.isSuccessful()) {
-                                            fitbitDailySummary.setSleepSummary(response.body());
-                                            firebaseManager.getFitbitYesterdayRef().child("sleep").setValue(response.body());
-                                            firebaseManager.getFitbitLast30DaysYesterdayRef().child("sleep").setValue(response.body());
-                                            DatabaseReference deviceRef = firebaseManager.getFitbitYesterdayRef().child("device").child("0").getRef();
-                                            if (deviceRef != null) {
-                                                deviceRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        if (dataSnapshot != null) {
-                                                            FitbitDeviceStatusSummary devices = dataSnapshot.getValue(FitbitDeviceStatusSummary.class);
-                                                            fitbitDailySummary.setDeviceStatusSummary(devices);
-                                                            insert(fitbitDailySummary);
-                                                        }
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                    }
-                                                });
-                                            }
-                                        } else {
-                                            Log.i(TAG, response.toString());
-                                            getAccessTokenWithRefreshToken();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<FitbitSleepSummary> call, Throwable t) {
-                                        getAccessTokenWithRefreshToken();
-                                    }
-                                });
-                                //TODO - chain sleep and device status calls here
-                            } else {
-                                getAccessTokenWithRefreshToken();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<FitbitActivitySummary> call, Throwable t) {
-                            Log.i(TAG, t.getMessage());
-                            getAccessTokenWithRefreshToken();
-                        }
-                    });
-                } else {
-                    getAccessTokenWithRefreshToken();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-    }*/
 
     public void sync() {
         firebaseManager.getFitbitRef().addListenerForSingleValueEvent(new ValueEventListener() {
@@ -556,60 +328,6 @@ public class FitbitRepository {
                 });
             }
         }).start();
-        /*
-        firebaseManager.getFitbitCredentialRef().addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getKey() != null) {
-                    if (dataSnapshot.child("refresh_token").getValue() != null) {
-                        String refreshToken = "";
-                        AsyncTaskBoolean fitbitTaskSuccess = new AsyncTaskBoolean(mApplication.getString(R.string.fitbit_camel_case));
-                        refreshToken = (String) dataSnapshot.child("refresh_token").getValue();
-                        Call<FitbitAuthCredentialsSummary> fitbitAuthCredentialsSummaryCall = fitbitService.getAccessTokenWithRefreshToken(authHeader, contentType, grantType, refreshToken, expiresIn);
-                        fitbitAuthCredentialsSummaryCall.enqueue(new Callback<FitbitAuthCredentialsSummary>() {
-                            @Override
-                            public void onResponse(Call<FitbitAuthCredentialsSummary> call, Response<FitbitAuthCredentialsSummary> response) {
-                                Log.i(TAG, response.toString());
-                                Log.i(TAG, "Access token refresh success: " + response.isSuccessful());
-                                if (response.isSuccessful()) {
-                                    firebaseManager.getFitbitCredentialRef().setValue(response.body())
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    AsyncTaskBoolean fitbitTaskSuccess = new AsyncTaskBoolean(mApplication.getString(R.string.fitbit_title));
-                                                    fitbitTaskSuccess.setResult(true);
-                                                    insertSuccess(fitbitTaskSuccess);
-                                                    firebaseManager.getIsConnectedRef().child(mApplication.getString(R.string.fitbit_title)).setValue(false);
-                                                }
-                                            })
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    firebaseManager.getIsConnectedRef().child(mApplication.getString(R.string.fitbit_title)).setValue(true);
-                                                    downloadData(date);
-                                                }
-                                            });
-                                } else {
-                                    firebaseManager.getIsConnectedRef().child(mApplication.getString(R.string.fitbit_title)).setValue(false);
-                                    fitbitTaskSuccess.setResult(true);
-                                    insertSuccess(fitbitTaskSuccess);
-                                    //TODO - when this happens, show a notification to let the user know something is wrong
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<FitbitAuthCredentialsSummary> call, Throwable t) {
-                                Log.i(TAG, t.toString());
-                            }
-                        });
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });*/
     }
 
     private static class insertAsyncTask extends AsyncTask<FitbitDailySummary, Void, Void> {
