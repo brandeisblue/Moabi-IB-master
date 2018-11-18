@@ -22,6 +22,7 @@ import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.request.GoalsReadRequest;
 import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.dao.AsyncTaskBooleanDao;
 import com.ivorybridge.moabi.database.dao.GoogleFitDao;
@@ -51,11 +52,11 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class GoogleFitService {
+public class GoogleFitAPI {
 
     private Context context;
     private AppCompatActivity mActivity;
-    private static final String TAG = GoogleFitService.class.getSimpleName();
+    private static final String TAG = GoogleFitAPI.class.getSimpleName();
     private static final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 6;
     private FirebaseManager firebaseManager;
     private FitnessOptions mFitnessOptions;
@@ -66,7 +67,7 @@ public class GoogleFitService {
     private FormattedTime formattedTime;
     private Application application;
 
-    public GoogleFitService(AppCompatActivity activity) {
+    public GoogleFitAPI(AppCompatActivity activity) {
         GoogleFitDB db = GoogleFitDB.getDatabase(activity.getApplication());
         AsyncTaskBooleanDB successDB = AsyncTaskBooleanDB.getDatabase(activity.getApplication());
         mFitnessOptions = configureFitnessOptions();
@@ -82,7 +83,7 @@ public class GoogleFitService {
         this.application = activity.getApplication();
     }
 
-    public GoogleFitService(Application application) {
+    public GoogleFitAPI(Application application) {
         GoogleFitDB db = GoogleFitDB.getDatabase(application);
         AsyncTaskBooleanDB successDB = AsyncTaskBooleanDB.getDatabase(application);
         mFitnessOptions = configureFitnessOptions();
@@ -133,6 +134,9 @@ public class GoogleFitService {
 
     public void downloadData(String date) {
         // start by reading in goals
+        AsyncTaskBoolean gFitTaskBoolean= new AsyncTaskBoolean(context.getString(R.string.googlefit_camel_case));
+        gFitTaskBoolean.setResult(false);
+        insertSuccess(gFitTaskBoolean);
         GoogleSignInOptionsExtension fitnessOptions = configureFitnessOptions();
         GoogleSignInAccount gsa = GoogleSignIn.getAccountForExtension(application, fitnessOptions);
         final Map<String, Object> googleFitGoals = new LinkedHashMap<>();
@@ -247,9 +251,6 @@ public class GoogleFitService {
         cal.set(Calendar.SECOND, 0);
         long startTime = cal.getTimeInMillis();*/
 
-        AsyncTaskBoolean gFitTaskBoolean= new AsyncTaskBoolean(context.getString(R.string.googlefit_camel_case));
-        gFitTaskBoolean.setResult(false);
-        insertSuccess(gFitTaskBoolean);
         DataReadRequest todayRequest =
                 new DataReadRequest.Builder()
                         .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
@@ -342,10 +343,10 @@ public class GoogleFitService {
                             }
                             Log.i(TAG, activityMap.toString());
                             getActiveMinutes(fitSummary, summaries, date);
-                            //firebaseManager.getGoogleFitRef().child(date).child("summary").updateChildren(activityMap);
-                            //firebaseManager.getGoogleFitRef().child(date).child("lastSync").setValue(formattedTime.getCurrentTimeAsHMMA());
-                            //firebaseManager.getGoogleFitLast30DaysRef().child(date).child("summary").updateChildren(activityMap);
-                            //firebaseManager.getDaysWithDataRef().child(date).child(context.getString(R.string.googlefit_camel_case)).setValue(true);
+                            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                                firebaseManager.getGoogleFitRef().child(date).child("summary").updateChildren(activityMap);
+                                firebaseManager.getGoogleFitRef().child(date).child("lastSync").setValue(formattedTime.getCurrentTimeAsHMMA());
+                            }
                             //TODO - change the today call code so that update can be done once.
                         }
                     });
@@ -408,9 +409,11 @@ public class GoogleFitService {
                                 gFitTaskSuccess.setResult(true);
                                 insertSuccess(gFitTaskSuccess);
                                 Log.i(TAG, timePerActivity.toString());
-                                //firebaseManager.getGoogleFitRef().child(date).child("summary").child(context.getString(R.string.activity_active_minutes_camel_case)).updateChildren(timePerActivity);
-                                //firebaseManager.getGoogleFitLast30DaysRef().child(date).child("summary").child(context.getString(R.string.activity_active_minutes_camel_case)).updateChildren(timePerActivity);
-                                //firebaseManager.getDaysWithDataRef().child(date).child(context.getString(R.string.googlefit_camel_case)).setValue(true);
+                                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                                    firebaseManager.getGoogleFitRef().child(date).child("summary")
+                                            .child(context.getString(R.string.activity_active_minutes_camel_case))
+                                            .updateChildren(timePerActivity);
+                                }
                             }
                         }
                     });
@@ -630,7 +633,7 @@ public class GoogleFitService {
         googleFitInputHistory.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
         googleFitInputHistory.setDate(date);
         inputHistoryRepository.insert(googleFitInputHistory);
-        AsyncTask.Status status = new GoogleFitService.insertAsyncTask(mGoogleFitDao).execute(dailySummary).getStatus();
+        AsyncTask.Status status = new GoogleFitAPI.insertAsyncTask(mGoogleFitDao).execute(dailySummary).getStatus();
         if (status.equals(AsyncTask.Status.FINISHED)) {
             return true;
         } else {
@@ -708,35 +711,5 @@ public class GoogleFitService {
                         .addDataType(DataType.AGGREGATE_HYDRATION, FitnessOptions.ACCESS_WRITE)
                         .build();
         return fitnessOptions;
-    }
-
-    private String getDate(long milliSeconds) {
-        // Create a DateFormatter object for displaying date in specified format.
-        String format = "EEE MMM dd HH:mm:ss z yyyy";
-        SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.US);
-
-        // Create a calendar object that will convert the date and time value in milliseconds to date.
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(milliSeconds);
-        return formatter.format(calendar.getTime());
-    }
-
-    private String getCurrentTime() {
-        Calendar c = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("h:mm a", Locale.US);
-        return df.format(c.getTime());
-    }
-
-    private String setUpDateForYesterday() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, -1);
-        SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        return mdformat.format(calendar.getTime());
-    }
-
-    private String setUpDatesForToday() {
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        return mdformat.format(calendar.getTime());
     }
 }

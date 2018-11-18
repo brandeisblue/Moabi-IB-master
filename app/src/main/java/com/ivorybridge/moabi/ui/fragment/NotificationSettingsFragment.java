@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.service.MotionSensorService;
+import com.ivorybridge.moabi.service.TimerService;
 import com.ivorybridge.moabi.service.UserGoalJob;
 import com.ivorybridge.moabi.service.UserGoalPeriodicJob;
 
@@ -67,6 +68,15 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
                 timerSwitchPref.setChecked(isChecked);
                 notificationSPEditor.putBoolean(getString(R.string.preference_timer_notification), isChecked);
                 notificationSPEditor.commit();
+                if (isChecked) {
+                    if (TimerService.TimeContainer.getInstance().isServiceRunning.get()) {
+                        getContext().startService(new Intent(getActivity(), TimerService.class));
+                    } else {
+                        if (getActivity() != null) {
+                            getContext().stopService(new Intent(getActivity(), TimerService.class));
+                        }
+                    }
+                }
                 return false;
             }
         });

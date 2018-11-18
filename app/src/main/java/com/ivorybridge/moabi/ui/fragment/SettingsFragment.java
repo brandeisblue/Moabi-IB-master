@@ -2,6 +2,7 @@ package com.ivorybridge.moabi.ui.fragment;
 
 import android.app.AppOpsManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,24 +11,34 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.ivorybridge.moabi.R;
+import com.ivorybridge.moabi.database.entity.util.ConnectedService;
+import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.database.firebase.FirebaseManager;
 import com.ivorybridge.moabi.repository.AsyncCallsMasterRepository;
+import com.ivorybridge.moabi.repository.DataInUseRepository;
 import com.ivorybridge.moabi.ui.activity.AdvancedSettingsActivity;
 import com.ivorybridge.moabi.ui.activity.ConnectServicesActivity;
 import com.ivorybridge.moabi.ui.activity.EditActivitiesActivity;
 import com.ivorybridge.moabi.ui.activity.EditSurveyItemsActivity;
+import com.ivorybridge.moabi.ui.activity.SignInActivity;
 import com.ivorybridge.moabi.util.FormattedTime;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.util.Calendar;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.SwitchPreferenceCompat;
+import androidx.preference.SwitchPreference;
 
 import static android.app.AppOpsManager.MODE_ALLOWED;
 import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
@@ -70,11 +81,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         if (unit != null) {
             if (unit.equals(getString(R.string.preference_unit_si_title))) {
                 unitPreference.setValueIndex(0);
-                //unitPreference.setSummary(getString(R.string.preference_unit_si_summary));
             } else {
                 unitPreference.setValueIndex(1);
-               // unitPreference.setTitle(getString(R.string.preference_unit_title));
-                //unitPreference.setSummary(getString(R.string.preference_unit_usc_summary));
             }
         }
 
@@ -101,6 +109,108 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             }
         });
 
+        Preference signInPref = findPreference("preference_sign_in");
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            signInPref.setVisible(false);
+        } else {
+            signInPref.setVisible(true);
+        }
+
+        signInPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                startActivity(new Intent(getActivity(), SignInActivity.class));
+                getActivity().finish();
+                return false;
+            }
+        });
+
+        Preference signOutPref = findPreference("preference_sign_out");
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            signOutPref.setVisible(true);
+        } else {
+            signOutPref.setVisible(false);
+        }
+
+        signOutPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(getString(R.string.preference_sign_out_title))
+                        .setMessage(getString(R.string.preference_sign_out_dialog_prompt))
+                        .setPositiveButton(getString(R.string.dialog_positive_text), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                AuthUI.getInstance()
+                                        .signOut(getActivity())
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                // user is now signed out
+                                                startActivity(new Intent(getActivity(), SignInActivity.class));
+                                                getActivity().finish();
+                                            }
+                                        });
+                            }
+                        })
+                        .setNegativeButton(getString(R.string.dialog_negative_text), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                return false;
+            }
+        });
+
+        Preference deletePref = findPreference("preference_delete_account");
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            deletePref.setVisible(true);
+        } else {
+            deletePref.setVisible(false);
+        }
+
+        deletePref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(getString(R.string.preference_delete_account_title))
+                        .setMessage(getString(R.string.preference_delete_account_dialog_prompt))
+                        .setPositiveButton(getString(R.string.dialog_positive_text), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                AuthUI.getInstance()
+                                        .delete(getActivity())
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    startActivity(new Intent(getActivity(), SignInActivity.class));
+                                                    getActivity().finish();
+                                                } else {
+                                                    Toast.makeText(getContext(),
+                                                            getString(R.string.preference_delete_account_fail_msg),
+                                                            Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        });
+                            }
+                        })
+                        .setNegativeButton(getString(R.string.dialog_negative_text), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                return false;
+            }
+        });
+
         findPreference("preference_profile_screen").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -120,11 +230,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                 return false;
             }
         });
+
         findPreference("preference_apps_and_services").setOnPreferenceClickListener(this);
         findPreference("preference_surveys").setOnPreferenceClickListener(this);
         findPreference("preference_edit_activities").setOnPreferenceClickListener(this);
         findPreference("preference_sync").setOnPreferenceClickListener(this);
-        final SwitchPreferenceCompat switchPreference = (SwitchPreferenceCompat) findPreference("preference_phone_usage_permission");
+
+        final SwitchPreference switchPreference = (SwitchPreference) findPreference("preference_phone_usage_permission");
         if (isUsagePermissionGranted(mContext)) {
             switchPreference.setChecked(true);
         } else {
@@ -137,17 +249,56 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 if (!switchPreference.isChecked()) {
                     if (!isUsagePermissionGranted(mContext)) {
-                        mContext.startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setTitle(getString(R.string.preference_phone_usage_permission))
+                                .setMessage(getString(R.string.preference_phone_usage_permission_prompt))
+                                .setPositiveButton(getString(R.string.dialog_positive_text), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        mContext.startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .setNegativeButton(getString(R.string.dialog_negative_text), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
                     } else {
-                        Toast.makeText(mContext, "Data usage access is already granted", Toast.LENGTH_SHORT).show();
-                        firebaseManager.getIsConnectedRef().child(getString(R.string.phone_usage_camel_case)).setValue(true);
-                        firebaseManager.getInputsInUseRef().child(getString(R.string.phone_usage_camel_case)).setValue(true);
-                        switchPreference.setChecked(true);
+                        Toast.makeText(mContext, getContext().getString(R.string.phone_usage_permission_granted), Toast.LENGTH_SHORT).show();
+                        if (getActivity() != null) {
+                            DataInUseRepository dataInUseRepository = new DataInUseRepository(getActivity().getApplication());
+                            InputInUse inputInUse = new InputInUse();
+                            inputInUse.setType("tracker");
+                            inputInUse.setName(getContext().getString(R.string.phone_usage_camel_case));
+                            inputInUse.setInUse(true);
+                            dataInUseRepository.insert(inputInUse);
+                            ConnectedService connectedService = new ConnectedService();
+                            connectedService.setType("tracker");
+                            connectedService.setName(getContext().getString(R.string.phone_usage_camel_case));
+                            connectedService.setConnected(true);
+                            dataInUseRepository.insert(connectedService);
+                            switchPreference.setChecked(true);
+                        }
                     }
                 } else {
-                    switchPreference.setChecked(false);
-                    firebaseManager.getIsConnectedRef().child(getString(R.string.phone_usage_camel_case)).setValue(false);
-                    firebaseManager.getInputsInUseRef().child(getString(R.string.phone_usage_camel_case)).setValue(false);
+                    if (getActivity() != null) {
+                        DataInUseRepository dataInUseRepository = new DataInUseRepository(getActivity().getApplication());
+                        InputInUse inputInUse = new InputInUse();
+                        inputInUse.setType("tracker");
+                        inputInUse.setName(getContext().getString(R.string.phone_usage_camel_case));
+                        inputInUse.setInUse(false);
+                        dataInUseRepository.insert(inputInUse);
+                        ConnectedService connectedService = new ConnectedService();
+                        connectedService.setType("tracker");
+                        connectedService.setName(getContext().getString(R.string.phone_usage_camel_case));
+                        connectedService.setConnected(false);
+                        dataInUseRepository.insert(connectedService);
+                        switchPreference.setChecked(false);
+                    }
                 }
                 return false;
             }
@@ -220,7 +371,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             Intent editActivityIntent = new Intent(mContext, EditActivitiesActivity.class);
             startActivity(editActivityIntent);
         } if (key.equals("preference_sync")) {
-            asyncCallsMasterRepository.sync();
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                asyncCallsMasterRepository.sync();
+            } else {
+                Toast.makeText(getContext(), getString(R.string.sync_sign_in_warning), Toast.LENGTH_LONG).show();
+            }
         }
         return false;
     }

@@ -188,11 +188,15 @@ public class BAActivityEntryFragment extends Fragment {
                                     activityViewModel.addActivityEntry(entry, formattedTime.getCurrentDateAsYYYYMMDD());
                                     //activityRepository.insertFavoritedActivity(favoritedActivity);
                                     if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                        firebaseManager.getActivityTodayRef().child(getCurrentTimeInString()).child(favoritedActivity.getName()).child("numEntry").setValue(1L);
-                                        firebaseManager.getActivityTodayRef().child(getCurrentTimeInString()).child(favoritedActivity.getName()).child("type").setValue(favoritedActivity.getActivtyType());
-                                        firebaseManager.getActivityLast30DaysTodayRef().child(getCurrentTimeInString()).child(favoritedActivity.getName()).child("numEntry").setValue(1L);
-                                        firebaseManager.getActivityLast30DaysTodayRef().child(getCurrentTimeInString()).child(favoritedActivity.getName()).child("type").setValue(favoritedActivity.getActivtyType());
-                                        firebaseManager.getDaysWithDataTodayRef().child(getString(R.string.baactivity_camel_case)).setValue(true);
+                                        firebaseManager.getActivityTodayRef().
+                                                child(getCurrentTimeInString())
+                                                .child(favoritedActivity.getName())
+                                                .child("numEntry").setValue(1L);
+                                        firebaseManager.getActivityTodayRef()
+                                                .child(getCurrentTimeInString())
+                                                .child(favoritedActivity.getName())
+                                                .child("type")
+                                                .setValue(favoritedActivity.getActivtyType());
                                     }
                                 }
                             }

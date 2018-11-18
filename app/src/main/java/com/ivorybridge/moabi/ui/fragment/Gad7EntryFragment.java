@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.ivorybridge.moabi.R;
-import com.ivorybridge.moabi.database.entity.anxiety.DailyGad7;
 import com.ivorybridge.moabi.database.entity.anxiety.Gad7;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.database.firebase.FirebaseManager;
@@ -128,30 +127,6 @@ public class Gad7EntryFragment extends Fragment {
         Gad7QuestionItemItemAdapter.add(new Gad7QuestionItem(5));
         Gad7QuestionItemItemAdapter.add(new Gad7QuestionItem(6));
         Gad7QuestionItemItemAdapter.add(new Gad7QuestionItem(7));
-
-        anxietyViewModel.getEntries(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), 365),
-                formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())).observe(getViewLifecycleOwner(), new Observer<List<Gad7>>() {
-            @Override
-            public void onChanged(@Nullable List<Gad7> entries) {
-                if (entries != null) {
-                    if (entries.size() > 0) {
-                        Log.i(TAG, entries.toString());
-                    }
-                }
-            }
-        });
-
-        anxietyViewModel.getDailyGad7s(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), 365),
-                formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())).observe(getViewLifecycleOwner(), new Observer<List<DailyGad7>>() {
-            @Override
-            public void onChanged(@Nullable List<DailyGad7> entries) {
-                if (entries != null) {
-                    if (entries.size() > 0) {
-                        Log.i(TAG, entries.toString());
-                    }
-                }
-            }
-        });
 
         enableBackButton();
         //disableNextButton();
@@ -339,10 +314,9 @@ public class Gad7EntryFragment extends Fragment {
                                         gad7.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
                                         gad7.setScore(finalScore);
                                         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                            firebaseManager.getGad7DayWithDataRef().child(formattedTime.getCurrentDateAsYYYYMMDD()).setValue(true);
-                                            firebaseManager.getGad7Ref().child(formattedTime.getCurrentDateAsYYYYMMDD()).child(formattedTime.getCurrentTimeAsHHMM())
-                                                    .setValue(finalScore);
-                                            firebaseManager.getGad7Last30DaysRef().child(formattedTime.getCurrentDateAsYYYYMMDD()).child(formattedTime.getCurrentTimeAsHHMM())
+                                            firebaseManager.getGad7Ref()
+                                                    .child(formattedTime.getCurrentDateAsYYYYMMDD())
+                                                    .child(formattedTime.getCurrentTimeAsHHMM())
                                                     .setValue(finalScore);
                                         }
                                         anxietyViewModel.insert(gad7, formattedTime.getCurrentDateAsYYYYMMDD());

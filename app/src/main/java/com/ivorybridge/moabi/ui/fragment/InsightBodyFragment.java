@@ -454,6 +454,90 @@ public class InsightBodyFragment extends Fragment {
                     }
                 }
             });
+        } else if (inputType.equals(APPUSAGE)) {
+            if (getActivity() != null) {
+                appUsageRepository = new AppUsageRepository(getActivity().getApplication());
+
+                chipGroup.removeAllViews();
+                Set<Long> dates = new TreeSet<>();
+                Set<String> apps = new TreeSet<>();
+                Map<String, Long> dataMap = new LinkedHashMap<>();
+                Handler handler = new Handler();
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<AppUsageSummary> appUsageSummaries = appUsageRepository.getAllNow(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                                formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                        if (appUsageSummaries != null && appUsageSummaries.size() > 0) {
+                            for (AppUsageSummary appUsageSummary : appUsageSummaries) {
+                                Log.i(TAG, formattedTime.convertLongToYYYYMMDD(appUsageSummary.getDateInLong()));
+                                List<AppUsage> appUsages = appUsageSummary.getActivities();
+                                for (AppUsage appUsage : appUsages) {
+                                    if (dataMap.get(appUsage.getAppName()) != null) {
+                                        Long old = dataMap.get(appUsage.getAppName());
+                                        dataMap.put(appUsage.getAppName(), old + appUsage.getTotalTime());
+                                    } else {
+                                        dataMap.put(appUsage.getAppName(), appUsage.getTotalTime());
+                                    }
+                                }
+                                dates.add(appUsageSummary.getDateInLong());
+                            }
+                            Long start = ((TreeSet<Long>) dates).first();
+                            Long end = ((TreeSet<Long>) dates).last();
+                            Long numDays = TimeUnit.MILLISECONDS.toDays(end - start);
+                            //Log.i(TAG, "Start: " + appUsageSummaries.get(0).getDate() + ", End: " + appUsageSummaries.get(appUsageSummaries.size() - 1).getDate());
+                            Log.i(TAG, "Num of Days: " + TimeUnit.MILLISECONDS.toDays(end - start));
+                            for (Map.Entry<String, Long> entry : dataMap.entrySet()) {
+                                if ((TimeUnit.MILLISECONDS.toMinutes(entry.getValue()) / numDays) > 5) {
+                                    if (entry.getKey().equals(getString(R.string.phone_usage_total_title))) {
+                                        apps.add("0" + getString(R.string.phone_usage_total_title));
+                                    } else {
+                                        apps.add(entry.getKey());
+                                    }
+                                }
+                            }
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    int i = 0;
+                                    int indexOfTotal = 0;
+                                    for (String name : apps) {
+                                        Chip chip = new Chip(getContext());
+                                        if (name.equals("0" + getString(R.string.phone_usage_total_title))) {
+                                            chip.setText(getString(R.string.phone_usage_total_title));
+                                            indexOfTotal = i;
+                                        } else {
+                                            chip.setText(name);
+                                            i++;
+                                        }
+                                        chip.setTextAppearanceResource(R.style.ChipTextStyle);
+                                        chip.setCheckable(true);
+                                        chip.setCheckedIconVisible(false);
+                                        chipGroup.addView(chip);
+                                    }
+                                    Chip total = (Chip) chipGroup.getChildAt(indexOfTotal);
+                                    total.setChecked(true);
+                                    configureSummary(getString(R.string.phone_usage_total_title), numOfDays);
+                                    chipGroup.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
+                                        @Override
+                                        public void onCheckedChanged(ChipGroup chipGroup, int i) {
+                                            Chip checkedChip = chipGroup.findViewById(chipGroup.getCheckedChipId());
+                                            if (checkedChip != null) {
+                                                Boolean isChecked = checkedChip.isChecked();
+                                                if (isChecked) {
+                                                    configureSummary(checkedChip.getText().toString(), numOfDays);
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    }
+                }).start();
+            }
         } else if (inputType.equals(ACTIVITY)) {
             chipGroup.removeAllViews();
             activityViewModel.getActivityEntries(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
@@ -1194,7 +1278,7 @@ public class InsightBodyFragment extends Fragment {
                                             }
                                         }
                                     }
-                                    for (Map.Entry<String, Double> entry: activitySummaryMap.entrySet()) {
+                                    for (Map.Entry<String, Double> entry : activitySummaryMap.entrySet()) {
                                         String eeeDate = formattedTime.convertStringYYYYMMDDToEEE(entry.getKey());
                                         Long oldCount = countByDayMap.get(eeeDate);
                                         countByDayMap.put(eeeDate, oldCount + 1L);
@@ -1313,7 +1397,7 @@ public class InsightBodyFragment extends Fragment {
                                             }
                                         }
                                     }
-                                    for (Map.Entry<String, Double> entry: activitySummaryMap.entrySet()) {
+                                    for (Map.Entry<String, Double> entry : activitySummaryMap.entrySet()) {
                                         String eeeDate = formattedTime.convertStringYYYYMMDDToEEE(entry.getKey());
                                         Long oldCount = countByDayMap.get(eeeDate);
                                         countByDayMap.put(eeeDate, oldCount + 1L);

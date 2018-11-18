@@ -65,6 +65,7 @@ public class UserGoalService extends Service implements SensorEventListener {
     @Override
     public void onCreate() {
         super.onCreate();
+        this.notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     @Override
@@ -79,7 +80,6 @@ public class UserGoalService extends Service implements SensorEventListener {
                 Context.MODE_PRIVATE);
         if (notificationSharedPreferences.getBoolean(
                 getString(R.string.preference_personal_goal_notification), false)) {
-            this.notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             this.isNotificationShowing = false;
             this.formattedTime = new FormattedTime();
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -244,7 +244,7 @@ public class UserGoalService extends Service implements SensorEventListener {
             NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.USER_GOAL_NOTIF_CHANNEL_ID),
                     NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
             channel.setDescription(NOTIFICATION_CHANNEL_DESC);
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(channel);
         }
         startForeground(NOTIFICATION_ID, notification);
@@ -402,7 +402,7 @@ public class UserGoalService extends Service implements SensorEventListener {
             NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.USER_GOAL_NOTIF_CHANNEL_ID),
                     NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
             channel.setDescription(NOTIFICATION_CHANNEL_DESC);
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(channel);
         }
         startForeground(NOTIFICATION_ID, notification);

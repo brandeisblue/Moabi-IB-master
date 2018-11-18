@@ -267,11 +267,10 @@ public class DailyReviewEntryFragment extends Fragment {
                                 dailyReview.setDailyReview(score);
                                 dailyReview.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
                                 if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                    firebaseManager.getDaysWithDataTodayRef().child(getString(R.string.daily_review_camel_case)).setValue(true);
-                                    firebaseManager.getDailyReviewRef().child(formattedTime.getCurrentDateAsYYYYMMDD()).child(formattedTime.getCurrentTimeAsHHMM())
+                                    firebaseManager.getDailyReviewRef()
+                                            .child(formattedTime.getCurrentDateAsYYYYMMDD())
+                                            .child(formattedTime.getCurrentTimeAsHHMM())
                                             .setValue(score);
-                                    firebaseManager.getDailyReviewLast30DaysRef().child(formattedTime.getCurrentDateAsYYYYMMDD())
-                                            .child(formattedTime.getCurrentTimeAsHHMM()).setValue(score);
                                 }
                                 dailyReviewViewModel.insert(dailyReview, formattedTime.getCurrentDateAsYYYYMMDD());
                                 deselectAll();

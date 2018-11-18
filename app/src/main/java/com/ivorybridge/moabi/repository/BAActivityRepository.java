@@ -97,14 +97,11 @@ public class BAActivityRepository {
                                 }
                             }
                         }
-                        firebaseManager.getDaysWithDataRef().child(date).child(application.getString(R.string.baactivity_camel_case)).setValue(true);
                     }
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }

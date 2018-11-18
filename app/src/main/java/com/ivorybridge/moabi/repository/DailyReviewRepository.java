@@ -86,12 +86,14 @@ public class DailyReviewRepository {
                             if (timeSnap.getKey() != null) {
                                 String dateTimeToConvert = date + " " + timeSnap.getKey();
                                 long dateInLong = formattedTime.convertStringYYYYMMDDhhmmToLong(dateTimeToConvert);
-                                DailyReview entry = new DailyReview();
-                                entry.setDailyReview((Long) timeSnap.child(application.getString(R.string.daily_review_camel_case)).getValue());
-                                entry.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
-                                entry.setDateInLong(dateInLong);
-                                Log.i(TAG, dateTimeToConvert + ": " + entry.getDailyReview() + ", ");
-                                insert(entry, date);
+                                if ((Long) timeSnap.getValue() != null) {
+                                    DailyReview entry = new DailyReview();
+                                    entry.setDailyReview((Long) timeSnap.getValue());
+                                    entry.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
+                                    entry.setDateInLong(dateInLong);
+                                    Log.i(TAG, dateTimeToConvert + ": " + entry.getDailyReview() + ", ");
+                                    insert(entry, date);
+                                }
                             }
                         }
                         firebaseManager.getDaysWithDataRef().child(date).child(application.getString(R.string.daily_review_camel_case)).setValue(true);

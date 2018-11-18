@@ -3,7 +3,11 @@ package com.ivorybridge.moabi.repository;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.util.Log;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.dao.AsyncTaskBooleanDao;
 import com.ivorybridge.moabi.database.dao.BuiltInFitnessDao;
@@ -18,6 +22,7 @@ import com.ivorybridge.moabi.util.FormattedTime;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 
 public class BuiltInFitnessRepository {
@@ -85,6 +90,30 @@ public class BuiltInFitnessRepository {
         } else {
             return false;
         }
+    }
+
+    public void sync() {
+        firebaseManager.getConnectedServicesRef().child(application.getString(R.string.moabi_tracker_camel_case))
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot dateSnap : dataSnapshot.getChildren()) {
+                    if (dateSnap.getKey() != null) {
+                        String date = dateSnap.getKey();
+                        BuiltInActivitySummary builtInActivitySummary = new BuiltInActivitySummary();
+                        if (dateSnap.getValue() != null) {
+                            builtInActivitySummary = dateSnap.getValue(BuiltInActivitySummary.class);
+                        }
+                        Log.i(TAG, builtInActivitySummary.getDate() + ": " + builtInActivitySummary.getSteps());
+                        insert(builtInActivitySummary, date);
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private static class insertAsyncTask extends AsyncTask<BuiltInActivitySummary, Void, Void> {

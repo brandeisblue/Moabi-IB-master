@@ -21,7 +21,7 @@ import com.ivorybridge.moabi.database.entity.util.ConnectedService;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.network.auth.AuthStateManager;
 import com.ivorybridge.moabi.network.auth.FitbitAuthTokenHandler;
-import com.ivorybridge.moabi.network.auth.GoogleFitService;
+import com.ivorybridge.moabi.network.auth.GoogleFitAPI;
 import com.ivorybridge.moabi.ui.recyclerviewitem.connectservicesactivity.ServiceItem;
 import com.ivorybridge.moabi.viewmodel.DataInUseViewModel;
 import com.mikepenz.fastadapter.FastAdapter;
@@ -45,7 +45,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 /**
  * This class displays UI for ConnectServicesActivity, which displays a list of services
- * that users can connect to, such as Fitbit, GoogleFitService and built-in app usage tracker.
+ * that users can connect to, such as Fitbit, GoogleFitAPI and built-in app usage tracker.
  *
  */
 public class ConnectServicesActivity extends AppCompatActivity implements
@@ -241,7 +241,7 @@ public class ConnectServicesActivity extends AppCompatActivity implements
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         dialog.dismiss();
-                        GoogleFitService gFit = new GoogleFitService(ConnectServicesActivity.this);
+                        GoogleFitAPI gFit = new GoogleFitAPI(ConnectServicesActivity.this);
                         gFit.requestPermission();
                         dialog.dismiss();
                     }

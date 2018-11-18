@@ -17,11 +17,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.entity.builtinfitness.BuiltInActivitySummary;
 import com.ivorybridge.moabi.database.entity.builtinfitness.BuiltInProfile;
+import com.ivorybridge.moabi.database.firebase.FirebaseManager;
 import com.ivorybridge.moabi.repository.BuiltInFitnessRepository;
-import com.ivorybridge.moabi.repository.DataInUseRepository;
 import com.ivorybridge.moabi.ui.activity.MainActivity;
 import com.ivorybridge.moabi.util.FormattedTime;
 
@@ -35,20 +36,6 @@ public class MotionSensorService extends Service implements SensorEventListener 
 
     private static final String TAG = MotionSensorService.class.getSimpleName();
     private SensorManager sensorManager;
-    // Continuous. possibly for distance.
-    // Output of the accelerometer minus the output of the gravity sensor.
-    // Reported in m/s^2 in the x, y and z fields of sensors_event_t.acceleration
-    private Sensor linearAccelSensor;
-    private Sensor accelSensor;
-    private Sensor pickUpSensor;
-    private Sensor gravitySensor;
-    private Sensor gyroSensor;
-    private Sensor motionSensor;
-    private Sensor stationarySensor;
-    // Triggers when the detecting a “significant motion”: a motion that might lead to a change in the user location.
-    // Used to reduce the power consumption of location determination.
-    // Each sensor event reports 1 in sensors_event_t.data[0]
-    private Sensor sigMotionSensor;
     // Generates an event each time a step is taken by the user.
     // The timestamp of the event sensors_event_t.timestamp corresponds to when the foot hit the ground, generating a high variation in acceleration.
     private Sensor stepDetectorSensor;
@@ -85,11 +72,11 @@ public class MotionSensorService extends Service implements SensorEventListener 
     private Notification customNotification;
     private FormattedTime formattedTime;
     private BuiltInFitnessRepository builtInFitnessRepository;
-    private DataInUseRepository dataInUseRepository;
     private BuiltInActivitySummary activitySummary;
     private BuiltInProfile profile;
     private NotificationCompat.Builder builder;
     private SharedPreferences notificationSharedPreferences;
+    private FirebaseManager firebaseManager;
 
     @Override
     public void onCreate() {
@@ -97,8 +84,8 @@ public class MotionSensorService extends Service implements SensorEventListener 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         formattedTime = new FormattedTime();
+        firebaseManager = new FirebaseManager();
         builtInFitnessRepository = new BuiltInFitnessRepository(getApplication());
-        dataInUseRepository = new DataInUseRepository(getApplication());
         notificationSharedPreferences = getSharedPreferences(
                 getString(R.string.com_ivorybridge_mobai_NOTIFICATION_SHARED_PREFERENCE),
                 Context.MODE_PRIVATE);
@@ -181,7 +168,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
             NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID),
                     NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
             channel.setDescription(NOTIFICATION_CHANNEL_DESC);
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(channel);
         }
         startForeground(NOTIFICATION_ID, notification);
@@ -276,6 +263,11 @@ public class MotionSensorService extends Service implements SensorEventListener 
                 activitySummary.setSedentaryMinutes(sedentaryMins);
                 activitySummary.setCalories(calories);
                 builtInFitnessRepository.insert(activitySummary, formattedTime.getCurrentDateAsYYYYMMDD());
+                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                    firebaseManager.getConnectedServicesRef().child(getString(R.string.moabi_tracker_camel_case))
+                            .child(formattedTime.getCurrentDateAsYYYYMMDD())
+                            .setValue(activitySummary);
+                }
                 handler.post(new Runnable() {
                     @Override
                     public void run() {

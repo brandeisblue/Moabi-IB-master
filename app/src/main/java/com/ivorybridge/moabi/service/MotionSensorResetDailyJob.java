@@ -5,7 +5,10 @@ import android.content.Intent;
 
 import com.evernote.android.job.DailyJob;
 import com.evernote.android.job.JobRequest;
+import com.google.firebase.auth.FirebaseAuth;
+import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.entity.builtinfitness.BuiltInActivitySummary;
+import com.ivorybridge.moabi.database.firebase.FirebaseManager;
 import com.ivorybridge.moabi.repository.BuiltInFitnessRepository;
 import com.ivorybridge.moabi.util.FormattedTime;
 
@@ -17,6 +20,8 @@ public class MotionSensorResetDailyJob extends DailyJob {
 
     public static final String TAG = "motion_sensor_daily_job";
     private Application application;
+    private FirebaseManager firebaseManager;
+
     public MotionSensorResetDailyJob(Application application) {
         this.application = application;
     }
@@ -37,6 +42,13 @@ public class MotionSensorResetDailyJob extends DailyJob {
         activitySummary.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
         activitySummary.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
         builtInFitnessRepository.insert(activitySummary, formattedTime.getCurrentDateAsYYYYMMDD());
+        firebaseManager = new FirebaseManager();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            firebaseManager.getConnectedServicesRef().child(application.getString(R.string.moabi_tracker_camel_case))
+                    .child(formattedTime.getCurrentDateAsYYYYMMDD())
+                    .setValue(activitySummary);
+        }
+        application.stopService(new Intent(application, MotionSensorService.class));
         application.startService(new Intent(application, MotionSensorService.class));
         return DailyJobResult.SUCCESS;
     }

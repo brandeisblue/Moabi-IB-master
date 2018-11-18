@@ -308,7 +308,6 @@ public class TimerActivity extends AppCompatActivity implements PropertyChangeLi
                     .child(formattedTime.getCurrentDateAsYYYYMMDD())
                     .child(formattedTime.convertLongToHHMM(timedActivitySummary.getDateInLong()))
                     .child(name).setValue(timedActivitySummary.getDuration());
-            firebaseManager.getDaysWithDataTodayRef().child(getString(R.string.timer_camel_case)).setValue(true);
         }
         TimerService.TimeContainer.getInstance().stopAndReset();
         //playButton.setText("start");

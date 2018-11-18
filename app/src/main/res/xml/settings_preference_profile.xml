@@ -11,5 +11,4 @@
             android:key="personal_goal_preference"
             app:iconSpaceReserved="false"
             android:title="Personal Goal Notification" />
-
 </androidx.preference.PreferenceScreen>

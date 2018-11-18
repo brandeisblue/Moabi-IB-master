@@ -140,7 +140,6 @@ public class FitbitRepository {
                         if (response.isSuccessful()) {
                             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                                 firebaseManager.getFitbitRef().child(date).child("activitySummary").setValue(response.body());
-                                firebaseManager.getFitbitLast30DaysRef().child(date).child("activitySummary").setValue(response.body());
                             }
                             fitbitDailySummary.setActivitySummary(response.body());
                             if (response.body() != null) {
@@ -161,8 +160,6 @@ public class FitbitRepository {
                                         }
                                         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                                             firebaseManager.getFitbitRef().child(date)
-                                                    .child("sleep").setValue(response.body());
-                                            firebaseManager.getFitbitLast30DaysRef().child(date)
                                                     .child("sleep").setValue(response.body());
                                         }
                                         Call<List<FitbitDeviceStatusSummary>> fitbitDeviceStatusCall
@@ -186,9 +183,6 @@ public class FitbitRepository {
                                                                 }
                                                             }
                                                             insert(fitbitDailySummary, date);
-                                                            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                                                firebaseManager.getDaysWithDataRef().child(date).child(mApplication.getString(R.string.fitbit_camel_case)).setValue(true);
-                                                            }
                                                         } else {
                                                             getAccessTokenWithRefreshToken(date);
                                                         }
@@ -263,7 +257,6 @@ public class FitbitRepository {
                     dailySummary.setSleepSummary(sleepSummary);
                     Log.i(TAG, sleepSummary.toString());
                     insert(dailySummary, date);
-                    firebaseManager.getDaysWithDataRef().child(date).child(mApplication.getString(R.string.fitbit_title)).setValue(true);
                 }
             }
 

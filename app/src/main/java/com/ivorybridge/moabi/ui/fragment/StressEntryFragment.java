@@ -144,11 +144,10 @@ public class StressEntryFragment extends Fragment {
                                 stress.setStress(lastProgress.doubleValue());
                                 stress.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
                                 if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                    firebaseManager.getDaysWithDataTodayRef().child(getString(R.string.stress_camel_case)).setValue(true);
-                                    firebaseManager.getStressRef().child(formattedTime.getCurrentDateAsYYYYMMDD()).child(formattedTime.getCurrentTimeAsHHMM())
+                                    firebaseManager.getStressRef()
+                                            .child(formattedTime.getCurrentDateAsYYYYMMDD())
+                                            .child(formattedTime.getCurrentTimeAsHHMM())
                                             .setValue(lastProgress.doubleValue());
-                                    firebaseManager.getStressLast30DaysRef().child(formattedTime.getCurrentDateAsYYYYMMDD())
-                                            .child(formattedTime.getCurrentTimeAsHHMM()).setValue(lastProgress.doubleValue());
                                 }
                                 stressViewModel.insert(stress, formattedTime.getCurrentDateAsYYYYMMDD());
                                 lastProgress = null;

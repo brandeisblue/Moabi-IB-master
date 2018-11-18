@@ -10,7 +10,7 @@ import com.ivorybridge.moabi.database.db.AsyncTaskBooleanDB;
 import com.ivorybridge.moabi.database.entity.util.AsyncTaskBoolean;
 import com.ivorybridge.moabi.database.entity.util.ConnectedService;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
-import com.ivorybridge.moabi.network.auth.GoogleFitService;
+import com.ivorybridge.moabi.network.auth.GoogleFitAPI;
 import com.ivorybridge.moabi.util.FormattedTime;
 
 import java.util.List;
@@ -21,13 +21,18 @@ public class AsyncCallsMasterRepository {
 
     private static final String TAG = AsyncCallsMasterRepository.class.getSimpleName();
     private FitbitRepository fitbitRepository;
-    private GoogleFitService googleFitService;
+    private GoogleFitAPI googleFitAPI;
     private GoogleFitRepository googleFitRepository;
     private AppUsageRepository appUsageRepository;
     private WeatherRepository weatherRepository;
     private MoodAndEnergyRepository moodAndEnergyRepository;
     private BAActivityRepository baActivityRepository;
     private TimedActivityRepository timedActivityRepository;
+    private DepressionRepository depressionRepository;
+    private AnxietyRepository anxietyRepository;
+    private DailyReviewRepository dailyReviewRepository;
+    private StressRepository stressRepository;
+    private BuiltInFitnessRepository builtInFitnessRepository;
     private DataInUseRepository dataInUseRepository;
     private FormattedTime formattedTime;
     private Context context;
@@ -38,13 +43,18 @@ public class AsyncCallsMasterRepository {
 
     public AsyncCallsMasterRepository(AppCompatActivity activity, String date) {
         this.fitbitRepository = new FitbitRepository(activity.getApplication());
-        this.googleFitService = new GoogleFitService(activity);
+        this.googleFitAPI = new GoogleFitAPI(activity);
         this.appUsageRepository = new AppUsageRepository(activity.getApplication());
         this.googleFitRepository = new GoogleFitRepository(activity.getApplication());
         this.weatherRepository = new WeatherRepository(activity.getApplication());
         this.moodAndEnergyRepository = new MoodAndEnergyRepository(activity.getApplication());
         this.baActivityRepository = new BAActivityRepository(activity.getApplication());
         this.timedActivityRepository = new TimedActivityRepository(activity.getApplication());
+        this.depressionRepository = new DepressionRepository(activity.getApplication());
+        this.anxietyRepository = new AnxietyRepository(activity.getApplication());
+        this.stressRepository = new StressRepository(activity.getApplication());
+        this.dailyReviewRepository = new DailyReviewRepository(activity.getApplication());
+        this.builtInFitnessRepository = new BuiltInFitnessRepository(activity.getApplication());
         this.dataInUseRepository = new DataInUseRepository(activity.getApplication());
         this.date = date;
         this.context = activity.getApplicationContext();
@@ -56,13 +66,18 @@ public class AsyncCallsMasterRepository {
 
     public AsyncCallsMasterRepository(Application application, String date) {
         this.fitbitRepository = new FitbitRepository(application);
-        this.googleFitService = new GoogleFitService(application);
+        this.googleFitAPI = new GoogleFitAPI(application);
         this.appUsageRepository = new AppUsageRepository(application);
         this.googleFitRepository = new GoogleFitRepository(application);
         this.weatherRepository = new WeatherRepository(application);
         this.moodAndEnergyRepository = new MoodAndEnergyRepository(application);
         this.baActivityRepository = new BAActivityRepository(application);
         this.timedActivityRepository = new TimedActivityRepository(application);
+        this.depressionRepository = new DepressionRepository(application);
+        this.anxietyRepository = new AnxietyRepository(application);
+        this.stressRepository = new StressRepository(application);
+        this.dailyReviewRepository = new DailyReviewRepository(application);
+        this.builtInFitnessRepository = new BuiltInFitnessRepository(application);
         this.dataInUseRepository = new DataInUseRepository(application);
         this.date = date;
         this.context = application.getApplicationContext();
@@ -114,8 +129,8 @@ public class AsyncCallsMasterRepository {
                                         AsyncTaskBoolean appUsageTaskSuccess = new AsyncTaskBoolean(application.getString(R.string.googlefit_camel_case));
                                         appUsageTaskSuccess.setResult(false);
                                         insertSuccess(appUsageTaskSuccess);
-                                        googleFitService.downloadData(date);
-                                        googleFitService.downloadData(formattedTime.getDateBeforeSpecifiedNumberOfDaysAsYYYYMMDD(date, 1));
+                                        googleFitAPI.downloadData(date);
+                                        googleFitAPI.downloadData(formattedTime.getDateBeforeSpecifiedNumberOfDaysAsYYYYMMDD(date, 1));
                                     } else if (name.equals(application.getString(R.string.weather_camel_case))) {
                                         AsyncTaskBoolean appUsageTaskSuccess = new AsyncTaskBoolean(application.getString(R.string.weather_camel_case));
                                         appUsageTaskSuccess.setResult(false);
@@ -146,6 +161,12 @@ public class AsyncCallsMasterRepository {
                 moodAndEnergyRepository.sync();
                 baActivityRepository.sync();
                 timedActivityRepository.sync();
+                depressionRepository.sync();
+                anxietyRepository.sync();
+                stressRepository.sync();
+                dailyReviewRepository.sync();
+                builtInFitnessRepository.sync();
+                weatherRepository.sync();
             }
         });
         thread.start();

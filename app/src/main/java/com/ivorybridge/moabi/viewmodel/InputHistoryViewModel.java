@@ -39,6 +39,10 @@ public class InputHistoryViewModel extends AndroidViewModel {
         return inputHistoryRepository.getInputDates();
     }
 
+    public List<InputDate> getAllInputDatesNow() {
+        return inputHistoryRepository.getInputDatesNow();
+    }
+
     public LiveData<List<String>> getAllInputTypes(Long start, Long end) {
         return inputHistoryRepository.getInputTypes(start, end);
     }

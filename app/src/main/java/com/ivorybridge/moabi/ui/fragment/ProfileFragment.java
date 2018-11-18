@@ -204,7 +204,7 @@ public class ProfileFragment extends Fragment {
                                             new DatePickerDialog.OnDateSetListener() {
                                                 @Override
                                                 public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-                                                    final String birthday = year + "/" + monthOfYear + 1+ "/" + dayOfMonth;
+                                                    final String birthday = year + "/" + (monthOfYear + 1) + "/" + dayOfMonth;
                                                     new Thread(new Runnable() {
                                                         @Override
                                                         public void run() {

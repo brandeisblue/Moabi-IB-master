@@ -87,12 +87,14 @@ public class TimedActivityRepository {
                                     if (activitySnap.getKey() != null && activitySnap.hasChildren()) {
                                         String dateTimeToConvert = date + " " + timeSnap.getKey();
                                         long dateInLong = formattedTime.convertStringYYYYMMDDhhmmToLong(dateTimeToConvert);
-                                        TimedActivitySummary timedActivitySummary = new TimedActivitySummary();
-                                        timedActivitySummary.setInputName(activitySnap.getKey());
-                                        timedActivitySummary.setDateInLong(dateInLong);
-                                        timedActivitySummary.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
-                                        timedActivitySummary.setDuration((Long) activitySnap.getValue());
-                                        insert(timedActivitySummary, date);
+                                        if ((Long) activitySnap.getValue() != null) {
+                                            TimedActivitySummary timedActivitySummary = new TimedActivitySummary();
+                                            timedActivitySummary.setInputName(activitySnap.getKey());
+                                            timedActivitySummary.setDateInLong(dateInLong);
+                                            timedActivitySummary.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
+                                            timedActivitySummary.setDuration((Long) activitySnap.getValue());
+                                            insert(timedActivitySummary, date);
+                                        }
                                     }
                                 }
 

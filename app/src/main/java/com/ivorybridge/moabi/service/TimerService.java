@@ -202,6 +202,8 @@ public class TimerService extends Service implements PropertyChangeListener {
             public void run() {
                 if (notificationSharedPreferences.getBoolean(getString(R.string.preference_timer_notification), false)) {
                     updateNotification();
+                } else {
+                    stopForeground(true);
                 }
             }
         }, 0, 1000);
@@ -250,7 +252,7 @@ public class TimerService extends Service implements PropertyChangeListener {
                     .setContentText(msToHourMinSec(TimeContainer.getInstance().getElapsedTime()))
                     .addAction(R.drawable.ic_reset, getString(R.string.reset_title), resetPendingIntent)
                     .addAction(R.drawable.ic_stop_black, getString(R.string.stop_title), stopPendingIntent)
-                    .addAction(R.drawable.ic_pause_black, getString(R.string.pause_title), changeStatePendingIntent)
+                    .addAction(R.drawable.ic_play_arrow, getString(R.string.start_title), changeStatePendingIntent)
                     .addAction(R.drawable.ic_save, getString(R.string.save_title), savePendingIntent)
                     .addAction(R.drawable.ic_cancel, getString(R.string.exit_title), exitPendingIntent)
                     .setDeleteIntent(exitPendingIntent)
@@ -262,7 +264,7 @@ public class TimerService extends Service implements PropertyChangeListener {
                             .setShowActionsInCompactView(1, 2, 3))
                     .build();
         }
-       //this.startForeground(NOTIFICATION_ID, customNotification);
+        //this.startForeground(NOTIFICATION_ID, customNotification);
         if(Build.VERSION.SDK_INT>=26) {
             NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.CHRONOMETER_NOTIF_CHANNEL_ID),
                     NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
@@ -457,5 +459,4 @@ public class TimerService extends Service implements PropertyChangeListener {
             startUpdateTimer();
         }
     }
-
 }

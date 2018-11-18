@@ -398,11 +398,15 @@ public class MoodEntryFragment extends Fragment {
                             //TODO - if getActivities for today (start of day till now) isn't null, update daysWithData
                             latestMoodAndEnergy.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
                             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                moodAndEnergyHasDataRef.setValue(true);
-                                firebaseManager.getMoodAndEnergyLevelTodayRef().child(formattedTime.getCurrentTimeAsHHMM())
-                                        .setValue(latestMoodAndEnergy);
-                                firebaseManager.getMoodAndEnergyLast30DaysTodayRef()
-                                        .child(formattedTime.getCurrentTimeAsHHMM()).setValue(latestMoodAndEnergy);
+                                String currentTime = formattedTime.getCurrentTimeAsHHMM();
+                                firebaseManager.getMoodAndEnergyLevelTodayRef()
+                                        .child(currentTime)
+                                        .child(getString(R.string.mood_camel_case))
+                                        .setValue(latestMoodAndEnergy.getMood());
+                                firebaseManager.getMoodAndEnergyLevelTodayRef()
+                                        .child(currentTime)
+                                        .child(getString(R.string.energy_camel_case))
+                                        .setValue(latestMoodAndEnergy.getEnergyLevel());
                             }
                             moodAndEnergyViewModel.insert(latestMoodAndEnergy, formattedTime.getCurrentDateAsYYYYMMDD());
                             moodAndEnergyViewModel.getEntries(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), 365),

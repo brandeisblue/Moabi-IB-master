@@ -393,10 +393,9 @@ public class Phq9EntryFragment extends Fragment {
                                         phq9.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
                                         phq9.setScore(finalScore);
                                         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                            firebaseManager.getPhq9DayWithDataRef().child(formattedTime.getCurrentDateAsYYYYMMDD()).setValue(true);
-                                            firebaseManager.getPhq9Ref().child(formattedTime.getCurrentDateAsYYYYMMDD()).child(formattedTime.getCurrentTimeAsHHMM())
-                                                    .setValue(finalScore);
-                                            firebaseManager.getPhq9Last30DaysRef().child(formattedTime.getCurrentDateAsYYYYMMDD()).child(formattedTime.getCurrentTimeAsHHMM())
+                                            firebaseManager.getPhq9Ref().child(
+                                                    formattedTime.getCurrentDateAsYYYYMMDD()).child(
+                                                            formattedTime.getCurrentTimeAsHHMM())
                                                     .setValue(finalScore);
                                         }
                                         depressionViewModel.insert(phq9, formattedTime.getCurrentDateAsYYYYMMDD());

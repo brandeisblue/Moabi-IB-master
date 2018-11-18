@@ -85,12 +85,14 @@ public class DepressionRepository {
                             if (timeSnap.getKey() != null) {
                                 String dateTimeToConvert = date + " " + timeSnap.getKey();
                                 long dateInLong = formattedTime.convertStringYYYYMMDDhhmmToLong(dateTimeToConvert);
-                                Phq9 entry = new Phq9();
-                                entry.setScore((Long) timeSnap.getValue());
-                                entry.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
-                                entry.setDateInLong(dateInLong);
-                                Log.i(TAG, dateTimeToConvert + ": " + entry.getScore() + ", ");
-                                insert(entry, date);
+                                if ((Long) timeSnap.getValue() != null){
+                                    Phq9 entry = new Phq9();
+                                    entry.setScore((Long) timeSnap.getValue());
+                                    entry.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
+                                    entry.setDateInLong(dateInLong);
+                                    Log.i(TAG, dateTimeToConvert + ": " + entry.getScore() + ", ");
+                                    insert(entry, date);
+                                }
                             }
                         }
                         firebaseManager.getDaysWithDataRef().child(date).child(application.getString(R.string.depression_phq9_camel_case)).setValue(true);

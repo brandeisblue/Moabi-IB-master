@@ -176,13 +176,7 @@ public class GoogleFitRepository {
                     googleFitSummary.setGoals(goals);
                     googleFitSummary.setSummaries(summaries);
                     insert(googleFitSummary, date);
-                    InputHistory googleFitInput = new InputHistory();
-                    googleFitInput.setDate(date);
-                    googleFitInput.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
-                    googleFitInput.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
-                    googleFitInput.setInputType(application.getString(R.string.googlefit_camel_case));
-                    inputHistoryRepository.insert(googleFitInput);
-                    firebaseManager.getDaysWithDataRef().child(date).child(application.getString(R.string.googlefit_camel_case)).setValue(true);
+                    //firebaseManager.getDaysWithDataRef().child(date).child(application.getString(R.string.googlefit_camel_case)).setValue(true);
                 }
             }
 

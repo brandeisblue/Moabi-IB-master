@@ -87,12 +87,19 @@ public class StressRepository {
                             if (timeSnap.getKey() != null) {
                                 String dateTimeToConvert = date + " " + timeSnap.getKey();
                                 long dateInLong = formattedTime.convertStringYYYYMMDDhhmmToLong(dateTimeToConvert);
-                                Stress entry = new Stress();
-                                entry.setStress((Double) timeSnap.child(application.getString(R.string.stress_camel_case)).getValue());
-                                entry.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
-                                entry.setDateInLong(dateInLong);
-                                Log.i(TAG, dateTimeToConvert + ": " + entry.getStress() + ", ");
-                                insert(entry, date);
+                                if (timeSnap.getValue() != null) {
+                                    Stress entry = new Stress();
+                                    if (timeSnap.getValue() instanceof Double) {
+                                        entry.setStress((Double) timeSnap.getValue());
+                                    } else if (timeSnap.getValue() instanceof Long) {
+                                        Long value = (Long)timeSnap.getValue();
+                                        entry.setStress(value.doubleValue());
+                                    }
+                                    entry.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
+                                    entry.setDateInLong(dateInLong);
+                                    Log.i(TAG, dateTimeToConvert + ": " + entry.getStress() + ", ");
+                                    insert(entry, date);
+                                }
                             }
                         }
                         firebaseManager.getDaysWithDataRef().child(date).child(application.getString(R.string.stress_camel_case)).setValue(true);

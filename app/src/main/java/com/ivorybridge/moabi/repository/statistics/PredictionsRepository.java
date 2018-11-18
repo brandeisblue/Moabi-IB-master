@@ -721,6 +721,291 @@ public class PredictionsRepository {
         }
     }
 
+    public void processGoogleFitXWeatherRegression(Map<String, GoogleFitSummary> googleFitSummaryMap,
+                                                   Map<String, WeatherDailySummary> weatherDailySummaryMap, int duration) {
+        List<WeatherDailySummary> indepVarList = new ArrayList<>();
+        List<GoogleFitSummary> depVarList = new ArrayList<>();
+        Set<String> activitiesSet = new LinkedHashSet<>();
+
+        for (Map.Entry<String, GoogleFitSummary> googleFitEntry : googleFitSummaryMap.entrySet()) {
+            if (weatherDailySummaryMap.get(googleFitEntry.getKey()) != null) {
+                depVarList.add(googleFitEntry.getValue());
+                indepVarList.add(weatherDailySummaryMap.get(googleFitEntry.getKey()));
+            }
+        }
+
+        activitiesSet.add(application.getString(R.string.humidity_camel_case));
+        activitiesSet.add(application.getString(R.string.temperature_camel_case));
+        activitiesSet.add(application.getString(R.string.precipitation_camel_case));
+
+        List<Double> stepsList = new ArrayList<>();
+        List<Double> caloriesList = new ArrayList<>();
+        List<Double> distanceList = new ArrayList<>();
+        List<Double> activeMinsList = new ArrayList<>();
+        List<Double> sedentaryMinsList = new ArrayList<>();
+        double stepsTotal = 0;
+        double caloriesTotal = 0;
+        double distancesTotal = 0;
+        double activeMinsTotal = 0;
+        double sedentaryMinsTotal = 0;
+
+        for (GoogleFitSummary activitySummary : depVarList) {
+            List<GoogleFitSummary.Summary> summaries = activitySummary.getSummaries();
+            for (GoogleFitSummary.Summary summary : summaries) {
+                if (summary.getName().equals(application.getString(R.string.activity_steps_camel_case))) {
+                    stepsList.add(summary.getValue());
+                    stepsTotal += summary.getValue();
+                } else if (summary.getName().equals(application.getString(R.string.activity_calories_camel_case))) {
+                    caloriesList.add(summary.getValue());
+                    caloriesTotal += summary.getValue();
+                } else if (summary.getName().equals(application.getString(R.string.activity_distance_camel_case))) {
+                    distanceList.add(summary.getValue());
+                    distancesTotal += summary.getValue();
+                } else if (summary.getName().equals(application.getString(R.string.activity_active_minutes_camel_case))) {
+                    activeMinsList.add(summary.getValue());
+                    activeMinsTotal += summary.getValue();
+                } else if (summary.getName().equals(application.getString(R.string.activity_sedentary_minutes_camel_case))) {
+                    sedentaryMinsList.add(summary.getValue());
+                    sedentaryMinsTotal += summary.getValue();
+                }
+            }
+        }
+
+        for (String activityName : activitiesSet) {
+            double[][] regression1 = new double[distanceList.size()][2];
+            double[][] regression2 = new double[distanceList.size()][2];
+            double[][] regression3 = new double[distanceList.size()][2];
+            double[][] regression4 = new double[distanceList.size()][2];
+            double[][] regression5 = new double[distanceList.size()][2];
+            double total = 0;
+
+            for (int i = 0; i < distanceList.size(); i++) {
+                regression1[i][1] = stepsList.get(i);
+                regression2[i][1] = caloriesList.get(i);
+                regression3[i][1] = distanceList.get(i);
+                regression4[i][1] = activeMinsList.get(i);
+                regression5[i][1] = sedentaryMinsList.get(i);
+                if (activityName.equals(application.getString(R.string.humidity_camel_case))) {
+                    regression1[i][0] = indepVarList.get(i).getAvgHumidity();
+                    regression2[i][0] = indepVarList.get(i).getAvgHumidity();
+                    regression3[i][0] = indepVarList.get(i).getAvgHumidity();
+                    regression4[i][0] = indepVarList.get(i).getAvgHumidity();
+                    regression5[i][0] = indepVarList.get(i).getAvgHumidity();
+                    total += indepVarList.get(i).getAvgHumidity();
+                    ;
+                } else if (activityName.equals(application.getString(R.string.temperature_camel_case))) {
+                    regression1[i][0] = indepVarList.get(i).getAvgTempC();
+                    regression2[i][0] = indepVarList.get(i).getAvgTempC();
+                    regression3[i][0] = indepVarList.get(i).getAvgTempC();
+                    regression4[i][0] = indepVarList.get(i).getAvgTempC();
+                    regression5[i][0] = indepVarList.get(i).getAvgTempC();
+                    total += indepVarList.get(i).getAvgTempC();
+                } else if (activityName.equals(application.getString(R.string.precipitation_camel_case))) {
+                    regression1[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    regression2[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    regression3[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    regression4[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    regression5[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    total += indepVarList.get(i).getTotalPrecipmm();
+                }
+            }
+
+            // linear  regression
+            SimpleRegression regression = new SimpleRegression();
+
+            double slope = 0;
+            double yintercept = 0;
+            double rsqured = 0;
+            double correlation = 0;
+            double recommendedActivityLevel = 0;
+            double indepVarAverage = total / regression1.length;
+
+            if (TimeUnit.MILLISECONDS.toMinutes((long) indepVarAverage) > 5) {
+
+                double stepsAverage = stepsTotal / regression1.length;
+                double caloriesAvg = caloriesTotal / regression1.length;
+                double activeMinsAvg = activeMinsTotal / regression1.length;
+                double sedentaryMinsAvg = sedentaryMinsTotal / regression1.length;
+                double distancesAvg = distancesTotal / regression1.length;
+
+                double stepsGoal = stepsAverage * 1.01; // TODO - set up multiplier for mood goal
+                double caloriesGoal = caloriesAvg * 1.01; // TODO - set up multiplier for energy goal
+                double activeMinsGoal = activeMinsAvg * 1.01; // TODO - set up multiplier for mood goal
+                double sedentaryMinsGoal = sedentaryMinsAvg * 0.99; // TODO - set up multiplier for energy goal
+                double distancesGoal = distancesAvg * 1.01; // TODO - set up multiplier for mood goal
+
+                String depVar = application.getString(R.string.activity_steps_camel_case);
+                String serviceType = application.getString(R.string.googlefit_camel_case);
+
+                // regression for steps x other fitbit measurements
+                regression.addData(regression1);
+                slope = regression.getSlope();
+                yintercept = regression.getIntercept();
+                rsqured = regression.getRSquare();
+                correlation = regression.getR();
+
+                recommendedActivityLevel = (stepsGoal - yintercept) / slope;
+                Log.i(TAG, Arrays.deepToString(regression1));
+                if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                    SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                            depVar,
+                            activityName, application.getString(R.string.weather_camel_case),
+                            slope, yintercept, rsqured, correlation,
+                            indepVarAverage, recommendedActivityLevel);
+                    regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + serviceType + duration);
+                    regressionResult.setDepVarType(1L);
+                    regressionResult.setDuration(duration);
+                    regressionResult.setDepVarTypeString(serviceType);
+                    regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                    regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                    regressionResult.setNumOfData((long) regression1.length);
+                    Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                            + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                            + recommendedActivityLevel
+                            + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                    insert(regressionResult);
+                }
+
+                regression.clear();
+
+                // regression for steps x other fitbit measurements
+                regression.addData(regression2);
+                slope = regression.getSlope();
+                yintercept = regression.getIntercept();
+                rsqured = regression.getRSquare();
+                correlation = regression.getR();
+
+                recommendedActivityLevel = (caloriesGoal - yintercept) / slope;
+
+                depVar = application.getString(R.string.activity_calories_camel_case);
+
+                Log.i(TAG, Arrays.deepToString(regression2));
+                if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                    SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                            depVar,
+                            activityName, application.getString(R.string.weather_camel_case),
+                            slope, yintercept, rsqured, correlation,
+                            indepVarAverage, recommendedActivityLevel);
+                    regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + serviceType + duration);
+                    regressionResult.setDepVarType(1L);
+                    regressionResult.setDuration(duration);
+                    regressionResult.setDepVarTypeString(serviceType);
+                    regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                    regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                    regressionResult.setNumOfData((long) regression1.length);
+                    Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                            + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                            + recommendedActivityLevel
+                            + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                    insert(regressionResult);
+                }
+
+                regression.clear();
+
+
+                // regression for steps x other fitbit measurements
+                regression.addData(regression3);
+                slope = regression.getSlope();
+                yintercept = regression.getIntercept();
+                rsqured = regression.getRSquare();
+                correlation = regression.getR();
+
+                recommendedActivityLevel = (distancesGoal - yintercept) / slope;
+
+                depVar = application.getString(R.string.activity_distance_camel_case);
+
+                Log.i(TAG, Arrays.deepToString(regression3));
+                if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                    SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                            depVar,
+                            activityName, application.getString(R.string.weather_camel_case),
+                            slope, yintercept, rsqured, correlation,
+                            indepVarAverage, recommendedActivityLevel);
+                    regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + serviceType + duration);
+                    regressionResult.setDepVarType(1L);
+                    regressionResult.setDuration(duration);
+                    regressionResult.setDepVarTypeString(serviceType);
+                    regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                    regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                    regressionResult.setNumOfData((long) regression1.length);
+                    Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                            + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                            + recommendedActivityLevel
+                            + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                    insert(regressionResult);
+                }
+
+
+                regression.clear();
+
+                // regression for steps x other fitbit measurements
+                regression.addData(regression4);
+                slope = regression.getSlope();
+                yintercept = regression.getIntercept();
+                rsqured = regression.getRSquare();
+                correlation = regression.getR();
+
+                recommendedActivityLevel = (activeMinsGoal - yintercept) / slope;
+                depVar = application.getString(R.string.activity_active_minutes_camel_case);
+
+                Log.i(TAG, Arrays.deepToString(regression4));
+                if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                    SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                            depVar,
+                            activityName, application.getString(R.string.weather_camel_case),
+                            slope, yintercept, rsqured, correlation,
+                            indepVarAverage, recommendedActivityLevel);
+                    regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + serviceType + duration);
+                    regressionResult.setDepVarType(1L);
+                    regressionResult.setDuration(duration);
+                    regressionResult.setDepVarTypeString(serviceType);
+                    regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                    regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                    regressionResult.setNumOfData((long) regression1.length);
+                    Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                            + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                            + recommendedActivityLevel
+                            + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                    insert(regressionResult);
+                }
+
+                regression.clear();
+
+                // regression for steps x other fitbit measurements
+                regression.addData(regression5);
+                slope = regression.getSlope();
+                yintercept = regression.getIntercept();
+                rsqured = regression.getRSquare();
+                correlation = regression.getR();
+
+                recommendedActivityLevel = (sedentaryMinsGoal - yintercept) / slope;
+                depVar = application.getString(R.string.activity_sedentary_minutes_camel_case);
+
+                Log.i(TAG, Arrays.deepToString(regression5));
+                if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                    SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                            depVar,
+                            activityName, application.getString(R.string.weather_camel_case),
+                            slope, yintercept, rsqured, correlation,
+                            indepVarAverage, recommendedActivityLevel);
+                    regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + serviceType + duration);
+                    regressionResult.setDepVarType(1L);
+                    regressionResult.setDuration(duration);
+                    regressionResult.setDepVarTypeString(serviceType);
+                    regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                    regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                    regressionResult.setNumOfData((long) regression1.length);
+                    Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                            + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                            + recommendedActivityLevel
+                            + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                    insert(regressionResult);
+                }
+                regression.clear();
+            }
+        }
+    }
+
     public void processFitbitXFitbitRegression(List<FitbitDailySummary> fitbitDailySummaries, int duration) {
         Set<String> activitiesSet = new LinkedHashSet<>();
         activitiesSet.add(application.getString(R.string.activity_steps_camel_case));
@@ -893,7 +1178,7 @@ public class PredictionsRepository {
                 }
                 index++;
             }
-            
+
             // linear  regression
             SimpleRegression regression = new SimpleRegression();
 
@@ -1669,6 +1954,357 @@ public class PredictionsRepository {
         }
     }
 
+    public void processFitbitXWeatherRegression(Map<String, FitbitDailySummary> fitbitDailySummaryMap,
+                                                Map<String, WeatherDailySummary> weatherDailySummaryMap, int duration) {
+        List<WeatherDailySummary> indepVarList = new ArrayList<>();
+        List<FitbitDailySummary> depVarList = new ArrayList<>();
+        Set<String> activitiesSet = new LinkedHashSet<>();
+
+        for (Map.Entry<String, FitbitDailySummary> entry : fitbitDailySummaryMap.entrySet()) {
+            if (weatherDailySummaryMap.get(entry.getKey()) != null) {
+                depVarList.add(entry.getValue());
+                indepVarList.add(weatherDailySummaryMap.get(entry.getKey()));
+            }
+        }
+
+        activitiesSet.add(application.getString(R.string.humidity_camel_case));
+        activitiesSet.add(application.getString(R.string.temperature_camel_case));
+        activitiesSet.add(application.getString(R.string.precipitation_camel_case));
+
+
+        for (String activityName : activitiesSet) {
+            int index = 0;
+            double[][] regression1 = new double[indepVarList.size()][2];
+            double[][] regression2 = new double[indepVarList.size()][2];
+            double[][] regression3 = new double[indepVarList.size()][2];
+            double[][] regression4 = new double[indepVarList.size()][2];
+            double[][] regression5 = new double[indepVarList.size()][2];
+            double[][] regression6 = new double[indepVarList.size()][2];
+            double[][] regression7 = new double[indepVarList.size()][2];
+            double total = 0;
+            double stepsTotal = 0;
+            double caloriesTotal = 0;
+            double distancesTotal = 0;
+            double activeMinsTotal = 0;
+            double sedentaryMinsTotal = 0;
+            double sleepTotal = 0;
+            double floorsTotal = 0;
+
+            for (int i = 0; i < indepVarList.size(); i++) {
+                if (activityName.equals(application.getString(R.string.humidity_camel_case))) {
+                    regression1[i][0] = indepVarList.get(i).getAvgHumidity();
+                    regression2[i][0] = indepVarList.get(i).getAvgHumidity();
+                    regression3[i][0] = indepVarList.get(i).getAvgHumidity();
+                    regression4[i][0] = indepVarList.get(i).getAvgHumidity();
+                    regression5[i][0] = indepVarList.get(i).getAvgHumidity();
+                    regression6[i][0] = indepVarList.get(i).getAvgHumidity();
+                    regression7[i][0] = indepVarList.get(i).getAvgHumidity();
+                    total += indepVarList.get(i).getAvgHumidity();
+
+                } else if (activityName.equals(application.getString(R.string.temperature_camel_case))) {
+                    regression1[i][0] = indepVarList.get(i).getAvgTempC();
+                    regression2[i][0] = indepVarList.get(i).getAvgTempC();
+                    regression3[i][0] = indepVarList.get(i).getAvgTempC();
+                    regression4[i][0] = indepVarList.get(i).getAvgTempC();
+                    regression5[i][0] = indepVarList.get(i).getAvgTempC();
+                    regression6[i][0] = indepVarList.get(i).getAvgTempC();
+                    regression7[i][0] = indepVarList.get(i).getAvgTempC();
+                    total += indepVarList.get(i).getAvgTempC();
+                } else if (activityName.equals(application.getString(R.string.precipitation_camel_case))) {
+                    regression1[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    regression2[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    regression3[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    regression4[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    regression5[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    regression6[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    regression7[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    total += indepVarList.get(i).getTotalPrecipmm();
+                }
+            }
+
+            int i = 0;
+            // iterate through each day
+            for (FitbitDailySummary activitySummary : depVarList) {
+                // if the app was used for the day, get the recorded time
+                regression1[i][1] = activitySummary.getActivitySummary().summary.getSteps().doubleValue();
+                regression2[i][1] = activitySummary.getActivitySummary().getSummary().getCaloriesOut().doubleValue();
+                regression3[i][1] = activitySummary.getActivitySummary().getSummary().getDistances().get(0).getDistance();
+                regression4[i][1] = activitySummary.getActivitySummary().getSummary().getFairlyActiveMinutes() + activitySummary.getActivitySummary().getSummary().getVeryActiveMinutes();
+                regression5[i][1] = activitySummary.getActivitySummary().getSummary().getSedentaryMinutes();
+                regression6[i][1] = activitySummary.getSleepSummary().getSummary().getTotalMinutesAsleep();
+                regression7[i][1] = activitySummary.getActivitySummary().getSummary().getFloors();
+                stepsTotal += activitySummary.getActivitySummary().summary.getSteps().doubleValue();
+                caloriesTotal += activitySummary.getActivitySummary().getSummary().getCaloriesOut().doubleValue();
+                distancesTotal += activitySummary.getActivitySummary().getSummary().getDistances().get(0).getDistance();
+                activeMinsTotal += activitySummary.getActivitySummary().getSummary().getFairlyActiveMinutes() + activitySummary.getActivitySummary().getSummary().getVeryActiveMinutes();
+                sedentaryMinsTotal += activitySummary.getActivitySummary().getSummary().getSedentaryMinutes();
+                sleepTotal += activitySummary.getSleepSummary().getSummary().getTotalMinutesAsleep();
+                floorsTotal += activitySummary.getActivitySummary().getSummary().getFloors();
+                i++;
+            }
+
+            // linear  regression
+            SimpleRegression regression = new SimpleRegression();
+
+            double slope = 0;
+            double yintercept = 0;
+            double rsqured = 0;
+            double correlation = 0;
+            double recommendedActivityLevel = 0;
+            double indepVarAverage = total / regression1.length;
+
+            double stepsAverage = stepsTotal / regression1.length;
+            double caloriesAvg = caloriesTotal / regression1.length;
+            double activeMinsAvg = activeMinsTotal / regression1.length;
+            double sedentaryMinsAvg = sedentaryMinsTotal / regression1.length;
+            double sleepAvg = sleepTotal / regression1.length;
+            double distancesAvg = distancesTotal / regression1.length;
+            double floorsAvg = floorsTotal / regression1.length;
+
+            double stepsGoal = stepsAverage * 1.01; // TODO - set up multiplier for mood goal
+            double caloriesGoal = caloriesAvg * 1.01; // TODO - set up multiplier for energy goal
+            double activeMinsGoal = activeMinsAvg * 1.01; // TODO - set up multiplier for mood goal
+            double sedentaryMinsGoal = sedentaryMinsAvg * 0.99; // TODO - set up multiplier for energy goal
+            double floorsGoal = floorsAvg * 1.01; // TODO - set up multiplier for mood goal
+            double sleepGoal = sleepAvg * 1.01; // TODO - set up multiplier for energy goal
+            double distancesGoal = distancesAvg * 1.01; // TODO - set up multiplier for mood goal
+
+            String depVar = application.getString(R.string.activity_steps_camel_case);
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression1);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (stepsGoal - yintercept) / slope;
+
+            Log.i(TAG, Arrays.deepToString(regression1));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.weather_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + application.getString(R.string.fitbit_camel_case) + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(application.getString(R.string.fitbit_camel_case));
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression2);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (caloriesGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_calories_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression2));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.weather_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + application.getString(R.string.fitbit_camel_case) + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(application.getString(R.string.fitbit_camel_case));
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression3);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (distancesGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_distance_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression3));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.weather_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + application.getString(R.string.fitbit_camel_case) + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(application.getString(R.string.fitbit_camel_case));
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+
+            regression.clear();
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression4);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (activeMinsGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_active_minutes_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression4));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.weather_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + application.getString(R.string.fitbit_camel_case) + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(application.getString(R.string.fitbit_camel_case));
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression5);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (sedentaryMinsGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_sedentary_minutes_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression5));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.weather_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + application.getString(R.string.fitbit_camel_case) + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(application.getString(R.string.fitbit_camel_case));
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression6);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (sleepGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_sleep_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression6));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.weather_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + application.getString(R.string.fitbit_camel_case) + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(application.getString(R.string.fitbit_camel_case));
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression7);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (floorsGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_floors_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression7));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.weather_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + application.getString(R.string.fitbit_camel_case) + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(application.getString(R.string.fitbit_camel_case));
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+        }
+    }
+
     public void processMoabiXMoabiRegression(List<BuiltInActivitySummary> dailySummaries, int duration) {
         Set<String> activitiesSet = new LinkedHashSet<>();
         activitiesSet.add(application.getString(R.string.activity_steps_camel_case));
@@ -2303,6 +2939,706 @@ public class PredictionsRepository {
             }
         }
     }
+
+    public void processMoabiXWeatherRegression(Map<String, BuiltInActivitySummary> builtInActivitySummaryMap,
+                                               Map<String, WeatherDailySummary> weatherDailySummaryMap, int duration) {
+        List<WeatherDailySummary> indepVarList = new ArrayList<>();
+        List<BuiltInActivitySummary> depVarList = new ArrayList<>();
+        Set<String> activitiesSet = new LinkedHashSet<>();
+
+        for (Map.Entry<String, BuiltInActivitySummary> entry : builtInActivitySummaryMap.entrySet()) {
+            if (weatherDailySummaryMap.get(entry.getKey()) != null) {
+                depVarList.add(entry.getValue());
+                indepVarList.add(weatherDailySummaryMap.get(entry.getKey()));
+            }
+        }
+
+        activitiesSet.add(application.getString(R.string.humidity_camel_case));
+        activitiesSet.add(application.getString(R.string.temperature_camel_case));
+        activitiesSet.add(application.getString(R.string.precipitation_camel_case));
+
+        String serviceType = application.getString(R.string.moabi_tracker_camel_case);
+
+        for (String activityName : activitiesSet) {
+            double[][] regression1 = new double[indepVarList.size()][2];
+            double[][] regression2 = new double[indepVarList.size()][2];
+            double[][] regression3 = new double[indepVarList.size()][2];
+            double[][] regression4 = new double[indepVarList.size()][2];
+            double[][] regression5 = new double[indepVarList.size()][2];
+
+            double total = 0;
+            double stepsTotal = 0;
+            double caloriesTotal = 0;
+            double distancesTotal = 0;
+            double activeMinsTotal = 0;
+            double sedentaryMinsTotal = 0;
+
+
+            for (int i = 0; i < indepVarList.size(); i++) {
+                if (activityName.equals(application.getString(R.string.humidity_camel_case))) {
+                    regression1[i][0] = indepVarList.get(i).getAvgHumidity();
+                    regression2[i][0] = indepVarList.get(i).getAvgHumidity();
+                    regression3[i][0] = indepVarList.get(i).getAvgHumidity();
+                    regression4[i][0] = indepVarList.get(i).getAvgHumidity();
+                    regression5[i][0] = indepVarList.get(i).getAvgHumidity();
+                    total += indepVarList.get(i).getAvgHumidity();
+                } else if (activityName.equals(application.getString(R.string.temperature_camel_case))) {
+                    regression1[i][0] = indepVarList.get(i).getAvgTempC();
+                    regression2[i][0] = indepVarList.get(i).getAvgTempC();
+                    regression3[i][0] = indepVarList.get(i).getAvgTempC();
+                    regression4[i][0] = indepVarList.get(i).getAvgTempC();
+                    regression5[i][0] = indepVarList.get(i).getAvgTempC();
+                    total += indepVarList.get(i).getAvgTempC();
+                } else if (activityName.equals(application.getString(R.string.precipitation_camel_case))) {
+                    regression1[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    regression2[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    regression3[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    regression4[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    regression5[i][0] = indepVarList.get(i).getTotalPrecipmm();
+                    total += indepVarList.get(i).getTotalPrecipmm();
+                }
+            }
+
+            int i = 0;
+            for (BuiltInActivitySummary activitySummary : depVarList) {
+                // if the app was used for the day, get the recorded time
+                regression1[i][1] = activitySummary.getSteps().doubleValue();
+                regression2[i][1] = activitySummary.getCalories();
+                regression3[i][1] = activitySummary.getDistance();
+                regression4[i][1] = activitySummary.getActiveMinutes();
+                regression5[i][1] = activitySummary.getSedentaryMinutes();
+                stepsTotal += activitySummary.getSteps().doubleValue();
+                caloriesTotal += activitySummary.getCalories();
+                distancesTotal += activitySummary.getDistance();
+                activeMinsTotal += activitySummary.getActiveMinutes();
+                sedentaryMinsTotal += activitySummary.getSedentaryMinutes();
+                i++;
+            }
+
+
+            // linear  regression
+            SimpleRegression regression = new SimpleRegression();
+
+            double slope = 0;
+            double yintercept = 0;
+            double rsqured = 0;
+            double correlation = 0;
+            double recommendedActivityLevel = 0;
+            double indepVarAverage = total / regression1.length;
+
+            double stepsAverage = stepsTotal / regression1.length;
+            double caloriesAvg = caloriesTotal / regression1.length;
+            double activeMinsAvg = activeMinsTotal / regression1.length;
+            double sedentaryMinsAvg = sedentaryMinsTotal / regression1.length;
+            double distancesAvg = distancesTotal / regression1.length;
+
+            double stepsGoal = stepsAverage * 1.01; // TODO - set up multiplier for mood goal
+            double caloriesGoal = caloriesAvg * 1.01; // TODO - set up multiplier for energy goal
+            double activeMinsGoal = activeMinsAvg * 1.01; // TODO - set up multiplier for mood goal
+            double sedentaryMinsGoal = sedentaryMinsAvg * 0.99; // TODO - set up multiplier for energy goal
+            double distancesGoal = distancesAvg * 1.01; // TODO - set up multiplier for mood goal
+
+            String depVar = application.getString(R.string.activity_steps_camel_case);
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression1);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (stepsGoal - yintercept) / slope;
+
+            Log.i(TAG, Arrays.deepToString(regression1));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.weather_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + serviceType + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(serviceType);
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression2);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (caloriesGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_calories_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression2));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.weather_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + serviceType + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(serviceType);
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression3);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (distancesGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_distance_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression3));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.weather_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + serviceType + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(serviceType);
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+
+            regression.clear();
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression4);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (activeMinsGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_active_minutes_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression4));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.weather_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + serviceType + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(serviceType);
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression5);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (sedentaryMinsGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_sedentary_minutes_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression5));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.weather_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.weather_camel_case) + "X" + depVar + serviceType + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(serviceType);
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+        }
+    }
+
+    public void processActivityXActivity(Map<String, List<BAActivityEntry>> dailySummaryMap, int duration) {
+        List<List<BAActivityEntry>> activityListList = new ArrayList<>();
+        List<BAActivityEntry> dailySummaries = new ArrayList<>();
+        Set<String> activitiesSet = new LinkedHashSet<>();
+
+        for (Map.Entry<String, List<BAActivityEntry>> entry : dailySummaryMap.entrySet()) {
+            activityListList.add(entry.getValue());
+        }
+
+        for (List<BAActivityEntry> list : activityListList) {
+            for (BAActivityEntry entry : list) {
+                activitiesSet.add(entry.getName());
+            }
+        }
+
+        String serviceType = application.getString(R.string.baactivity_camel_case);
+
+        for (String activityName : activitiesSet) {
+            int index = 0;
+            double[][] regression1 = new double[activityListList.size()][2];
+            double depVarTotal = 0;
+            double indepVarTotal = 0;
+
+            for (String indepVarName : activitiesSet) {
+                int i = 0;
+                for (List<BAActivityEntry> activityEntries : activityListList) {
+                    for (BAActivityEntry entry : activityEntries) {
+                        if (entry.getName().equals(activityName)) {
+                            double old = regression1[i][1];
+                            regression1[i][1] = old + 1;
+                            depVarTotal += 1;
+                        } else if (entry.getName().equals(indepVarName)) {
+                            double old = regression1[i][0];
+                            regression1[i][0] = old + 1;
+                            indepVarTotal += 1;
+                        }
+                    }
+                    i++;
+                }
+
+                double depVarAverage = depVarTotal / regression1.length;
+                double depVarGoal = depVarAverage * 1.01; // TODO - set up multiplier for mood goal
+                // linear  regression
+                SimpleRegression regression = new SimpleRegression();
+
+                double slope = 0;
+                double yintercept = 0;
+                double rsqured = 0;
+                double correlation = 0;
+                double recommendedActivityLevel = 0;
+                double indepVarAverage = indepVarTotal / regression1.length;
+
+                String depVar = activityName;
+
+                // regression for steps x other fitbit measurements
+                regression.addData(regression1);
+                slope = regression.getSlope();
+                yintercept = regression.getIntercept();
+                rsqured = regression.getRSquare();
+                correlation = regression.getR();
+
+                recommendedActivityLevel = (depVarGoal - yintercept) / slope;
+
+                Log.i(TAG, Arrays.deepToString(regression1));
+                if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                    SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                            depVar,
+                            indepVarName, application.getString(R.string.baactivity_camel_case),
+                            slope, yintercept, rsqured, correlation,
+                            indepVarAverage, recommendedActivityLevel);
+                    regressionResult.setDepXIndepVars(indepVarName + application.getString(R.string.baactivity_camel_case) + "X" + depVar + serviceType + duration);
+                    regressionResult.setDepVarType(1L);
+                    regressionResult.setDuration(duration);
+                    regressionResult.setDepVarTypeString(serviceType);
+                    regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                    regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                    regressionResult.setNumOfData((long) regression1.length);
+                    Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                            + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                            + recommendedActivityLevel
+                            + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                    insert(regressionResult);
+                }
+                regression.clear();
+            }
+        }
+    }
+
+    /*
+    public void processActivityXFitbit(Map<String, List<BAActivityEntry>> dailySummaryMap, Map<String, FitbitDailySummary> fitbitDailySummaryMap, int duration) {
+        List<List<BAActivityEntry>> activityListList = new ArrayList<>();
+        List<BAActivityEntry> dailySummaries = new ArrayList<>();
+        List<FitbitDailySummary> indepVarList = new ArrayList<>();
+        Set<String> activitiesSet = new LinkedHashSet<>();
+
+        for (Map.Entry<String, List<BAActivityEntry>> entry : dailySummaryMap.entrySet()) {
+            if (fitbitDailySummaryMap.get(entry.getKey()) != null) {
+                activityListList.add(entry.getValue());
+                indepVarList.add(fitbitDailySummaryMap.get(entry.getKey()));
+            }
+        }
+
+        for (List<BAActivityEntry> list : activityListList) {
+            for (BAActivityEntry entry : list) {
+                activitiesSet.add(entry.getName());
+            }
+        }
+
+        String serviceType = application.getString(R.string.baactivity_camel_case);
+
+        for (String activityName : activitiesSet) {
+            int index = 0;
+            double[][] regression1 = new double[indepVarList.size()][2];
+            double[][] regression2 = new double[indepVarList.size()][2];
+            double[][] regression3 = new double[indepVarList.size()][2];
+            double[][] regression4 = new double[indepVarList.size()][2];
+            double[][] regression5 = new double[indepVarList.size()][2];
+            double[][] regression6 = new double[indepVarList.size()][2];
+            double[][] regression7 = new double[indepVarList.size()][2];
+            double depVarTotal = 0;
+            double stepsTotal = 0;
+            double caloriesTotal = 0;
+            double distancesTotal = 0;
+            double activeMinsTotal = 0;
+            double sedentaryMinsTotal = 0;
+            double sleepTotal = 0;
+            double floorsTotal = 0;
+
+            // iterate through each day
+            for (List<BAActivityEntry> summaries : activityListList) {
+                for (BAActivityEntry activity : summaries) {
+                    // if the app was used for the day, get the recorded time
+                    if (activityName.equals(activity.getName())) {
+                        double old = regression1[index][0];
+                        regression1[index][0] = old + 1;
+                        regression2[index][0] = old + 1;
+                        regression3[index][0] = old + 1;
+                        regression4[index][0] = old + 1;
+                        regression5[index][0] = old + 1;
+                        regression6[index][0] = old + 1;
+                        regression7[index][0] = old + 1;
+                        depVarTotal++;
+                        break;
+                    }
+                }
+                index++;
+            }
+
+            int i = 0;
+            // iterate through each day
+            for (FitbitDailySummary activitySummary : indepVarList) {
+                // if the app was used for the day, get the recorded time
+                regression1[i][1] = activitySummary.getActivitySummary().summary.getSteps().doubleValue();
+                regression2[i][1] = activitySummary.getActivitySummary().getSummary().getCaloriesOut().doubleValue();
+                regression3[i][1] = activitySummary.getActivitySummary().getSummary().getDistances().get(0).getDistance();
+                regression4[i][1] = activitySummary.getActivitySummary().getSummary().getFairlyActiveMinutes() + activitySummary.getActivitySummary().getSummary().getVeryActiveMinutes();
+                regression5[i][1] = activitySummary.getActivitySummary().getSummary().getSedentaryMinutes();
+                regression6[i][1] = activitySummary.getSleepSummary().getSummary().getTotalMinutesAsleep();
+                regression7[i][1] = activitySummary.getActivitySummary().getSummary().getFloors();
+                stepsTotal += activitySummary.getActivitySummary().summary.getSteps().doubleValue();
+                caloriesTotal += activitySummary.getActivitySummary().getSummary().getCaloriesOut().doubleValue();
+                distancesTotal += activitySummary.getActivitySummary().getSummary().getDistances().get(0).getDistance();
+                activeMinsTotal += activitySummary.getActivitySummary().getSummary().getFairlyActiveMinutes() + activitySummary.getActivitySummary().getSummary().getVeryActiveMinutes();
+                sedentaryMinsTotal += activitySummary.getActivitySummary().getSummary().getSedentaryMinutes();
+                sleepTotal += activitySummary.getSleepSummary().getSummary().getTotalMinutesAsleep();
+                floorsTotal += activitySummary.getActivitySummary().getSummary().getFloors();
+                i++;
+            }
+
+
+            // linear  regression
+            SimpleRegression regression = new SimpleRegression();
+
+            double slope = 0;
+            double yintercept = 0;
+            double rsqured = 0;
+            double correlation = 0;
+            double recommendedActivityLevel = 0;
+            double depVarAvg = depVarTotal / regression1.length;
+
+            double stepsAverage = stepsTotal / regression1.length;
+            double caloriesAvg = caloriesTotal / regression1.length;
+            double activeMinsAvg = activeMinsTotal / regression1.length;
+            double sedentaryMinsAvg = sedentaryMinsTotal / regression1.length;
+            double sleepAvg = sleepTotal / regression1.length;
+            double distancesAvg = distancesTotal / regression1.length;
+            double floorsAvg = floorsTotal / regression1.length;
+
+            double stepsGoal = stepsAverage * 1.01; // TODO - set up multiplier for mood goal
+            double caloriesGoal = caloriesAvg * 1.01; // TODO - set up multiplier for energy goal
+            double activeMinsGoal = activeMinsAvg * 1.01; // TODO - set up multiplier for mood goal
+            double sedentaryMinsGoal = sedentaryMinsAvg * 0.99; // TODO - set up multiplier for energy goal
+            double floorsGoal = floorsAvg * 1.01; // TODO - set up multiplier for mood goal
+            double sleepGoal = sleepAvg * 1.01; // TODO - set up multiplier for energy goal
+            double distancesGoal = distancesAvg * 1.01; // TODO - set up multiplier for mood goal
+
+            String depVar = application.getString(R.string.activity_steps_camel_case);
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression1);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (stepsGoal - yintercept) / slope;
+
+            Log.i(TAG, Arrays.deepToString(regression1));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.phone_usage_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        stepsAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.phone_usage_camel_case) + "X" + depVar + application.getString(R.string.fitbit_camel_case) + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(application.getString(R.string.fitbit_camel_case));
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression2);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (caloriesGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_calories_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression2));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.phone_usage_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.phone_usage_camel_case) + "X" + depVar + application.getString(R.string.fitbit_camel_case) + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(application.getString(R.string.fitbit_camel_case));
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression3);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (distancesGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_distance_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression3));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.phone_usage_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.phone_usage_camel_case) + "X" + depVar + application.getString(R.string.fitbit_camel_case) + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(application.getString(R.string.fitbit_camel_case));
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+
+            regression.clear();
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression4);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (activeMinsGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_active_minutes_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression4));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.phone_usage_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.phone_usage_camel_case) + "X" + depVar + application.getString(R.string.fitbit_camel_case) + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(application.getString(R.string.fitbit_camel_case));
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression5);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (sedentaryMinsGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_sedentary_minutes_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression5));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.phone_usage_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.phone_usage_camel_case) + "X" + depVar + application.getString(R.string.fitbit_camel_case) + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(application.getString(R.string.fitbit_camel_case));
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression6);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (sleepGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_sleep_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression6));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.phone_usage_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.phone_usage_camel_case) + "X" + depVar + application.getString(R.string.fitbit_camel_case) + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(application.getString(R.string.fitbit_camel_case));
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+
+            // regression for steps x other fitbit measurements
+            regression.addData(regression7);
+            slope = regression.getSlope();
+            yintercept = regression.getIntercept();
+            rsqured = regression.getRSquare();
+            correlation = regression.getR();
+
+            recommendedActivityLevel = (floorsGoal - yintercept) / slope;
+            depVar = application.getString(R.string.activity_floors_camel_case);
+
+            Log.i(TAG, Arrays.deepToString(regression7));
+            if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                        depVar,
+                        activityName, application.getString(R.string.phone_usage_camel_case),
+                        slope, yintercept, rsqured, correlation,
+                        indepVarAverage, recommendedActivityLevel);
+                regressionResult.setDepXIndepVars(activityName + application.getString(R.string.phone_usage_camel_case) + "X" + depVar + application.getString(R.string.fitbit_camel_case) + duration);
+                regressionResult.setDepVarType(1L);
+                regressionResult.setDuration(duration);
+                regressionResult.setDepVarTypeString(application.getString(R.string.fitbit_camel_case));
+                regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                regressionResult.setNumOfData((long) regression1.length);
+                Log.i(TAG, regressionResult.getDepXIndepVars() + ": " + "Slope is " + slope + ", Y-intercept is "
+                        + yintercept + ", Average is " + indepVarAverage + ", Recommended activity level is "
+                        + recommendedActivityLevel
+                        + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                insert(regressionResult);
+            }
+
+            regression.clear();
+        }
+    }*/
 
     public void processMoodAndEnergyWithGoogleFit(Map<String, AverageMood> moodsAndEnergyLevelMap, List<GoogleFitSummary> googleFitSummaries, int duration) {
         List<List<GoogleFitSummary.Summary>> summariesListList = new ArrayList<>();
@@ -5510,7 +6846,7 @@ public class PredictionsRepository {
             }
         }
 
-        for (Map.Entry<String, List<String>> entry: activitiesMap.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : activitiesMap.entrySet()) {
             String date = entry.getKey();
             summariesListList.add(entry.getValue());
         }
@@ -6273,7 +7609,7 @@ public class PredictionsRepository {
             }
         }
 
-        for (Map.Entry<String, List<String>> entry: activitiesMap.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : activitiesMap.entrySet()) {
             String date = entry.getKey();
             summariesListList.add(entry.getValue());
         }

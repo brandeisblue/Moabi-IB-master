@@ -127,7 +127,6 @@ public class AppUsageRepository {
                     appUsageSummary.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
                     appUsageSummary.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
                     insertAppUsage(appUsageSummary, date);
-                    //firebaseManager.getDaysWithDataRef().child(dateSnap.getKey()).child(application.getString(R.string.phone_usage_camel_case)).setValue(true);
                 }
             }
             @Override
@@ -193,8 +192,6 @@ public class AppUsageRepository {
             inputHistoryRepository.insert(appUsageInputHistory);
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                 firebaseManager.getAppUsageRef().child(date).updateChildren(mapToUpdate);
-                firebaseManager.getAppUsageLast30DaysRef().child(date).updateChildren(mapToUpdate);
-                firebaseManager.getDaysWithDataRef().child(date).child(application.getString(R.string.phone_usage_camel_case)).setValue(true);
             }
         }
     }

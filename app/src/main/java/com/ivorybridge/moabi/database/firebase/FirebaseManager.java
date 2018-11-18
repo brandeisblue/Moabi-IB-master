@@ -201,7 +201,7 @@ public class FirebaseManager {
         googleFitIsInUseRef = inputsInUseRef.child("fitbit");
         appUsageIsInUseRef = inputsInUseRef.child("phoneUsage");
         moodAndEnergyIsInUseRef = inputsInUseRef.child("moodAndEnergy");
-        behavioralActivationActivityIsInUseRef = inputsInUseRef.child("6behavioralActivationActivity");
+        behavioralActivationActivityIsInUseRef = inputsInUseRef.child("baActivity");
 
         // connected services
         isConnectedRef = userRef.child("isConnected");
@@ -214,11 +214,11 @@ public class FirebaseManager {
         userInputsRef = userRef.child("userInputs");
         moodAndEnergyRef = userInputsRef.child("moodAndEnergy");
         moodAndEnergyLevelTodayRef = moodAndEnergyRef.child(todaysDate);
-        activityRef = userInputsRef.child("6behavioralActivationActivity");
+        activityRef = userInputsRef.child("baActivity");
         activityTodayRef = activityRef.child(setUpDatesForToday());
         personalHashTagRef = userInputsRef.child("hashTags");
         personalHashTagTodayRef = personalHashTagRef.child(setUpDatesForToday());
-        stressRef = userInputsRef.child("2stress");
+        stressRef = userInputsRef.child("stress");
         dailyReviewRef = userInputsRef.child("dailyReview");
         phq9Ref = userInputsRef.child("phq9");
         gad7Ref = userInputsRef.child("gad7");

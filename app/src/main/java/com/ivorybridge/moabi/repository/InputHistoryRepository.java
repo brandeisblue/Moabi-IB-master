@@ -54,6 +54,10 @@ public class InputHistoryRepository {
         return inputHistoryDao.getInputDates();
     }
 
+    public List<InputDate> getInputDatesNow() {
+        return inputHistoryDao.getInputDatesNow();
+    }
+
     private static class insertAsyncTask extends AsyncTask<InputHistory, Void, Void> {
 
         private InputHistoryDao mAsyncTaskDao;

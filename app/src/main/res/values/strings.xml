@@ -15,6 +15,10 @@
     <!-- Facebook Application ID, prefixed by 'fb'. Enables Chrome Custom tabs. -->
     <string name="facebook_login_protocol_scheme" translatable="false">fb2065912553739218</string>
 
+    <!-- Messages -->
+    <string name="sync_sign_in_warning">You must be signed in to sync your data.</string>
+    <string name="phone_usage_permission_granted">App usage permission is granted.</string>
+
     <!-- Display Titles -->
     <string name="settings_notifications_title">Notifications</string>
     <string name="settings_profile_title">Profile</string>
@@ -158,6 +162,14 @@
     <string name="preference_edit_activities_title">Edit Activities</string>
     <string name="preference_unit_si_title">SI</string>
     <string name="preference_unit_usc_title">USC</string>
+    <string name="preference_sign_in_title">Sign In</string>
+    <string name="preference_sign_out_title">Sign Out</string>
+    <string name="preference_sign_out_dialog_prompt">Do you want to sign out?\n\nYour data will be kept in the cloud.\n\nIf you wish to delete your data, you must also delete your account.</string>
+    <string name="preference_delete_account_dialog_prompt">Do you want to delete your account?\n\nYour data will be permanently removed from the cloud.</string>
+    <string name="preference_delete_account_fail_msg">An error occurred.\nPlease try again.</string>
+    <string name="preference_delete_account_title">Delete Account</string>
+    <string name="preference_phone_usage_permission">App Usage Permission</string>
+    <string name="preference_phone_usage_permission_prompt">To track phone/app usage\nyou must grant the usage data permission.\n\nFind Moabi on the usage data access settings and allow usage tracking.</string>
     <string name="preference_unit_si_summary">kilometers/kilograms/°C</string>
     <string name="preference_unit_usc_summary">miles/pounds/°F</string>
     <string name="preference_fitness_tracker_notification">pref_fitness_tracker_notification</string>
@@ -165,6 +177,9 @@
     <string name="preference_personal_goal_notification">pref_personal_goal_notification</string>
     <string name="preference_daily_check_in_notification">pref_daily_check_in_notification</string>
     <string name="preference_daily_cheers_notification">pref_daily_cheers_notification</string>
+    <string name="preference_sign_in">pref_sign_in</string>
+    <string name="preference_sign_out">pref_sign_out</string>
+
 
     <!-- Unit -->
     <string name="unit_step_sing">step</string>

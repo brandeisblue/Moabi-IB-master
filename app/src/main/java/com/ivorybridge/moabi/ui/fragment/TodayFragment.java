@@ -274,7 +274,14 @@ public class TodayFragment extends Fragment implements
                 if (getActivity() != null) {
                     if (isOnline()) {
                         Log.i(TAG, "Making network calls");
-                        asyncCallsMasterRepository.makeCallsToConnectedServices();
+                        if (!mDate.equals(formattedTime.getCurrentDateAsYYYYMMDD())) {
+                            asyncCallsMasterRepository.makeCallsToConnectedServices();
+                            Intent restartActivity = new Intent(getActivity(), MainActivity.class);
+                            restartActivity.putExtra("date", formattedTime.getCurrentDateAsYYYYMMDD());
+                            startActivity(restartActivity);
+                        } else {
+                            asyncCallsMasterRepository.makeCallsToConnectedServices();
+                        }
                     }
                 } else {
                     Toast.makeText(getContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show();
@@ -294,73 +301,71 @@ public class TodayFragment extends Fragment implements
                                     getActivity().startActivity(intent);
                                     break;
                                 case R.id.menu_calendar:
-                                    inputHistoryViewModel.getAllInputDates().observe(getActivity(), new Observer<List<InputDate>>() {
+                                    Handler handler = new Handler();
+                                    new Thread(new Runnable() {
                                         @Override
-                                        public void onChanged(@Nullable List<InputDate> inputDates) {
+                                        public void run() {
+                                            List<InputDate> inputDates = inputHistoryViewModel.getAllInputDatesNow();
                                             if (inputDates != null) {
-                                                Handler handler = new Handler();
-                                                new Thread(new Runnable() {
+                                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                                                // 1. Convert list of strings to an array of calendars.
+                                                // 2. Set the days to the date picker.
+                                                // 3. Set up listener for the date picker.
+                                                Calendar[] selectableDays = new Calendar[inputDates.size()];
+                                                for (int i = 0; i < inputDates.size(); i++) {
+                                                    Calendar c = Calendar.getInstance();
+                                                    try {
+                                                        Date d = sdf.parse(inputDates.get(i).getDate());
+                                                        c.setTime(d);
+                                                        selectableDays[i] = c;
+                                                    } catch (ParseException e) {
+                                                        e.printStackTrace();
+                                                        Date d = new Date(formattedTime.getCurrentTimeInMilliSecs());
+                                                        c.setTime(d);
+                                                        selectableDays[i] = c;
+                                                    }
+                                                }
+                                                Log.i(TAG, Arrays.toString(selectableDays));
+                                                Calendar now = Calendar.getInstance();
+                                                DatePickerDialog dpd = DatePickerDialog.newInstance(
+                                                        TodayFragment.this,
+                                                        now.get(Calendar.YEAR),
+                                                        now.get(Calendar.MONTH),
+                                                        now.get(Calendar.DAY_OF_MONTH)
+                                                );
+                                                dpd.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+                                                    @Override
+                                                    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+                                                        String d = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                                                        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                                                        SimpleDateFormat sf2 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                                                        Date convertedDate = new Date();
+                                                        try {
+                                                            convertedDate = sf.parse(d);
+                                                        } catch (ParseException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                        String date = sf2.format(convertedDate);
+                                                        getActivity().finish();
+                                                        Intent restartActivity = new Intent(getActivity(), MainActivity.class);
+                                                        restartActivity.putExtra("date", date);
+                                                        startActivity(restartActivity);
+                                                    }
+                                                });
+                                                dpd.setSelectableDays(selectableDays);
+                                                dpd.setHighlightedDays(selectableDays);
+                                                //dpd.show(getActivity().getFragmentManager(), "Hello");
+                                                handler.post(new Runnable() {
                                                     @Override
                                                     public void run() {
-                                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-                                                        // 1. Convert list of strings to an array of calendars.
-                                                        // 2. Set the days to the date picker.
-                                                        // 3. Set up listener for the date picker.
-                                                        Calendar[] selectableDays = new Calendar[inputDates.size()];
-                                                        for (int i = 0; i < inputDates.size(); i++) {
-                                                            Calendar c = Calendar.getInstance();
-                                                            try {
-                                                                Date d = sdf.parse(inputDates.get(i).getDate());
-                                                                c.setTime(d);
-                                                                selectableDays[i] = c;
-                                                            } catch (ParseException e) {
-                                                                e.printStackTrace();
-                                                            }
+                                                        if (getFragmentManager() != null) {
+                                                            dpd.show(getFragmentManager(), "Calendar");
                                                         }
-                                                        Calendar now = Calendar.getInstance();
-                                                        DatePickerDialog dpd = DatePickerDialog.newInstance(
-                                                                TodayFragment.this,
-                                                                now.get(Calendar.YEAR),
-                                                                now.get(Calendar.MONTH),
-                                                                now.get(Calendar.DAY_OF_MONTH)
-                                                        );
-                                                        dpd.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-                                                            @Override
-                                                            public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-                                                                String d = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
-                                                                SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-                                                                SimpleDateFormat sf2 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-                                                                Date convertedDate = new Date();
-                                                                try {
-                                                                    convertedDate = sf.parse(d);
-                                                                } catch (ParseException e) {
-                                                                    e.printStackTrace();
-                                                                }
-                                                                String date = sf2.format(convertedDate);
-                                                                getActivity().finish();
-                                                                Intent restartActivity = new Intent(getActivity(), MainActivity.class);
-                                                                restartActivity.putExtra("date", date);
-                                                                startActivity(restartActivity);
-                                                            }
-                                                        });
-                                                        dpd.setSelectableDays(selectableDays);
-                                                        dpd.setHighlightedDays(selectableDays);
-                                                        //dpd.show(getActivity().getFragmentManager(), "Hello");
-                                                        handler.post(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                if (getFragmentManager() != null) {
-                                                                    dpd.show(getFragmentManager(), "Calendar");
-                                                                }
-                                                            }
-                                                        });
                                                     }
-                                                }).start();
-
-
+                                                });
                                             }
                                         }
-                                    });
+                                    }).start();
                                     break;
                             }
                             return true;
@@ -392,7 +397,7 @@ public class TodayFragment extends Fragment implements
                         if (!asyncTask.getResult()) {
                             isLoading = true;
                         }
-                        //Log.i(TAG, asyncTask.getTaskName() + ": " + asyncTask.getResult());
+                        Log.i(TAG, asyncTask.getTaskName() + ": " + asyncTask.getResult());
                     }
                     if (isLoading) {
                         if (progressBar.getVisibility() != View.VISIBLE) {

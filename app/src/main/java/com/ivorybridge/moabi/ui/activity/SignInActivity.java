@@ -1,12 +1,14 @@
 package com.ivorybridge.moabi.ui.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 
 import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.BuildConfig;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.snackbar.Snackbar;
@@ -16,6 +18,7 @@ import com.ivorybridge.moabi.R;
 import java.util.Arrays;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 /**
  * This class takes care of everything that happens during a sign-in process,
@@ -74,7 +77,7 @@ public class SignInActivity extends AppCompatActivity {
                                     .setLogo(R.drawable.logo_transparent_background)
                                     .setTheme(R.style.LoginTheme)
                                     .setIsSmartLockEnabled(false)
-                                    //.setIsSmartLockEnabled(!BuildConfig.DEBUG /* credentials */, true /* hints */)
+                                    .setIsSmartLockEnabled(!BuildConfig.DEBUG /* credentials */, true /* hints */)
                                     .setAvailableProviders(
                                             Arrays.asList(
                                                     new AuthUI.IdpConfig.GoogleBuilder().build(),
@@ -144,7 +147,16 @@ public class SignInActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(SignInActivity.this, IntroActivity.class));
+        SharedPreferences getPrefs = PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext());
+
+        //  Create a new boolean and preference and set it to true
+        boolean isFirstStart = getPrefs.getBoolean("firstStart", true);
+        if (isFirstStart) {
+            startActivity(new Intent(SignInActivity.this, IntroActivity.class));
+        } else {
+            startActivity(new Intent(SignInActivity.this, SettingsActivity.class));
+        }
     }
 }
 

@@ -28,7 +28,7 @@ import com.ivorybridge.moabi.database.entity.util.DataInUseMediatorLiveData;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.database.firebase.FirebaseManager;
 import com.ivorybridge.moabi.network.auth.FitbitAuthorizationRequest;
-import com.ivorybridge.moabi.network.auth.GoogleFitService;
+import com.ivorybridge.moabi.network.auth.GoogleFitAPI;
 import com.ivorybridge.moabi.repository.DataInUseRepository;
 import com.ivorybridge.moabi.viewmodel.DataInUseViewModel;
 import com.mikepenz.fastadapter.FastAdapter;
@@ -479,7 +479,7 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             dialog.dismiss();
-                            GoogleFitService gFit = new GoogleFitService(item.mActivity);
+                            GoogleFitAPI gFit = new GoogleFitAPI(item.mActivity);
                             gFit.requestPermission();
                             dialog.dismiss();
                         }

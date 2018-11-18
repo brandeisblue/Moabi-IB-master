@@ -112,22 +112,26 @@ public class MoodAndEnergyRepository {
                                 String dateTimeToConvert = date + " " + timeSnap.getKey();
                                 long dateInLong = formattedTime.convertStringYYYYMMDDhhmmToLong(dateTimeToConvert);
                                 MoodAndEnergy entry = new MoodAndEnergy();
-                                entry.setMood((Long) timeSnap.child(application.getString(R.string.mood_camel_case)).getValue());
-                                entry.setEnergyLevel((Long) timeSnap.child(application.getString(R.string.energy_camel_case)).getValue());
-                                entry.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
-                                entry.setDateInLong(dateInLong);
-                                Log.i(TAG, dateTimeToConvert + ": " + entry.getMood() + ", " + entry.getEnergyLevel());
-                                insert(entry, date);
+                                Long mood = (Long) timeSnap.child(application.getString(R.string.mood_camel_case)).getValue();
+                                Long energy = (Long) timeSnap.child(application.getString(R.string.energy_camel_case)).getValue();
+                                if (energy == null) {
+                                    energy = (Long) timeSnap.child("energyLevel").getValue();
+                                }
+                                if (mood != null && energy != null) {
+                                    entry.setMood(mood);
+                                    entry.setEnergyLevel(energy);
+                                    entry.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
+                                    entry.setDateInLong(dateInLong);
+                                    Log.i(TAG, dateTimeToConvert + ": " + entry.getMood() + ", " + entry.getEnergyLevel());
+                                    insert(entry, date);
+                                }
                             }
                         }
-                        firebaseManager.getDaysWithDataRef().child(date).child(application.getString(R.string.mood_and_energy_camel_case)).setValue(true);
                     }
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }

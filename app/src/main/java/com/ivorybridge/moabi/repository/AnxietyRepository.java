@@ -86,15 +86,16 @@ public class AnxietyRepository {
                             if (timeSnap.getKey() != null) {
                                 String dateTimeToConvert = date + " " + timeSnap.getKey();
                                 long dateInLong = formattedTime.convertStringYYYYMMDDhhmmToLong(dateTimeToConvert);
-                                Gad7 entry = new Gad7();
-                                entry.setScore((Long) timeSnap.getValue());
-                                entry.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
-                                entry.setDateInLong(dateInLong);
-                                Log.i(TAG, dateTimeToConvert + ": " + entry.getScore() + ", ");
-                                insert(entry, date);
+                                if ((Long) timeSnap.getValue() != null) {
+                                    Gad7 entry = new Gad7();
+                                    entry.setScore((Long) timeSnap.getValue());
+                                    entry.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
+                                    entry.setDateInLong(dateInLong);
+                                    Log.i(TAG, dateTimeToConvert + ": " + entry.getScore() + ", ");
+                                    insert(entry, date);
+                                }
                             }
                         }
-                        firebaseManager.getDaysWithDataRef().child(date).child(application.getString(R.string.anxiety_gad7_camel_case)).setValue(true);
                     }
                 }
             }

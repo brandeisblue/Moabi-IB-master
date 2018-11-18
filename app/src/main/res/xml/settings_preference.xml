@@ -27,18 +27,18 @@
             android:icon="@drawable/ic_notification_outline_black"
             android:key="preference_notifications_screen"
             android:title="@string/preference_notifications_title">
+        </androidx.preference.PreferenceScreen>
 
-        <androidx.preference.SwitchPreferenceCompat
+        <androidx.preference.SwitchPreference
             android:fontFamily="@font/source_sans_pro"
             android:icon="@drawable/ic_appusage"
             android:key="preference_phone_usage_permission"
-            android:summary="Enable phone usage access"
-            android:title="Access to Phone Usage Data" />
+            android:title="@string/preference_phone_usage_permission" />
 
-        </androidx.preference.PreferenceScreen>
     </androidx.preference.PreferenceCategory>
 
     <androidx.preference.PreferenceCategory android:title="Data Settings">
+
         <Preference
             android:fontFamily="@font/source_sans_pro"
             android:icon="@drawable/ic_link"
@@ -64,6 +64,29 @@
             android:icon="@drawable/ic_refresh"
             android:summary=""
             android:title="Sync" />
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory android:title="Account Settings">
+        <Preference
+            android:fontFamily="@font/source_sans_pro"
+            android:icon="@drawable/ic_sign_in_outline_black"
+            android:key="preference_sign_in"
+            android:summary=""
+            android:title="@string/preference_sign_in_title" />
+
+        <Preference
+            android:fontFamily="@font/source_sans_pro"
+            android:key="preference_sign_out"
+            android:summary=""
+            android:icon="@drawable/ic_sign_out_outline_black"
+            android:title="@string/preference_sign_out_title" />
+
+        <Preference
+            android:fontFamily="@font/source_sans_pro"
+            android:key="preference_delete_account"
+            android:summary=""
+            android:icon="@drawable/ic_delete_outline_black"
+            android:title="@string/preference_delete_account_title" />
     </androidx.preference.PreferenceCategory>
 
 

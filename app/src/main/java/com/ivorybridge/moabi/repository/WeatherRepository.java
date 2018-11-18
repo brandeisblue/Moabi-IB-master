@@ -21,6 +21,9 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.dao.AsyncTaskBooleanDao;
 import com.ivorybridge.moabi.database.dao.WeatherDailySummaryDao;
@@ -40,6 +43,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 
@@ -292,7 +296,6 @@ public class WeatherRepository {
             inputHistory.setInputType(application.getString(R.string.weather_camel_case));
             inputHistoryRepository.insert(inputHistory);
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                firebaseManager.getDaysWithDataRef().child(formattedTime.getCurrentDateAsYYYYMMDD()).child(application.getString(R.string.weather_camel_case)).setValue(true);
                 firebaseManager.getConnectedServicesRef().child(application.getString(R.string.weather_camel_case)).child(formattedTime.getCurrentDateAsYYYYMMDD()).setValue(weatherDailySummary);
             }
             Log.i(TAG, "Image URL is " +
@@ -377,7 +380,6 @@ public class WeatherRepository {
             inputHistory.setInputType(application.getString(R.string.weather_camel_case));
             inputHistoryRepository.insert(inputHistory);
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                firebaseManager.getDaysWithDataRef().child(date).child(application.getString(R.string.weather_camel_case)).setValue(true);
                 firebaseManager.getConnectedServicesRef().child(application.getString(R.string.weather_camel_case)).child(date).setValue(weatherDailySummary);
             }
         } catch (JSONException e) {
@@ -385,6 +387,35 @@ public class WeatherRepository {
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
+    }
+
+    public void sync() {
+        firebaseManager.getConnectedServicesRef().child(application.getString(R.string.weather_camel_case))
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot dateSnap: dataSnapshot.getChildren()) {
+                            if (dateSnap.getKey() != null) {
+                                String date = dateSnap.getKey();
+                                if (dateSnap.getValue() != null) {
+                                    WeatherDailySummary weatherDailySummary = dateSnap.getValue(WeatherDailySummary.class);
+                                    insert(weatherDailySummary);
+                                    InputHistory inputHistory = new InputHistory();
+                                    inputHistory.setDate(date);
+                                    inputHistory.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
+                                    inputHistory.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
+                                    inputHistory.setInputType(application.getString(R.string.weather_camel_case));
+                                    inputHistoryRepository.insert(inputHistory);
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     public boolean insert(WeatherDailySummary weatherDailySummary) {
