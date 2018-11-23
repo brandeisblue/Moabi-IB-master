@@ -1,6 +1,7 @@
 package com.ivorybridge.moabi.ui.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import butterknife.ButterKnife;
 
 public class StatsFragment extends Fragment {
 
+    private static final String TAG = StatsFragment.class.getSimpleName();
     @BindView(R.id.fragment_stats_sliding_tabs)
     TabLayout tabLayout;
     @BindView(R.id.fragment_stats_viewpager)
@@ -67,6 +69,7 @@ public class StatsFragment extends Fragment {
                     List<String> inputsInUseList = new ArrayList<>();
                     for (InputInUse inputInUse : inputInUses) {
                         if (inputInUse.isInUse()) {
+                            Log.i(TAG, inputInUse.getName());
                             if (inputInUse.getName().equals(getString(R.string.mood_and_energy_camel_case))) {
                                 inputsInUseList.add("201" + getString(R.string.mood_camel_case));
                                 inputsInUseList.add("202" + getString(R.string.energy_camel_case));

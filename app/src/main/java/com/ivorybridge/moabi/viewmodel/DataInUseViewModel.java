@@ -32,6 +32,15 @@ public class DataInUseViewModel extends AndroidViewModel {
         return this.mRepository.getAllInputsInUseNow();
     }
 
+    public void deleteAllInputs() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mRepository.deleteAllInputsInUse();
+            }
+        }).start();
+    }
+
     public boolean insert(InputInUse selection) {
         return this.mRepository.insert(selection);
     }

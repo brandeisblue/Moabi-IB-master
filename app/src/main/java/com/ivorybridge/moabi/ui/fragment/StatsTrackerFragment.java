@@ -46,7 +46,7 @@ import com.ivorybridge.moabi.repository.AppUsageRepository;
 import com.ivorybridge.moabi.repository.TimedActivityRepository;
 import com.ivorybridge.moabi.ui.adapter.IconSpinnerAdapter;
 import com.ivorybridge.moabi.ui.recyclerviewitem.stats.MeansAndSumItem;
-import com.ivorybridge.moabi.ui.util.FitnessTrackerBarChartMarkerView;
+import com.ivorybridge.moabi.ui.util.NumeralChartMarkerView;
 import com.ivorybridge.moabi.util.FormattedTime;
 import com.ivorybridge.moabi.viewmodel.AppUsageViewModel;
 import com.ivorybridge.moabi.viewmodel.BuiltInFitnessViewModel;
@@ -871,7 +871,10 @@ public class StatsTrackerFragment extends Fragment {
                                     Log.i(TAG, Arrays.toString(activitiesArray));
 
                                     if (activitiesArray != null && context != null) {
-                                        int spinnerSelection = 0;
+                                        int spinnerSelection = timedActivitySharedPreferences.getInt("stats_spinner_selection", 0);
+                                        if (spinnerSelection >= activitiesArray.length) {
+                                            spinnerSelection = 0;
+                                        }
                                         IconSpinnerAdapter iconSpinnerAdapter = new IconSpinnerAdapter(context, activitiesArray, imagesArray);
                                         spinner.setAdapter(iconSpinnerAdapter);
                                         spinner.setSelection(spinnerSelection);
@@ -986,7 +989,10 @@ public class StatsTrackerFragment extends Fragment {
                                         Log.i(TAG, Arrays.toString(activitiesArray));
 
                                         if (activitiesArray != null && context != null) {
-                                            int spinnerSelection = 0;
+                                            int spinnerSelection = phoneUsageSharedPreferences.getInt("stats_spinner_selection", 0);
+                                            if (spinnerSelection >= activitiesArray.length) {
+                                                spinnerSelection = 0;
+                                            }
                                             IconSpinnerAdapter iconSpinnerAdapter = new IconSpinnerAdapter(context, activitiesArray, imagesArray);
                                             spinner.setAdapter(iconSpinnerAdapter);
                                             spinner.setSelection(spinnerSelection);
@@ -3004,8 +3010,21 @@ public class StatsTrackerFragment extends Fragment {
         //barChart.animateY(1000, Easing.EasingOption.Linear);
         barChart.setFitBars(true);
         barChart.setData(barData);
-        FitnessTrackerBarChartMarkerView chartMarkerView = new FitnessTrackerBarChartMarkerView(context, R.layout.mpchart_chartvalueselectedview, entryDatesList, activity, numOfDays, barChart);
-        barChart.setMarker(chartMarkerView);
+        //FitnessTrackerBarChartMarkerView chartMarkerView = new FitnessTrackerBarChartMarkerView(context, R.layout.mpchart_chartvalueselectedview, entryDatesList, activity, numOfDays, barChart);
+        //barChart.setMarker(chartMarkerView);
+        NumeralChartMarkerView numeralChartMarker = new NumeralChartMarkerView(getContext(),
+                R.layout.mpchart_chartvalueselectedview, entryDatesList, numOfDays, barChart, activity);
+        if (inputType.equals(getString(R.string.timer_camel_case))) {
+            numeralChartMarker = new NumeralChartMarkerView(getContext(),
+                    R.layout.mpchart_chartvalueselectedview, entryDatesList, numOfDays, barChart, getString(R.string.timer_camel_case));
+        } else if (inputType.equals(getString(R.string.phone_usage_camel_case))) {
+            numeralChartMarker = new NumeralChartMarkerView(getContext(),
+                    R.layout.mpchart_chartvalueselectedview, entryDatesList, numOfDays, barChart, getString(R.string.phone_usage_camel_case));
+        } else {
+            numeralChartMarker = new NumeralChartMarkerView(getContext(),
+                    R.layout.mpchart_chartvalueselectedview, entryDatesList, numOfDays, barChart, activity);
+        }
+        barChart.setMarker(numeralChartMarker);
         barChart.getLegend().setEnabled(false);
         barChart.invalidate();
     }

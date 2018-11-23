@@ -127,9 +127,8 @@ public class TimerActivity extends AppCompatActivity implements PropertyChangeLi
             }
         });
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(getString(R.string.timer_camel_case));
+            getSupportActionBar().setTitle(getString(R.string.timer_title));
         }
-
 
         formattedTime = new FormattedTime();
         timerHandler = new Handler();

@@ -14,7 +14,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {BuiltInActivitySummary.class, BuiltInProfile.class}, version = 1, exportSchema = false)
+@Database(entities = {BuiltInActivitySummary.class, BuiltInProfile.class}, version = 2, exportSchema = false)
 public abstract class BuiltInFitnessDB extends RoomDatabase {
 
     public abstract BuiltInFitnessDao builtInFitnessDao();
@@ -44,6 +44,13 @@ public abstract class BuiltInFitnessDB extends RoomDatabase {
     private static Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE built_in_profile_new (uniqueID TEXT NOT NULL," +
+                    " name TEXT, gender TEXT, height REAL, BMR REAL, " +
+                    " weight REAL, dateOfBirth TEXT, dateOfRegistration TEXT, " +
+                    " age INTEGER, " +
+                    " PRIMARY KEY(uniqueID) )");
+            database.execSQL("DROP TABLE built_in_profile_table");
+            database.execSQL("ALTER TABLE built_in_profile_new RENAME TO built_in_profile_table");
         }
     };
 
@@ -53,7 +60,7 @@ public abstract class BuiltInFitnessDB extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             BuiltInFitnessDB.class, "built_in_fitness_database")
-                            .addMigrations(MIGRATION_2_1)
+                            .addMigrations(MIGRATION_1_2)
                             .build();
                 }
             }

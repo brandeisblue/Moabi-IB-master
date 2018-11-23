@@ -272,7 +272,7 @@ public class InsightMindFragment extends Fragment {
                                 imagesArray[i] = R.drawable.ic_partly_cloudy;
                             } else if (activitiesArray[i].equals("30 Moabi")) {
                                 activitiesArray[i] = getString(R.string.insight_mind_x_moabi);
-                                imagesArray[i] = R.drawable.ic_logo_monogram_colored;
+                                imagesArray[i] = R.drawable.ic_monogram_colored;
                             } else if (activitiesArray[i].equals("42 Timer")) {
                                 activitiesArray[i] = getString(R.string.insight_mind_x_timer);
                                 imagesArray[i] = R.drawable.ic_stopwatch;
@@ -286,6 +286,9 @@ public class InsightMindFragment extends Fragment {
                         }
                         if (activitiesArray != null && getContext() != null) {
                             int spinnerSelection = mindInsightPreferences.getInt("mind_insight_spinner_selection", 0);
+                            if (spinnerSelection >= activitiesArray.length) {
+                                spinnerSelection = 0;
+                            }
                             IconSpinnerAdapter iconSpinnerAdapter = new IconSpinnerAdapter(getContext(), activitiesArray, imagesArray);
                             spinner.setAdapter(iconSpinnerAdapter);
                             spinner.setSelection(spinnerSelection);
@@ -451,7 +454,7 @@ public class InsightMindFragment extends Fragment {
                                             topThreeItemItemAdapter.clear();
                                             recommendationItemItemAdapter.clear();
                                             InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.mood_camel_case), average);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(barEntries, entryDatesList, average, finalValueToPass);
+                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.mood_camel_case), barEntries, entryDatesList, average, finalValueToPass);
                                             averageItemItemAdapter.add(moodAverageItem);
                                             bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                             if (sortedList.size() > 0) {
@@ -567,7 +570,7 @@ public class InsightMindFragment extends Fragment {
                                             topThreeItemItemAdapter.clear();
                                             recommendationItemItemAdapter.clear();
                                             InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.energy_camel_case), average);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(barEntries, entryDatesList, average, finalValueToPass);
+                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.energy_camel_case), barEntries, entryDatesList, average, finalValueToPass);
                                             averageItemItemAdapter.add(moodAverageItem);
                                             bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                             if (sortedList.size() > 0) {
@@ -683,7 +686,7 @@ public class InsightMindFragment extends Fragment {
                                             topThreeItemItemAdapter.clear();
                                             recommendationItemItemAdapter.clear();
                                             InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.stress_camel_case), average);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(barEntries, entryDatesList, average, finalValueToPass);
+                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.stress_camel_case), barEntries, entryDatesList, average, finalValueToPass);
                                             averageItemItemAdapter.add(moodAverageItem);
                                             bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                             if (sortedList.size() > 0) {
@@ -799,7 +802,7 @@ public class InsightMindFragment extends Fragment {
                                             topThreeItemItemAdapter.clear();
                                             recommendationItemItemAdapter.clear();
                                             InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.daily_review_camel_case), average);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(barEntries, entryDatesList, average, finalValueToPass);
+                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.daily_review_camel_case), barEntries, entryDatesList, average, finalValueToPass);
                                             averageItemItemAdapter.add(moodAverageItem);
                                             bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                             if (sortedList.size() > 0) {
@@ -915,7 +918,7 @@ public class InsightMindFragment extends Fragment {
                                             topThreeItemItemAdapter.clear();
                                             recommendationItemItemAdapter.clear();
                                             InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.depression_phq9_camel_case), average);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(barEntries, entryDatesList, average, finalValueToPass);
+                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.depression_phq9_camel_case), barEntries, entryDatesList, average, finalValueToPass);
                                             averageItemItemAdapter.add(moodAverageItem);
                                             bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                             if (sortedList.size() > 0) {
@@ -1031,7 +1034,7 @@ public class InsightMindFragment extends Fragment {
                                             topThreeItemItemAdapter.clear();
                                             recommendationItemItemAdapter.clear();
                                             InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.anxiety_gad7_camel_case), average);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(barEntries, entryDatesList, average, finalValueToPass);
+                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.anxiety_gad7_camel_case), barEntries, entryDatesList, average, finalValueToPass);
                                             averageItemItemAdapter.add(moodAverageItem);
                                             bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                             if (sortedList.size() > 0) {

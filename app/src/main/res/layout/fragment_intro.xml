@@ -2,20 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/white">
 
-    <ImageView
-        android:id="@+id/fragment_intro_logo"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:src="@drawable/logo_transparent_background"/>
 
     <ImageView
         android:id="@+id/fragment_intro_image"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:src="@drawable/logo_transparent_background"/>
+        android:layout_weight="10"
+        android:src="@drawable/ic_img_mind_body_wordcloud_long"/>
 
 </LinearLayout>

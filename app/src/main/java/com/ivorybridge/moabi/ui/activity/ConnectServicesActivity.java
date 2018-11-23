@@ -274,4 +274,20 @@ public class ConnectServicesActivity extends AppCompatActivity implements
                 .iconRes(R.drawable.ic_googlefit)
                 .show();
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        SharedPreferences getPrefs = androidx.preference.PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext());
+        boolean tut1Complete1 = getPrefs.getBoolean("tut_1_complete", false);
+        if (!tut1Complete1) {
+            Intent intent = new Intent(ConnectServicesActivity.this, EditSurveyItemsActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            onBackPressed();
+            finish();
+        }
+    }
 }

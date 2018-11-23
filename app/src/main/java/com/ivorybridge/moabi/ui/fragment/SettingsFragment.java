@@ -25,6 +25,7 @@ import com.ivorybridge.moabi.ui.activity.AdvancedSettingsActivity;
 import com.ivorybridge.moabi.ui.activity.ConnectServicesActivity;
 import com.ivorybridge.moabi.ui.activity.EditActivitiesActivity;
 import com.ivorybridge.moabi.ui.activity.EditSurveyItemsActivity;
+import com.ivorybridge.moabi.ui.activity.IntroActivity;
 import com.ivorybridge.moabi.ui.activity.SignInActivity;
 import com.ivorybridge.moabi.util.FormattedTime;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -38,6 +39,7 @@ import androidx.core.content.ContextCompat;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreference;
 
 import static android.app.AppOpsManager.MODE_ALLOWED;
@@ -142,12 +144,19 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
+                                SharedPreferences getPrefs = PreferenceManager
+                                        .getDefaultSharedPreferences(getContext());
+                                SharedPreferences.Editor e = getPrefs.edit();
+                                //  Edit preference to make it false because we don't want this to run again
+                                e.putBoolean("firstStart", true);
+                                //  Apply changes
+                                e.apply();
                                 AuthUI.getInstance()
                                         .signOut(getActivity())
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 // user is now signed out
-                                                startActivity(new Intent(getActivity(), SignInActivity.class));
+                                                startActivity(new Intent(getActivity(), IntroActivity.class));
                                                 getActivity().finish();
                                             }
                                         });
@@ -188,7 +197,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    startActivity(new Intent(getActivity(), SignInActivity.class));
+                                                    SharedPreferences getPrefs = PreferenceManager
+                                                            .getDefaultSharedPreferences(getContext());
+                                                    SharedPreferences.Editor e = getPrefs.edit();
+                                                    //  Edit preference to make it false because we don't want this to run again
+                                                    e.putBoolean("firstStart", true);
+                                                    //  Apply changes
+                                                    e.apply();
+                                                    startActivity(new Intent(getActivity(), IntroActivity.class));
                                                     getActivity().finish();
                                                 } else {
                                                     Toast.makeText(getContext(),

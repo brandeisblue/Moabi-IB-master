@@ -1,6 +1,7 @@
 package com.ivorybridge.moabi.ui.util;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +28,8 @@ public class NumeralChartMarkerView extends MarkerView {
     private MPPointF mOffset;
     private FormattedTime formattedTime;
     private String inputType;
+    private SharedPreferences unitSharedPreferences;
+    private String unit;
 
     public NumeralChartMarkerView(Context context, int layoutResource, List<String> entryDatesList,
                                   int numOfDays, Chart chart, String inputType) {
@@ -38,6 +41,12 @@ public class NumeralChartMarkerView extends MarkerView {
         this.entryDatesList = entryDatesList;
         this.numOfDays = numOfDays;
         this.inputType = inputType;
+        this.unitSharedPreferences = getContext().getSharedPreferences(getContext().getString(
+                R.string.com_ivorybridge_moabi_UNIT_SHARED_PREFERENCE_KEY),
+                Context.MODE_PRIVATE);
+        this.unit = unitSharedPreferences.getString(getContext()
+                        .getString(R.string.com_ivorybridge_mobai_UNIT_KEY),
+                getContext().getString(R.string.preference_unit_si_title));
         setChartView(chart);
     }
 
@@ -67,6 +76,37 @@ public class NumeralChartMarkerView extends MarkerView {
             score = String.format(Locale.US, "%.0f",(e.getY() / 27f) * 100) + "%";
         } else if (inputType.equals(getContext().getString(R.string.anxiety_gad7_camel_case))) {
             score = String.format(Locale.US, "%.0f",(e.getY() / 21f) * 100) + "%";
+        } else if (inputType.equals(getContext().getString(R.string.activity_steps_title))) {
+            if (e.getY() > 1) {
+                score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_step_plur);
+            } else {
+                score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_step_sing);
+            }
+        } else if (inputType.contains("Minutes") || inputType.equals(getContext().getString(R.string.activity_sleep_title)) ||
+                inputType.contains(getContext().getString(R.string.phone_usage_camel_case))) {
+            score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_time_sing);
+        } else if (inputType.equals(getContext().getString(R.string.activity_distance_title))) {
+            if (unit.equals(getContext().getString(R.string.preference_unit_si_title))) {
+                score = String.format(Locale.US, "%.2f", (e.getY())) + " " + getContext().getString(R.string.unit_distance_si);
+            } else {
+                score = String.format(Locale.US, "%.2f", (e.getY())) + " " + getContext().getString(R.string.unit_distance_usc);
+            }
+        } else if (inputType.equals(getContext().getString(R.string.activity_calories_title))) {
+            score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_calories);
+        } else if (inputType.equals(getContext().getString(R.string.activity_floors_title))) {
+            if (e.getY() > 1) {
+                score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_floor_plur);
+            } else {
+                score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_floor_sing);
+            }
+        } else if (inputType.equals(getContext().getString(R.string.timer_camel_case))) {
+            score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_time_sing);
+        } else if (inputType.equals(getContext().getString(R.string.baactivity_camel_case))) {
+            if (e.getY() > 1) {
+                score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_activity_plur);
+            } else {
+                score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_activity_sing);
+            }
         }
         if (x >= 0) {
             int index = (int) x;

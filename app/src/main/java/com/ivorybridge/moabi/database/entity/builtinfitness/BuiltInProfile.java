@@ -17,6 +17,7 @@ public class BuiltInProfile {
     public Double weight;
     public String dateOfBirth;
     public String dateOfRegistration;
+    public Long age;
 
     @NonNull
     public String getUniqueID() {
@@ -81,5 +82,13 @@ public class BuiltInProfile {
 
     public void setDateOfRegistration(String dateOfRegistration) {
         this.dateOfRegistration = dateOfRegistration;
+    }
+
+    public Long getAge() {
+        return age;
+    }
+
+    public void setAge(Long age) {
+        this.age = age;
     }
 }

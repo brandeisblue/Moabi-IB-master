@@ -42,12 +42,14 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
     private List<String> entryDatesList;
     private double average;
     private float bestValue;
+    private String inputType;
 
     public InsightBestAndWorstItem() {
 
     }
 
-    public InsightBestAndWorstItem(List<BarEntry> barEntries, List<String> entryDatesList, double average, float bestValue) {
+    public InsightBestAndWorstItem(String inputType, List<BarEntry> barEntries, List<String> entryDatesList, double average, float bestValue) {
+        this.inputType = inputType;
         this.barEntries = barEntries;
         this.entryDatesList = entryDatesList;
         this.average = average;
@@ -89,14 +91,14 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             formattedTime = new FormattedTime();
             tf = ResourcesCompat.getFont(itemView.getContext(), R.font.source_sans_pro);
             styleBarChart();
-            drawBarChart(item.barEntries, item.entryDatesList, item.average, item.bestValue);
+            drawBarChart(item.barEntries, item.entryDatesList, item.average, item.bestValue, item.inputType);
         }
 
         @Override
         public void unbindView(InsightBestAndWorstItem item) {
         }
 
-        private void drawBarChart(List<BarEntry> barEntries, List<String> entryDatesList, double average, float bestValue) {
+        private void drawBarChart(List<BarEntry> barEntries, List<String> entryDatesList, double average, float bestValue, String inputType) {
             if (barEntries.size() == 0) {
                 barChart.isEmpty();
                 barChart.clear();
@@ -152,8 +154,6 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             YAxis rightAxis = barChart.getAxisRight();
             leftAxis.setDrawGridLines(false);
             leftAxis.setDrawAxisLine(false);
-            //leftAxis.setAxisMaximum(3f);
-            leftAxis.setAxisMinimum(0f);
             leftAxis.setTypeface(tf);
             leftAxis.setTextSize(12);
             leftAxis.setGranularity(1f);
@@ -167,6 +167,139 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             rightAxis.setDrawLabels(false);
             rightAxis.setDrawAxisLine(false);
             rightAxis.setEnabled(false);
+            if (inputType.equals(itemView.getContext().getString(R.string.mood_camel_case)) || inputType.equals(itemView.getContext().getString(R.string.energy_camel_case))) {
+                // set up y-axis
+                leftAxis.setDrawGridLines(false);
+                leftAxis.setDrawAxisLine(false);
+                leftAxis.setAxisMaximum(3.5f);
+                leftAxis.setAxisMinimum(1f);
+                leftAxis.setTypeface(tf);
+                leftAxis.setTextSize(12);
+                leftAxis.setGranularity(0.5f);
+                leftAxis.setTextColor(Color.DKGRAY);
+                leftAxis.setGranularityEnabled(true);
+                //leftAxis.setLabelCount(3, true);
+                leftAxis.setValueFormatter(new IAxisValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value, AxisBase axis) {
+                        //Log.i(TAG, "Y-axis value is: " + value);
+                        if (value == 1f) {
+                            return itemView.getContext().getString(R.string.chart_label_poor);
+                        } else if (value == 3f) {
+                            return itemView.getContext().getString(R.string.chart_label_good);
+                        } else {
+                            return "";
+                        }
+                    }
+                });
+            } else if (inputType.equals(itemView.getContext().getString(R.string.stress_camel_case))) {
+                leftAxis.setDrawGridLines(false);
+                leftAxis.setDrawAxisLine(false);
+                leftAxis.setAxisMaximum(10f);
+                leftAxis.setAxisMinimum(0f);
+                leftAxis.setTypeface(tf);
+                leftAxis.setTextSize(12);
+                leftAxis.setGranularity(5f);
+                leftAxis.setTextColor(Color.DKGRAY);
+                leftAxis.setGranularityEnabled(true);
+                leftAxis.setValueFormatter(new IAxisValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value, AxisBase axis) {
+                        //Log.i(TAG, "Y-axis value is: " + value);
+                        if (value == 10f) {
+                            return itemView.getContext().getString(R.string.chart_label_max);
+                        } else if (value == 0f) {
+                            return itemView.getContext().getString(R.string.chart_label_none);
+                        } else {
+                            return "";
+                        }
+                    }
+                });
+            } else if (inputType.equals(itemView.getContext().getString(R.string.daily_review_camel_case))) {
+                leftAxis.setDrawGridLines(false);
+                leftAxis.setDrawAxisLine(false);
+                leftAxis.setAxisMaximum(5f);
+                leftAxis.setAxisMinimum(1f);
+                leftAxis.setTypeface(tf);
+                leftAxis.setTextSize(12);
+                leftAxis.setGranularity(1f);
+                leftAxis.setTextColor(Color.DKGRAY);
+                leftAxis.setGranularityEnabled(true);
+                leftAxis.setValueFormatter(new IAxisValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value, AxisBase axis) {
+                        //Log.i(TAG, "Y-axis value is: " + value);
+                        if (value == 5f) {
+                            return itemView.getContext().getString(R.string.chart_label_excellent);
+                        } else if (value == 1f) {
+                            return itemView.getContext().getString(R.string.chart_label_terrible);
+                        } else {
+                            return "";
+                        }
+                    }
+                });
+            } else if (inputType.equals(itemView.getContext().getString(R.string.depression_phq9_camel_case))) {
+                leftAxis.setDrawGridLines(false);
+                leftAxis.setDrawAxisLine(false);
+                leftAxis.setAxisMaximum(28f);
+                leftAxis.setAxisMinimum(0f);
+                leftAxis.setTypeface(tf);
+                leftAxis.setTextSize(12);
+                leftAxis.setGranularity(1.0f);
+                leftAxis.setGranularityEnabled(true);
+                leftAxis.setTextColor(Color.DKGRAY);
+                leftAxis.setLabelCount(29, true);
+                leftAxis.setValueFormatter(new IAxisValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value, AxisBase axis) {
+                        Log.i(TAG, "Y-axis value is: " + value);
+                    /*
+                    if (value == 4f) {
+                        return "Min";
+                    } */
+                        if (value == 9f) {
+                            return itemView.getContext().getString(R.string.chart_mild_abbr);
+                        } else if ((int) value == 14f) {
+                            return itemView.getContext().getString(R.string.chart_moderate_abbr);
+                        } /*else if (value == 19f) {
+                        return "M.Sv";
+                    } */ else if (value == 27f) {
+                            return itemView.getContext().getString(R.string.chart_severe_abbr);
+                        } else {
+                            return "";
+                        }
+                    }
+                });
+            } else if (inputType.equals(itemView.getContext().getString(R.string.anxiety_gad7_camel_case))) {
+                leftAxis.setDrawGridLines(false);
+                leftAxis.setDrawAxisLine(false);
+                leftAxis.setAxisMaximum(21f);
+                leftAxis.setAxisMinimum(0f);
+                leftAxis.setTypeface(tf);
+                leftAxis.setTextSize(12);
+                leftAxis.setGranularity(1.0f);
+                leftAxis.setTextColor(Color.DKGRAY);
+                leftAxis.setGranularityEnabled(true);
+                leftAxis.setLabelCount(22, true);
+                leftAxis.setValueFormatter(new IAxisValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value, AxisBase axis) {
+                        Log.i(TAG, "Y-axis value is: " + value);
+                    /*if (value == 4f) {
+                        return "Min";
+                    }*/
+                        if (value == 9f) {
+                            return itemView.getContext().getString(R.string.chart_mild_abbr);
+                        } else if (value == 14f) {
+                            return itemView.getContext().getString(R.string.chart_moderate_abbr);
+                        } else if (value == 21f) {
+                            return itemView.getContext().getString(R.string.chart_severe_abbr);
+                        } else {
+                            return "";
+                        }
+                    }
+                });
+            }
 
             BarDataSet set = new BarDataSet(barEntries, "");
             int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white);
@@ -217,7 +350,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             Bitmap bestBitmap = BitmapFactory.decodeResource(itemView.getResources(), R.drawable.ic_star_filled);
             barChart.setRenderer(new ImageBarChartRenderer(barChart, barChart.getAnimator(), barChart.getViewPortHandler(), bestBitmap, bestValue));
             NumeralChartMarkerView chartMarkerView = new NumeralChartMarkerView(itemView.getContext(),
-                    R.layout.mpchart_chartvalueselectedview, entryDatesList, numOfDays, barChart, "");
+                    R.layout.mpchart_chartvalueselectedview, entryDatesList, numOfDays, barChart, inputType);
             barChart.setMarker(chartMarkerView);
             barChart.getLegend().setEnabled(false);
             barChart.invalidate();

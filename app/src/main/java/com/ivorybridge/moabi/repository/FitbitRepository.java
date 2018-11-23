@@ -24,6 +24,7 @@ import com.ivorybridge.moabi.database.entity.util.AsyncTaskBoolean;
 import com.ivorybridge.moabi.database.entity.util.ConnectedService;
 import com.ivorybridge.moabi.database.entity.util.Credential;
 import com.ivorybridge.moabi.database.entity.util.InputHistory;
+import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.database.firebase.FirebaseManager;
 import com.ivorybridge.moabi.network.auth.FitbitService;
 import com.ivorybridge.moabi.util.FormattedTime;
@@ -269,6 +270,7 @@ public class FitbitRepository {
 
     private void getAccessTokenWithRefreshToken(String date) {
 
+        Toast.makeText(mApplication, "Refreshing token", Toast.LENGTH_LONG).show();
         String CLIENT_ID = "22D6TC";
         String CLIENT_SECRET = "05f59d5f32a14ecba00cd6c2a58fa7a5";
         String clientCredentials = CLIENT_ID + ":" + CLIENT_SECRET;
@@ -302,7 +304,18 @@ public class FitbitRepository {
                             connectedService.setConnected(true);
                             connectedService.setType("tracker");
                             dataInUseRepository.insert(connectedService);
+                            InputInUse inputInUse = new InputInUse();
+                            inputInUse.setType("tracker");
+                            inputInUse.setName(mApplication.getString(R.string.fitbit_camel_case));
+                            inputInUse.setInUse(true);
+                            dataInUseRepository.insert(inputInUse);
+                            Toast.makeText(mApplication, "Refreshing token successful.", Toast.LENGTH_LONG).show();
                         } else {
+                            InputInUse inputInUse = new InputInUse();
+                            inputInUse.setType("tracker");
+                            inputInUse.setName(mApplication.getString(R.string.fitbit_camel_case));
+                            inputInUse.setInUse(false);
+                            dataInUseRepository.insert(inputInUse);
                             ConnectedService connectedService = new ConnectedService();
                             connectedService.setName(mApplication.getString(R.string.fitbit_camel_case));
                             connectedService.setConnected(false);
@@ -310,6 +323,7 @@ public class FitbitRepository {
                             dataInUseRepository.insert(connectedService);
                             fitbitTaskSuccess.setResult(true);
                             insertSuccess(fitbitTaskSuccess);
+                            Toast.makeText(mApplication, "Refreshing token unsuccessful.", Toast.LENGTH_LONG).show();
                             //TODO - when this happens, show a notification to let the user know something is wrong
                         }
                     }
@@ -317,6 +331,7 @@ public class FitbitRepository {
                     @Override
                     public void onFailure(Call<FitbitAuthCredentialsSummary> call, Throwable t) {
                         Log.i(TAG, t.toString());
+                        Toast.makeText(mApplication,  t.toString(), Toast.LENGTH_LONG).show();
                     }
                 });
             }

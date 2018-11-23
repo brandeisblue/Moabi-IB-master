@@ -23,6 +23,8 @@ import android.widget.Toast;
 import com.google.android.material.appbar.AppBarLayout;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.entity.util.AsyncTaskBoolean;
+import com.ivorybridge.moabi.database.entity.util.ConnectedService;
+import com.ivorybridge.moabi.database.entity.util.DataInUseMediatorLiveData;
 import com.ivorybridge.moabi.database.entity.util.InputDate;
 import com.ivorybridge.moabi.database.entity.util.InputHistory;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
@@ -68,6 +70,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -475,6 +478,91 @@ public class TodayFragment extends Fragment implements
     }
 
     private void setItemsToRecyclerView(String unit) {
+        DataInUseMediatorLiveData dataInUseMediatorLiveData = new DataInUseMediatorLiveData(dataInUseViewModel.getAllInputsInUse(), dataInUseViewModel.getAllConnectedServices());
+        dataInUseMediatorLiveData.observe(getViewLifecycleOwner(), new Observer<Pair<List<InputInUse>, List<ConnectedService>>>() {
+            @Override
+            public void onChanged(Pair<List<InputInUse>, List<ConnectedService>> listListPair) {
+                Set<String> inputTypes = new LinkedHashSet<>();
+                List<String> inputMethodsWithDataList = new ArrayList<>();
+                if (listListPair.first != null && listListPair.first.size() > 0) {
+                    mEmptyAdapter.clear();
+                    for (InputInUse inputInUse : listListPair.first) {
+                        if (inputInUse.isInUse()) {
+                            if (listListPair.second != null && listListPair.second.size() > 0) {
+                                for (ConnectedService connectedService : listListPair.second) {
+                                    if (inputInUse.getName().equals(connectedService.getName()) && connectedService.isConnected()) {
+                                        inputMethodsWithDataList.add(connectedService.getName());
+                                    }
+                                }
+                            }
+                            if (inputMethodsWithDataList.size() > 0) {
+                                if (getContext() != null && getActivity() != null) {
+                                    activityTrackerItemItemAdapter.clear();
+                                    activityTrackerItemItemAdapter.add(new ActivityTrackerItem(
+                                            getContext(), (AppCompatActivity) getActivity(), TodayFragment.this,
+                                            inputMethodsWithDataList, mDate, unit));
+                                }
+                                if (inputMethodsWithDataList.contains(getString(R.string.weather_camel_case))) {
+                                    weatherLayout.setVisibility(View.VISIBLE);
+                                } else {
+                                    weatherLayout.setVisibility(View.GONE);
+                                }
+                            }
+                            if (inputInUse.getName().equals(getString(R.string.phone_usage_camel_case))) {
+                                if (getContext() != null) {
+                                    appUsageItemItemAdapter.clear();
+                                    appUsageItemItemAdapter.add(new AppUsageItem(TodayFragment.this, mDate));
+                                }
+                            }
+                            if (inputInUse.getName().equals(getString(R.string.mood_and_energy_camel_case))) {
+                                moodItemAdapter.clear();
+                                moodItemAdapter.add(new MoodItem(
+                                        TodayFragment.this, mDate));
+                                energyItemAdapter.clear();
+                                energyItemAdapter.add(new EnergyItem(
+                                        TodayFragment.this, mDate));
+                            }
+                            if (inputInUse.getName().equals(getString(R.string.stress_camel_case))) {
+                                stressItemAdapter.clear();
+                                stressItemAdapter.add(new StressItem(
+                                        TodayFragment.this, mDate));
+                            }
+                            if (inputInUse.getName().equals(getString(R.string.daily_review_camel_case))) {
+                                dailyReviewItemAdapter.clear();
+                                dailyReviewItemAdapter.add(new DailyReviewItem(
+                                        TodayFragment.this, mDate));
+                            }
+                            if (inputInUse.getName().equals(getString(R.string.depression_phq9_camel_case))) {
+                                phq9ItemAdapter.clear();
+                                phq9ItemAdapter.add(new Phq9Item(
+                                        TodayFragment.this, mDate));
+                            }
+                            if (inputInUse.getName().equals(getString(R.string.anxiety_gad7_camel_case))) {
+                                gad7ItemAdapter.clear();
+                                gad7ItemAdapter.add(new Gad7Item(
+                                        TodayFragment.this, mDate));
+                            }
+                            if (inputInUse.getName().equals(getString(R.string.baactivity_camel_case))) {
+                                bAActivityItemAdapter.clear();
+                                bAActivityItemAdapter.add(new BAActivityItem(TodayFragment.this, mDate));
+                            }
+                            if (inputInUse.getName().equals(getString(R.string.timer_camel_case))) {
+                                timedActivityItemAdapter.clear();
+                                timedActivityItemAdapter.add(new TimedActivityItem(TodayFragment.this, mDate));
+                            }
+                            if (inputInUse.getName().equals(getString(R.string.weather_camel_case))) {
+                                weatherLayout.setVisibility(View.VISIBLE);
+                            }
+                            Log.i(TAG, inputTypes.toString());
+                        }
+                    }
+                } else {
+                    mEmptyAdapter.clear();
+                    mEmptyAdapter.add(new EmptyItem());
+                }
+            }
+        });
+        /*
         dataInUseViewModel.getAllInputsInUse().observe(this, new Observer<List<InputInUse>>() {
             @Override
             public void onChanged(@Nullable List<InputInUse> inputInUseList) {
@@ -490,7 +578,6 @@ public class TodayFragment extends Fragment implements
                 timedActivityItemAdapter.clear();
                 mEmptyAdapter.clear();
                 if (inputInUseList != null) {
-                    Log.i(TAG, inputInUseList.toString());
                     Set<String> inputTypes = new LinkedHashSet<>();
                     List<String> inputMethodsWithDataList = new ArrayList<>();
                     for (InputInUse inputInUse : inputInUseList) {
@@ -566,21 +653,24 @@ public class TodayFragment extends Fragment implements
                     mEmptyAdapter.add(new EmptyItem());
                 }
             }
-        });
+        });*/
         inputHistoryViewModel.getInputHistory(mDate).observe(this, new Observer<List<InputHistory>>() {
             @Override
             public void onChanged(@Nullable List<InputHistory> inputHistories) {
                 if (inputHistories != null) {
                     Set<String> inputTypes = new LinkedHashSet<>();
                     for (InputHistory inputHistory : inputHistories) {
-                        inputTypes.add(inputHistory.getInputType());
+                        if (inputHistory.getInputType().equals(getString(R.string.timer_camel_case))) {
+                            inputTypes.add(inputHistory.getInputType());
+                        }
                     }
-                    if (inputTypes.contains(getString(R.string.timer_camel_case))) {
+                    if (inputTypes.size() > 0) {
                         timedActivityItemAdapter.clear();
                         timedActivityItemAdapter.add(new TimedActivityItem(TodayFragment.this, mDate));
                     }
                     Log.i(TAG, inputTypes.toString());
                 }
+                /*
                 if ((inputHistories == null || inputHistories.size() == 0) && activityTrackerItemItemAdapter.getAdapterItemCount() == 0 &&
                         appUsageItemItemAdapter.getAdapterItemCount() == 0 &&
                         moodItemAdapter.getAdapterItemCount() == 0 &&
@@ -589,7 +679,7 @@ public class TodayFragment extends Fragment implements
                         ) {
                     mEmptyAdapter.clear();
                     mEmptyAdapter.add(new EmptyItem());
-                }
+                }*/
             }
         });
     }

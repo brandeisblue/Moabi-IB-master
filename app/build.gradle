@@ -110,6 +110,8 @@ dependencies {
     implementation 'me.zhanghai.android.materialprogressbar:library:1.6.0'
     implementation 'net.openid:appauth:0.7.1'
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
+    implementation 'com.getkeepsafe.taptargetview:taptargetview:1.12.0'
+    implementation 'com.github.iammert:MaterialIntroView:1.6.0'
     android.defaultConfig.manifestPlaceholders =
             ['appAuthRedirectScheme': 'moabi']
     implementation 'com.mikepenz:itemanimators:1.1.0'

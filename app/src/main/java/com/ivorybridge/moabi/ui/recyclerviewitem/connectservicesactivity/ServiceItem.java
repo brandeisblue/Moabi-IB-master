@@ -7,7 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.Process;
 import android.provider.Settings;
 import android.view.View;
@@ -19,6 +21,8 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.StackingBehavior;
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
@@ -30,6 +34,7 @@ import com.ivorybridge.moabi.database.firebase.FirebaseManager;
 import com.ivorybridge.moabi.network.auth.FitbitAuthorizationRequest;
 import com.ivorybridge.moabi.network.auth.GoogleFitAPI;
 import com.ivorybridge.moabi.repository.DataInUseRepository;
+import com.ivorybridge.moabi.ui.activity.MainActivity;
 import com.ivorybridge.moabi.viewmodel.DataInUseViewModel;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.items.AbstractItem;
@@ -43,6 +48,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.util.Pair;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.PreferenceManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.refactor.library.SmoothCheckBox;
@@ -120,7 +126,10 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
             checkBox.setEnabled(false);
             //inputInUseViewModel = ViewModelProviders.
             dataInUseRepository = new DataInUseRepository(item.mActivity.getApplication());
-
+            SharedPreferences getPrefs = PreferenceManager
+                    .getDefaultSharedPreferences(itemView.getContext());
+            SharedPreferences.Editor e = getPrefs.edit();
+            boolean tut1Complete = getPrefs.getBoolean("tut_1_complete", false);
             // set each item's image and text
             final String itemType = item.itemType;
             if (itemType.equals(itemView.getContext().getString(R.string.phone_usage_camel_case))) {
@@ -140,17 +149,63 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                 descriptionTextView.setText(R.string.weather_description);
                 titleTextView.setText(R.string.weather_title);
             } else if (itemType.equals(itemView.getContext().getString(R.string.moabi_tracker_camel_case))) {
-                iconImageView.setImageResource(R.drawable.ic_logo_monogram_colored);
+                iconImageView.setImageResource(R.drawable.ic_monogram_colored);
                 descriptionTextView.setText(R.string.moabi_tracker_description);
                 titleTextView.setText(R.string.moabi_tracker_title);
-            }
-
-            // configure checkbox.
-            if (isUsagePermissionGranted(itemView.getContext())) {
-                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                    firebaseManager.getIsConnectedRef().child(itemView.getContext().getString(R.string.phone_usage_camel_case)).setValue(true);
+                if (!tut1Complete) {
+                    TapTargetView.showFor(item.mActivity, TapTarget.forView(itemView.getRootView().findViewById(R.id.activity_connected_services_recyclerview_item_cardview),
+                            itemView.getContext().getString(R.string.tutorial_connect_services_title),
+                            itemView.getContext().getString(R.string.tutorial_edit_entry_msg))
+                                    .outerCircleColor(R.color.colorPrimary)
+                                    .outerCircleAlpha(0.7f)
+                                    .targetCircleColor(R.color.white)
+                                    .titleTextSize(16)
+                                    //.titleTextColor(R.color.colorPrimary)      // Specify the color of the title text
+                                    .descriptionTextSize(16)            // Specify the size (in sp) of the description text
+                                    //.descriptionTextColor(R.color.white)  // Specify the color of the description text
+                                    .textColor(R.color.white)
+                                    .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+                                    .dimColor(R.color.black)            // If set, will dim behind the view with 30% opacity of the given color
+                                    .drawShadow(true)                   // Whether to draw a drop shadow or not
+                                    .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
+                                    .tintTarget(false)                   // Whether to tint the target view's color
+                                    .transparentTarget(true)          // Specify whether the target is transparent (displays the content underneath)
+                                    //.icon(ContextCompat.getDrawable(this, R.drawable.bg_rectangle_rounded_white))           // Specify a custom drawable to draw as the target
+                                    .targetRadius(96),                  // Specify the target radius (in dp)
+                            new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+                                @Override
+                                public void onTargetClick(TapTargetView view) {
+                                    super.onTargetClick(view);      // This call is optional
+                                    checkBox.setChecked(true, true);
+                                    InputInUse inputInUse = new InputInUse();
+                                    inputInUse.setType("tracker");
+                                    inputInUse.setName(itemView.getContext().getString(R.string.moabi_tracker_camel_case));
+                                    inputInUse.setInUse(true);
+                                    dataInUseRepository.insert(inputInUse);
+                                    ConnectedService connectedService = new ConnectedService();
+                                    connectedService.setType("tracker");
+                                    connectedService.setName(itemView.getContext().getString(R.string.moabi_tracker_camel_case));
+                                    connectedService.setConnected(true);
+                                    dataInUseRepository.insert(connectedService);
+                                    if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                                        firebaseManager.getInputsInUseRef().child(itemView.getContext().getString(R.string.moabi_tracker_camel_case)).setValue(true);
+                                        firebaseManager.getIsConnectedRef().child(itemView.getContext().getString(R.string.moabi_tracker_camel_case)).setValue(true);
+                                    }
+                                    e.putBoolean("tut_1_complete", true);
+                                    e.commit();
+                                    Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Intent tutorialIntent = new Intent(item.mActivity, MainActivity.class);
+                                            itemView.getContext().startActivity(tutorialIntent);
+                                        }
+                                    }, 300);
+                                }
+                            });
                 }
             }
+
             initializeCheckBox(item, itemType, checkBox);
 
             cardView.setOnClickListener(new View.OnClickListener() {
@@ -258,7 +313,7 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                             listListPair.first.size() > 0 && listListPair.second.size() > 0) {
                         for (InputInUse inputInUse : listListPair.first) {
                             if (inputInUse.getName().equals(itemType) && inputInUse.isInUse()) {
-                                for (ConnectedService connectedService: listListPair.second) {
+                                for (ConnectedService connectedService : listListPair.second) {
                                     if (connectedService.getName().equals(itemType)) {
                                         checkBox.setChecked(connectedService.isConnected());
                                     }

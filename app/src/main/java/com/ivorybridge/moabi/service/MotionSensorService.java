@@ -27,7 +27,9 @@ import com.ivorybridge.moabi.ui.activity.MainActivity;
 import com.ivorybridge.moabi.util.FormattedTime;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import androidx.core.app.NotificationCompat;
@@ -77,6 +79,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
     private NotificationCompat.Builder builder;
     private SharedPreferences notificationSharedPreferences;
     private FirebaseManager firebaseManager;
+    private double bmr;
 
     @Override
     public void onCreate() {
@@ -94,6 +97,38 @@ public class MotionSensorService extends Service implements SensorEventListener 
             sensorGravity = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             sensorManager.registerListener(this, stepDetectorSensor, SensorManager.SENSOR_DELAY_FASTEST);
         }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<BuiltInProfile> builtInProfiles = builtInFitnessRepository.getUserProfileNow();
+                if (builtInProfiles != null && builtInProfiles.size() > 0) {
+                    profile = builtInProfiles.get(0);
+                    if (profile.getHeight() != null) {
+                        if (profile.getGender() == null) {
+                            bmr = 1577.5;
+                        } else if (profile.getGender().equals(getString(R.string.profile_sex_male))) {
+                            bmr = profile.getWeight() * 10 + 6.25 * profile.getHeight();
+                            if (profile.getAge() != null) {
+                                bmr = bmr - 5 * profile.getAge() + 5;
+                            }
+                        } else {
+                            bmr = profile.getWeight() * 10 + 6.25 * profile.getHeight();
+                            if (profile.getAge() != null) {
+                                bmr = bmr - 5 * profile.getAge() - 161;
+                            }
+                        }
+                    }
+                } else {
+                    BuiltInProfile builtInProfile = new BuiltInProfile();
+                    builtInProfile.setBMR(1577.5);
+                    builtInProfile.setDateOfRegistration(formattedTime.getCurrentDateAsYYYYMMDD());
+                    builtInProfile.setHeight(170d);
+                    builtInProfile.setWeight(70d);
+                    builtInProfile.setUniqueID(UUID.randomUUID().toString());
+                    builtInFitnessRepository.insert(builtInProfile);
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -155,7 +190,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
         Intent notificationIntent = new Intent(MotionSensorService.this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(MotionSensorService.this, 0, notificationIntent, 0);
         builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
-                .setSmallIcon(R.drawable.ic_logo_monogram_white)
+                .setSmallIcon(R.drawable.ic_monogram_white)
                 .setContentTitle("Today: " + steps + " steps")
                 .setContentText("Today: " + String.format(Locale.US, "%.2f", distance / 1000) + " km, " + TimeUnit.MILLISECONDS.toMinutes(activeMins) + " mins, " + TimeUnit.MILLISECONDS.toMinutes(sedentaryMins) + " mins, " + calories + " Cal")
                 .setColor(getColor(R.color.colorPrimary))
@@ -181,6 +216,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
             @Override
             public void run() {
                 activitySummary = builtInFitnessRepository.getNow(formattedTime.getCurrentDateAsYYYYMMDD());
+
                 if (activitySummary == null) {
                     activitySummary = new BuiltInActivitySummary();
                     activitySummary.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
@@ -224,19 +260,29 @@ public class MotionSensorService extends Service implements SensorEventListener 
                 }
                 if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
                     steps++;
-                    distance = steps * 0.762;
+                    if (profile.getHeight() != null) {
+                        if (profile.getGender() == null) {
+                            distance = steps * (profile.getHeight() * 0.414) / 100;
+                        } else if (profile.getGender().equals(getString(R.string.profile_sex_male))) {
+                            distance = steps * profile.getHeight() * 0.415 / 100;
+                        } else {
+                            distance = steps * profile.getHeight() * 0.413 / 100;
+                        }
+                    } else {
+                        distance = steps * 0.762;
+                    }
                     long timeNow = (new Date()).getTime()
                             + (event.timestamp - System.nanoTime()) / 1000000L;
                     Log.i(TAG, "Last: " + timeOfLastEntry + ", Now: " + timeNow);
                     if (timeOfLastEntry != 0) {
-                        if (timeNow - timeOfLastEntry < 5000) {
+                        if (timeNow - timeOfLastEntry < 5000 && timeNow - timeOfLastEntry > 0) {
                             activeMins += timeNow - timeOfLastEntry;
                         }
                     } else {
                         activeMins = 0;
                     }
                     double elapsedTime = formattedTime.getCurrentTimeInMilliSecs() - formattedTime.getStartOfDay(formattedTime.getCurrentDateAsYYYYMMDD());
-                    calories = (double) steps / 1000 * 40 + 1600 * (elapsedTime / 86400000);
+                    calories = (double) steps / 1000 * 40 + bmr * (elapsedTime / 86400000);
                     activitySummary.setLastSensorTimeStamp(timeNow);
                     activitySummary.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
                 } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -253,6 +299,31 @@ public class MotionSensorService extends Service implements SensorEventListener 
                     if ((Math.abs(prevY - gravity[1]) > threshold) && !ignore) {
                         steps++;
                         ignore = true;
+                        if (profile.getHeight() != null) {
+                            if (profile.getGender() == null) {
+                                distance = steps * profile.getHeight() * 0.414 / 100;
+                            } else if (profile.getGender().equals(getString(R.string.profile_sex_male))) {
+                                distance = steps * profile.getHeight() * 0.415 / 100;
+                            } else {
+                                distance = steps * profile.getHeight() * 0.413 / 100;
+                            }
+                        } else {
+                            distance = steps * 0.762;
+                        }
+                        long timeNow = (new Date()).getTime()
+                                + (event.timestamp - System.nanoTime()) / 1000000L;
+                        Log.i(TAG, "Last: " + timeOfLastEntry + ", Now: " + timeNow);
+                        if (timeOfLastEntry != 0) {
+                            if (timeNow - timeOfLastEntry < 5000 && timeNow - timeOfLastEntry > 0) {
+                                activeMins += timeNow - timeOfLastEntry;
+                            }
+                        } else {
+                            activeMins = 0;
+                        }
+                        double elapsedTime = formattedTime.getCurrentTimeInMilliSecs() - formattedTime.getStartOfDay(formattedTime.getCurrentDateAsYYYYMMDD());
+                        calories = (double) steps / 1000 * 40 + bmr * (elapsedTime / 86400000);
+                        activitySummary.setLastSensorTimeStamp(timeNow);
+                        activitySummary.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
                     }
                     prevY = gravity[1];
                 }

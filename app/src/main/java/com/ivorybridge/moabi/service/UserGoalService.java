@@ -19,13 +19,16 @@ import android.util.Log;
 
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.entity.builtinfitness.BuiltInActivitySummary;
+import com.ivorybridge.moabi.database.entity.builtinfitness.BuiltInProfile;
 import com.ivorybridge.moabi.repository.BuiltInFitnessRepository;
 import com.ivorybridge.moabi.repository.DataInUseRepository;
 import com.ivorybridge.moabi.ui.activity.MainActivity;
 import com.ivorybridge.moabi.util.FormattedTime;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import androidx.core.app.NotificationCompat;
@@ -52,6 +55,16 @@ public class UserGoalService extends Service implements SensorEventListener {
     private BuiltInFitnessRepository builtInFitnessRepository;
     private DataInUseRepository dataInUseRepository;
     private BuiltInActivitySummary activitySummary;
+    // Gravity for accelerometer data
+    private float[] gravity = new float[3];
+    // smoothed values
+    private float[] smoothed = new float[3];
+    private Sensor sensorGravity;
+    private double bearing = 0;
+    private double prevY;
+    private double threshold;
+    private boolean ignore;
+    private int countdown;
     private long timeOfLastEntry = 0;
     private long steps = 0;
     private long activeMins = 0;
@@ -61,11 +74,46 @@ public class UserGoalService extends Service implements SensorEventListener {
     private NotificationCompat.Builder builder;
     private SharedPreferences notificationSharedPreferences;
     private SharedPreferences.Editor notificationSPEditor;
+    private BuiltInProfile profile;
+    private double bmr;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        builtInFitnessRepository = new BuiltInFitnessRepository(getApplication());
         this.notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<BuiltInProfile> builtInProfiles = builtInFitnessRepository.getUserProfileNow();
+                if (builtInProfiles != null && builtInProfiles.size() > 0) {
+                    profile = builtInProfiles.get(0);
+                    if (profile.getHeight() != null) {
+                        if (profile.getGender() == null) {
+                            bmr = 1577.5;
+                        } else if (profile.getGender().equals(getString(R.string.profile_sex_male))) {
+                            bmr = profile.getWeight() * 10 + 6.25 * profile.getHeight();
+                            if (profile.getAge() != null) {
+                                bmr = bmr - 5 * profile.getAge() + 5;
+                            }
+                        } else {
+                            bmr = profile.getWeight() * 10 + 6.25 * profile.getHeight();
+                            if (profile.getAge() != null) {
+                                bmr = bmr - 5 * profile.getAge() - 161;
+                            }
+                        }
+                    }
+                } else {
+                    BuiltInProfile builtInProfile = new BuiltInProfile();
+                    builtInProfile.setBMR(1577.5);
+                    builtInProfile.setDateOfRegistration(formattedTime.getCurrentDateAsYYYYMMDD());
+                    builtInProfile.setHeight(170d);
+                    builtInProfile.setWeight(70d);
+                    builtInProfile.setUniqueID(UUID.randomUUID().toString());
+                    builtInFitnessRepository.insert(builtInProfile);
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -230,7 +278,7 @@ public class UserGoalService extends Service implements SensorEventListener {
             title = title.substring(0, index) + " " + title.substring(index);
         }
         builder = new NotificationCompat.Builder(this, getApplicationContext().getString(R.string.USER_GOAL_NOTIF_CHANNEL_ID))
-                .setSmallIcon(R.drawable.ic_logo_monogram_white)
+                .setSmallIcon(R.drawable.ic_monogram_white)
                 .setContentTitle(title)
                 .setContentText(tracker)
                 .setTicker(NOTIFICATION_CHANNEL_DESC)
@@ -301,19 +349,69 @@ public class UserGoalService extends Service implements SensorEventListener {
                     }
                     if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
                         steps++;
-                        distance = steps * 0.762;
-                        long timeInMillis = (new Date()).getTime()
+                        if (profile.getHeight() != null) {
+                            if (profile.getGender() == null) {
+                                distance = steps * (profile.getHeight() * 0.414) / 100;
+                            } else if (profile.getGender().equals(getString(R.string.profile_sex_male))) {
+                                distance = steps * profile.getHeight() * 0.415 / 100;
+                            } else {
+                                distance = steps * profile.getHeight() * 0.413 / 100;
+                            }
+                        } else {
+                            distance = steps * 0.762;
+                        }
+                        long timeNow = (new Date()).getTime()
                                 + (event.timestamp - System.nanoTime()) / 1000000L;
-                        Log.i(TAG, "Last: " + timeOfLastEntry + ", Now: " + timeInMillis);
+                        Log.i(TAG, "Last: " + timeOfLastEntry + ", Now: " + timeNow);
                         if (timeOfLastEntry != 0) {
-                            if (timeInMillis - timeOfLastEntry < 5000) {
-                                activeMins += timeInMillis - timeOfLastEntry;
+                            if (timeNow - timeOfLastEntry < 5000 && timeNow - timeOfLastEntry > 0) {
+                                activeMins += timeNow - timeOfLastEntry;
                             }
                         } else {
                             activeMins = 0;
                         }
                         double elapsedTime = formattedTime.getCurrentTimeInMilliSecs() - formattedTime.getStartOfDay(formattedTime.getCurrentDateAsYYYYMMDD());
-                        calories = (double) steps / 1000 * 40 + 1600 * (elapsedTime / 86400000);
+                        calories = (double) steps / 1000 * 40 + bmr * (elapsedTime / 86400000);
+                        activitySummary.setLastSensorTimeStamp(timeNow);
+                        activitySummary.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
+                    } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                        // we need to use a low pass filter to make data smoothed
+                        smoothed = lowPassFilter(event.values, gravity);
+                        gravity[0] = smoothed[0];
+                        gravity[1] = smoothed[1];
+                        gravity[2] = smoothed[2];
+                        if (ignore) {
+                            countdown--;
+                            ignore = (countdown < 0) ? false : ignore;
+                        } else
+                            countdown = 22;
+                        if ((Math.abs(prevY - gravity[1]) > threshold) && !ignore) {
+                            steps++;
+                            ignore = true;
+                            if (profile.getHeight() != null) {
+                                if (profile.getGender() == null) {
+                                    distance = steps * profile.getHeight() * 0.414 / 100;
+                                } else if (profile.getGender().equals(getString(R.string.profile_sex_male))) {
+                                    distance = steps * profile.getHeight() * 0.415 / 100;
+                                } else {
+                                    distance = steps * profile.getHeight() * 0.413 / 100;
+                                }
+                            } else {
+                                distance = steps * 0.762;
+                            }
+                            long timeNow = (new Date()).getTime()
+                                    + (event.timestamp - System.nanoTime()) / 1000000L;
+                            Log.i(TAG, "Last: " + timeOfLastEntry + ", Now: " + timeNow);
+                            if (timeOfLastEntry != 0) {
+                                if (timeNow - timeOfLastEntry < 5000 && timeNow - timeOfLastEntry > 0) {
+                                    activeMins += timeNow - timeOfLastEntry;
+                                }
+                            } else {
+                                activeMins = 0;
+                            }
+                            double elapsedTime = formattedTime.getCurrentTimeInMilliSecs() - formattedTime.getStartOfDay(formattedTime.getCurrentDateAsYYYYMMDD());
+                            calories = (double) steps / 1000 * 40 + bmr * (elapsedTime / 86400000);
+                        }
                     }
                     handler.post(new Runnable() {
                         @Override
@@ -325,6 +423,14 @@ public class UserGoalService extends Service implements SensorEventListener {
             }).start();
         }
     }
+
+        protected float[] lowPassFilter(float[] input, float[] output) {
+            if (output == null) return input;
+            for (int i = 0; i < input.length; i++) {
+                output[i] = output[i] + 1.0f * (input[i] - output[i]);
+            }
+            return output;
+        }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -389,7 +495,7 @@ public class UserGoalService extends Service implements SensorEventListener {
         }
         Log.i(TAG, tracker);
         builder = new NotificationCompat.Builder(this, getApplicationContext().getString(R.string.USER_GOAL_NOTIF_CHANNEL_ID))
-                .setSmallIcon(R.drawable.ic_logo_monogram_white)
+                .setSmallIcon(R.drawable.ic_monogram_white)
                 .setContentTitle(title)
                 .setContentText(tracker)
                 .setTicker(NOTIFICATION_CHANNEL_DESC)

@@ -2364,8 +2364,8 @@ public class StatsNonTrackerFragment extends Fragment {
         YAxis leftAxis = lineChart.getAxisLeft();
         YAxis rightAxis = lineChart.getAxisRight();
 
-        if (inputType.equals(getString(R.string.mood_camel_case)) || inputType.equals(getString(R.string.energy_camel_case))) {
-            // set up y-axis
+        if (inputType.equals(getString(R.string.mood_camel_case))
+                || inputType.equals(getString(R.string.energy_camel_case))) {
             leftAxis.setDrawGridLines(false);
             leftAxis.setDrawAxisLine(false);
             leftAxis.setAxisMaximum(3.5f);
@@ -2497,7 +2497,6 @@ public class StatsNonTrackerFragment extends Fragment {
                 }
             });
         }
-
         leftAxis.removeAllLimitLines();
         LimitLine averageLL = new LimitLine(average, getString(R.string.chart_avg_abbr));
         averageLL.setLineWidth(1f);
@@ -2624,8 +2623,6 @@ public class StatsNonTrackerFragment extends Fragment {
             //leftAxis.addLimitLine(severe);
             //leftAxis.addLimitLine(max);
         }
-        //leftAxis.setDrawLimitLinesBehindData(true);
-        //leftAxis.addLimitLine(goodLL);
         rightAxis.setDrawGridLines(false);
         rightAxis.setDrawLabels(false);
         rightAxis.setDrawAxisLine(false);

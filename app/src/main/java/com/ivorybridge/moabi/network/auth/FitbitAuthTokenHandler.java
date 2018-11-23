@@ -14,14 +14,17 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.entity.util.ConnectedService;
 import com.ivorybridge.moabi.database.entity.util.Credential;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
+import com.ivorybridge.moabi.database.firebase.FirebaseManager;
 import com.ivorybridge.moabi.repository.CredentialRepository;
 import com.ivorybridge.moabi.repository.DataInUseRepository;
+import com.ivorybridge.moabi.util.FormattedTime;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -43,6 +46,7 @@ public class FitbitAuthTokenHandler {
     private String encodedCodeString;
     private String CODE_VERIFIER;
     private String CODE_CHALLENGE;
+    private FirebaseManager firebaseManager;
     private static final String CLIENT_ID = "22D6TC";
     private static final String CLIENT_SECRET = "05f59d5f32a14ecba00cd6c2a58fa7a5";
     private static final String FITBIT_TOKEN_PREFERENCES = "FibitTokenPrefs";
@@ -53,6 +57,7 @@ public class FitbitAuthTokenHandler {
     private SharedPreferences sharedpreferences;
     private DataInUseRepository dataInUseRepository;
     private CredentialRepository credentialRepository;
+    private FormattedTime formattedTime;
 
     public FitbitAuthTokenHandler(AppCompatActivity activity, String redirectUri) {
         Log.i(TAG, TAG + " is created");
@@ -61,6 +66,8 @@ public class FitbitAuthTokenHandler {
         sharedpreferences = mContext.getSharedPreferences(
                 FITBIT_TOKEN_PREFERENCES, Context.MODE_PRIVATE);
         mFitbitEditor = sharedpreferences.edit();
+        firebaseManager = new FirebaseManager();
+        formattedTime = new FormattedTime();
         //parseImplicitGrantResponse();
         parseAuthorizationCode();
         String clientCredentials = CLIENT_ID + ":" + CLIENT_SECRET;
@@ -120,8 +127,10 @@ public class FitbitAuthTokenHandler {
                         credential.setAccessToken((String) map.get("access_token"));
                         credential.setRefreshToken((String) map.get("refresh_token"));
                         credentialRepository.insert(credential);
-                        //firebaseManager.getFitbitCredentialRef().updateChildren(map);
-                        //firebaseManager.getFitbitCredentialRef().child("time").setValue(getCurrentTime());
+                        if (FirebaseAuth.getInstance() != null) {
+                            firebaseManager.getFitbitCredentialRef().updateChildren(map);
+                            firebaseManager.getFitbitCredentialRef().child("time").setValue(formattedTime.getCurrentTimeAsHMMA());
+                        }
                     }
                 }, new Response.ErrorListener() {
             @Override

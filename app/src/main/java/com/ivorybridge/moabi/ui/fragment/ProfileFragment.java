@@ -57,6 +57,8 @@ public class ProfileFragment extends Fragment {
     TextView heightTextView;
     @BindView(R.id.fragment_profile_weight_text)
     TextView weightTextView;
+    @BindView(R.id.fragment_profile_age_text)
+    TextView ageTextView;
     @BindView(R.id.fragment_profile_gender_layout)
     RelativeLayout genderLayout;
     @BindView(R.id.fragment_profile_dob_layout)
@@ -65,12 +67,11 @@ public class ProfileFragment extends Fragment {
     RelativeLayout heightLayout;
     @BindView(R.id.fragment_profile_weight_layout)
     RelativeLayout weightLayout;
+    @BindView(R.id.fragment_profile_age_layout)
+    RelativeLayout ageLayout;
     private BuiltInFitnessRepository builtInFitnessRepository;
     private FormattedTime formattedTime;
     private SharedPreferences unitSharedPreferences;
-    private SharedPreferences.OnSharedPreferenceChangeListener unitPrefChangeListener;
-    private NumberPicker.OnValueChangeListener picker1ValueChangeListener;
-    private NumberPicker.OnValueChangeListener picker2ValueChangeListener;
 
 
     @Override
@@ -269,6 +270,21 @@ public class ProfileFragment extends Fragment {
                                     }
                                 });
                             }
+                            String age = "";
+                            long ageLong = 0;
+                            if (profile.getAge() != null) {
+                                age = profile.getAge() + "";
+                                ageLong = profile.getAge();
+                            }
+                            final int numFirstNumPicker = (int) ageLong / 10;
+                            final int numSecondNumPicker = (int) ageLong % 10;
+                            ageTextView.setText(age);
+                            ageLayout.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    configureDoubleNumPicksLayout("Age", unit, numFirstNumPicker, numSecondNumPicker);
+                                }
+                            });
                         }
                     }
                 });
@@ -344,6 +360,23 @@ public class ProfileFragment extends Fragment {
                 numPicker1.setValue(firstNum);
                 numPicker2.setValue(secondNum);
             }
+        }
+        if (type.equals("Age")) {
+            final String[] weights = new String[12];
+            for (int i = 0; i < 12; i++) {
+                weights[i] = Integer.toString(i * 10);
+            }
+            numPicker1.setMaxValue(weights.length - 1);
+            numPicker1.setMinValue(0);
+            numPicker1.setDisplayedValues(weights);
+            numPicker2.setMaxValue(9);
+            numPicker2.setMinValue(0);
+            firstUnit.setText("");
+            firstUnit.setGravity(Gravity.CENTER);
+            secondUnit.setText("");
+            secondUnit.setGravity(Gravity.CENTER);
+            numPicker1.setValue(firstNum);
+            numPicker2.setValue(secondNum);
         }
         final TextView emptyView = new TextView(getContext());
         final TextView emptyView2 = new TextView(getContext());
@@ -425,6 +458,29 @@ public class ProfileFragment extends Fragment {
                                         } else {
                                             profile.setWeight((numPicker1.getValue() * 100 * 0.45359237) + numPicker2.getValue() * 0.45359237);
                                         }
+                                        builtInFitnessRepository.insert(profile);
+                                    }
+                                }
+                            }).start();
+                        }
+                    });
+            builder.create().show();
+        } else if (type.equals("Age")) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(getString(R.string.profile_age_title))
+                    .setView(LL)
+                    .setPositiveButton(getString(R.string.survey_okay_prompt), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Log.i(TAG, numPicker1.getValue() + ", " + numPicker2.getValue());
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (getActivity() != null) {
+                                        builtInFitnessRepository = new BuiltInFitnessRepository(getActivity().getApplication());
+                                        List<BuiltInProfile> builtInProfiles = builtInFitnessRepository.getUserProfileNow();
+                                        BuiltInProfile profile = builtInProfiles.get(0);
+                                        profile.setAge((long) (numPicker1.getValue() * 10) + numPicker2.getValue());
                                         builtInFitnessRepository.insert(profile);
                                     }
                                 }

@@ -217,7 +217,7 @@ public class TimerService extends Service implements PropertyChangeListener {
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), getApplicationContext().getString(R.string.CHRONOMETER_NOTIF_CHANNEL_ID))
-                .setSmallIcon(R.drawable.ic_logo_monogram_white)
+                .setSmallIcon(R.drawable.ic_monogram_white)
                 .setColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary))
                 .setOnlyAlertOnce(true);
 
@@ -229,7 +229,7 @@ public class TimerService extends Service implements PropertyChangeListener {
 
         if (TimeContainer.getInstance().getCurrentState() == TimeContainer.STATE_RUNNING) {
             customNotification = builder
-                    .setSmallIcon(R.drawable.ic_logo_monogram_white)
+                    .setSmallIcon(R.drawable.ic_monogram_white)
                     .setContentTitle(name)
                     .setContentText(msToHourMinSec(TimeContainer.getInstance().getElapsedTime()))
                     .addAction(R.drawable.ic_reset, getString(R.string.reset_title), resetPendingIntent)
@@ -247,7 +247,7 @@ public class TimerService extends Service implements PropertyChangeListener {
                     .build();
         } else {
             customNotification = builder
-                    .setSmallIcon(R.drawable.ic_logo_monogram_white)
+                    .setSmallIcon(R.drawable.ic_monogram_white)
                     .setContentTitle(name)
                     .setContentText(msToHourMinSec(TimeContainer.getInstance().getElapsedTime()))
                     .addAction(R.drawable.ic_reset, getString(R.string.reset_title), resetPendingIntent)

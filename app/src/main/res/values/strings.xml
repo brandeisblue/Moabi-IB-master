@@ -2,7 +2,19 @@
     <string name="app_name">Moabi</string>
 
     <!-- App Intro-->
-
+    <string name="tutorial_main_welcome_msg">Welcome!\nClick \"make entry\" to get started.</string>
+    <string name="tutorial_2_main_msg">Now, click \"make entry\" again to track your mood.</string>
+    <string name="tutorial_main_click_fab"></string>
+    <string name="tutorial_edit_entry_title">You can choose from different surveys to track how your
+        mood, energy level, stress and more change over time.\n\nClick \”Mood &amp; Energy\”
+        to track your mood and energy level.
+</string>
+    <string name="tutorial_connect_services_title">You can use this built-in tracker to
+        track your physical activity and see how it affects your life.
+        \n\nCheck back later if you also want to learn how your phone usage, weather and data from
+        your favorite fitness apps are related to your life.
+</string>
+    <string name="tutorial_edit_entry_msg"></string>
 
     <!-- Strings for sign-in activity -->
     <string name="sign_in_cancelled">Sign-in was cancelled</string>
@@ -254,6 +266,7 @@
     <string name="dismiss_title">Dismiss</string>
     <string name="dont_ask_again_title">Don\'t ask again.</string>
     <string name="continue_as_a_guest_title">Continue as a guest</string>
+    <string name="skip_title">Skip</string>
     <string name="sign_in_title">Sign in</string>
     <string name="submit_title">Submit</string>
 
@@ -374,7 +387,7 @@
 
 
     <!-- PHQ9 Questions -->
-    <string name="phq9_question_1">1. Little Interst or pleasure in doing things?</string>
+    <string name="phq9_question_1">1. Little interest or pleasure in doing things?</string>
     <string name="phq9_question_2">2. Feeling down, depressed, or hopeless?</string>
     <string name="phq9_question_3">3. Trouble falling or staying asleep, or sleeping too much?</string>
     <string name="phq9_question_4">4. Feeling tired or having little energy?</string>
@@ -386,9 +399,12 @@
 
     <!-- Profile -->
     <string name="profile_sex_title">Sex</string>
+    <string name="profile_sex_male">Male</string>
+    <string name="profile_sex_female">Female</string>
     <string name="profile_date_of_birth_title">Date of Birth</string>
     <string name="profile_height_title">Height</string>
     <string name="profile_weight_title">Weight</string>
+    <string name="profile_age_title">Age</string>
 
     <!-- Phone Usage-->
     <string name="phone_usage_total_title">Total</string>

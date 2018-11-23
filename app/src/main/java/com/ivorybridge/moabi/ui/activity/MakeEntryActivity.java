@@ -1,6 +1,7 @@
 package com.ivorybridge.moabi.ui.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +23,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -52,12 +54,19 @@ public class MakeEntryActivity extends AppCompatActivity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MakeEntryActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
+                onBackPressed();
             }
         });
         dataInUseViewModel = ViewModelProviders.of(this).get(DataInUseViewModel.class);
+        SharedPreferences getPrefs = PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext());
+        boolean tut1Complete = getPrefs.getBoolean("tut_1_complete", false);
+        if (!tut1Complete) {
+            dataInUseViewModel.deleteAllInputs();
+            Intent intent = new Intent(MakeEntryActivity.this, EditSurveyItemsActivity.class);
+            startActivity(intent);
+        }
+
         dataInUseViewModel.getAllInputsInUse().observe(this, new Observer<List<InputInUse>>() {
             @Override
             public void onChanged(List<InputInUse> inputInUses) {
@@ -105,5 +114,13 @@ public class MakeEntryActivity extends AppCompatActivity {
 
     private int fetchColor(@ColorRes int color) {
         return ContextCompat.getColor(this, color);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(MakeEntryActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

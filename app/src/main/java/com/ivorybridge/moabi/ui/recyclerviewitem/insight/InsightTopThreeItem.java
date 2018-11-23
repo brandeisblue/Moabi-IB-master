@@ -584,7 +584,7 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
                         drawable = R.drawable.ic_partly_cloudy;
                         indepVarType = itemView.getContext().getString(R.string.weather_title);
                     } else if (summary.getIndepVarType().equals(itemView.getContext().getString(R.string.moabi_tracker_camel_case))) {
-                        drawable = R.drawable.ic_logo_monogram_colored;
+                        drawable = R.drawable.ic_monogram_colored;
                         indepVarType = itemView.getContext().getString(R.string.moabi_tracker_title);
                     } else if (summary.getIndepVarType().equals(itemView.getContext().getString(R.string.timer_camel_case))) {
                         drawable = R.drawable.ic_stopwatch;

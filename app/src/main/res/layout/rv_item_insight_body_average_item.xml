@@ -16,25 +16,26 @@
 
     <com.warkiz.widget.IndicatorStayLayout
         android:id="@+id/rv_item_insight_body_average_item_seekbar_layout"
-        android:layout_below="@id/rv_item_insight_body_average_item_title_textview"
-        android:layout_marginTop="8dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rv_item_insight_body_average_item_title_textview"
+        android:layout_marginTop="8dp">
 
         <com.warkiz.widget.IndicatorSeekBar
             android:id="@+id/rv_item_insight_body_average_item_seekbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:isb_indicator_color="#b1000000"
+            app:isb_clear_default_padding="true"
             app:isb_indicator_text_color="@color/white"
-            app:isb_indicator_text_size="14sp"
+            app:isb_indicator_text_size="12sp"
             app:isb_progress_value_float="true"
             app:isb_seek_smoothly="true"
             app:isb_show_indicator="rectangle"
             app:isb_show_tick_texts="true"
             app:isb_thumb_color="@color/colorPrimaryDark"
             app:isb_thumb_text_color="@color/colorPrimary"
-            app:isb_tick_texts_color="@color/black"
+            app:isb_tick_texts_color="@color/darker_gray"
             app:isb_ticks_count="2"
             app:isb_track_progress_color="@color/colorPrimary"
             app:isb_user_seekable="false" />

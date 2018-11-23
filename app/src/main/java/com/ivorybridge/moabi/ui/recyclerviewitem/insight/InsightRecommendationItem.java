@@ -167,7 +167,7 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
                 depVarImageView.setImageResource(R.drawable.ic_review_black);
             } 
 
-            int drawable = R.drawable.ic_logo_monogram_colored;
+            int drawable = R.drawable.ic_monogram_colored;
             if (service.equals(itemView.getContext().getString(R.string.fitbit_camel_case))) {
                 drawable = R.drawable.ic_fitbit_logo;
             } else if (service.equals(itemView.getContext().getString(R.string.phone_usage_camel_case))) {
@@ -175,7 +175,7 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
             } else if (service.equals(itemView.getContext().getString(R.string.googlefit_camel_case))) {
                 drawable = R.drawable.ic_googlefit;
             } else if (service.equals(itemView.getContext().getString(R.string.moabi_tracker_camel_case))) {
-                drawable = R.drawable.ic_logo_monogram_colored;
+                drawable = R.drawable.ic_monogram_colored;
             } else if (service.equals(itemView.getContext().getString(R.string.weather_camel_case))) {
                 drawable = R.drawable.ic_partly_cloudy;
             } else if (service.equals(itemView.getContext().getString(R.string.timer_camel_case))) {

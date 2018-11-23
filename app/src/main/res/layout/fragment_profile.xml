@@ -87,7 +87,7 @@
             android:textColor="@color/black"
             android:textSize="16sp"
             android:layout_centerVertical="true"
-            android:text="Date of Birth" />
+            android:text="@string/profile_date_of_birth_title" />
 
         <TextView
             android:id="@+id/fragment_profile_dob_text"
@@ -96,6 +96,36 @@
             android:layout_centerVertical="true"
             android:textSize="16sp"
             android:textColor="@color/colorPrimary"
+            android:gravity="center"
+            android:layout_alignParentEnd="true"></TextView>
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/fragment_profile_age_layout"
+        android:layout_width="match_parent"
+        android:layout_height="?android:listPreferredItemHeight"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textSize="16sp"
+            android:text="@string/profile_age_title"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/fragment_profile_age_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
             android:gravity="center"
             android:layout_alignParentEnd="true"></TextView>
     </RelativeLayout>
@@ -116,7 +146,7 @@
             android:textColor="@color/black"
             android:textSize="16sp"
             android:layout_centerVertical="true"
-            android:text="Height" />
+            android:text="@string/profile_height_title" />
 
         <TextView
             android:id="@+id/fragment_profile_height_text"
@@ -144,7 +174,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:textSize="16sp"
-            android:text="Weight"
+            android:text="@string/profile_weight_title"
             android:textColor="@color/black" />
 
         <TextView

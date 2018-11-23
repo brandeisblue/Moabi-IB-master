@@ -1,10 +1,13 @@
 package com.ivorybridge.moabi.ui.activity;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.ui.recyclerviewitem.entryitem.EntryItemItem;
+import com.ivorybridge.moabi.viewmodel.DataInUseViewModel;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IItem;
 import com.mikepenz.fastadapter.adapters.ItemAdapter;
@@ -12,8 +15,9 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter;
 import java.util.Arrays;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,10 +33,7 @@ public class EditSurveyItemsActivity extends AppCompatActivity {
     // adapters
     private FastAdapter<IItem> fastAdapter;
     private ItemAdapter<EntryItemItem> userInputsInUseItemItemAdapter;
-
-    static {
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-    }
+    private DataInUseViewModel dataInUseViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,13 @@ public class EditSurveyItemsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_connect_services);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+        dataInUseViewModel = ViewModelProviders.of(this).get(DataInUseViewModel.class);
+        SharedPreferences getPrefs = PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext());
+        boolean tut1Complete = getPrefs.getBoolean("tut_1_complete", false);
+        if (!tut1Complete) {
+            dataInUseViewModel.deleteAllInputs();
+        }
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,8 +84,18 @@ public class EditSurveyItemsActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
+    public void onBackPressed() {
+        super.onBackPressed();
+        SharedPreferences getPrefs = PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext());
+        boolean tut1Complete1 = getPrefs.getBoolean("tut_1_complete", false);
+        if (!tut1Complete1) {
+            Intent intent = new Intent(EditSurveyItemsActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            onBackPressed();
+            //finish();
+        }
     }
 }

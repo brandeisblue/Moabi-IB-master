@@ -27,8 +27,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/WhiteBlackAndBlueAppTheme"
-        tools:replace="android:icon">
+        android:theme="@style/WhiteBlackAndBlueAppTheme">
 
         <service
             android:name=".service.TimerService"

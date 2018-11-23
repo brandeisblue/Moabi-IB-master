@@ -236,7 +236,7 @@ public class InsightBodyFragment extends Fragment {
                                 imagesArray[i] = R.drawable.ic_appusage;
                             } else if (activitiesArray[i].equals("4 Moabi")) {
                                 activitiesArray[i] = getString(R.string.insight_summary_moabi);
-                                imagesArray[i] = R.drawable.ic_logo_monogram_colored;
+                                imagesArray[i] = R.drawable.ic_monogram_colored;
                             } else if (activitiesArray[i].equals("8 Activity")) {
                                 activitiesArray[i] = getString(R.string.insight_summary_activity);
                                 imagesArray[i] = R.drawable.ic_physical_activity_black;
@@ -247,6 +247,9 @@ public class InsightBodyFragment extends Fragment {
                         }
                         if (activitiesArray != null && getContext() != null) {
                             int spinnerSelection = bodyInsightPreferences.getInt("body_insight_spinner_selection", 0);
+                            if (spinnerSelection >= activitiesArray.length) {
+                                spinnerSelection = 0;
+                            }
                             IconSpinnerAdapter iconSpinnerAdapter = new IconSpinnerAdapter(getContext(), activitiesArray, imagesArray);
                             spinner.setAdapter(iconSpinnerAdapter);
                             spinner.setSelection(spinnerSelection);
@@ -803,7 +806,7 @@ public class InsightBodyFragment extends Fragment {
                                             recommendationItemItemAdapter.clear();
                                             InsightBodyAverageItem averageItem = new InsightBodyAverageItem(activity, activitySummaryMap);
                                             averageItemItemAdapter.add(averageItem);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(barEntries, entryDatesList, average, finalValueToPass);
+                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(activity, barEntries, entryDatesList, average, finalValueToPass);
                                             bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                             if (sortedList.size() > 0) {
                                                 if (getActivity() != null) {
@@ -953,7 +956,7 @@ public class InsightBodyFragment extends Fragment {
                                             recommendationItemItemAdapter.clear();
                                             InsightBodyAverageItem averageItem = new InsightBodyAverageItem(activity, activitySummaryMap);
                                             averageItemItemAdapter.add(averageItem);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(barEntries, entryDatesList, average, finalValueToPass);
+                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(activity, barEntries, entryDatesList, average, finalValueToPass);
                                             bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                             if (sortedList.size() > 0) {
                                                 if (getActivity() != null) {
@@ -1087,7 +1090,7 @@ public class InsightBodyFragment extends Fragment {
                                             recommendationItemItemAdapter.clear();
                                             InsightBodyAverageItem averageItem = new InsightBodyAverageItem(activity, activitySummaryMap);
                                             averageItemItemAdapter.add(averageItem);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(barEntries, entryDatesList, average, finalValueToPass);
+                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(activity, barEntries, entryDatesList, average, finalValueToPass);
                                             bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                             if (sortedList.size() > 0) {
                                                 if (getActivity() != null) {
@@ -1198,7 +1201,7 @@ public class InsightBodyFragment extends Fragment {
                                             recommendationItemItemAdapter.clear();
                                             InsightBodyAverageItem averageItem = new InsightBodyAverageItem(activity, activitySummaryMap);
                                             averageItemItemAdapter.add(averageItem);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(barEntries, entryDatesList, average, finalValueToPass);
+                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.phone_usage_camel_case), barEntries, entryDatesList, average, finalValueToPass);
                                             bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                             if (sortedList.size() > 0) {
                                                 if (getActivity() != null) {
@@ -1315,9 +1318,9 @@ public class InsightBodyFragment extends Fragment {
                                             bestAndAverageItemItemAdapter.clear();
                                             topThreeItemItemAdapter.clear();
                                             recommendationItemItemAdapter.clear();
-                                            InsightBodyAverageItem averageItem = new InsightBodyAverageItem(activity, activitySummaryMap);
+                                            InsightBodyAverageItem averageItem = new InsightBodyAverageItem(getString(R.string.baactivity_camel_case), activitySummaryMap);
                                             averageItemItemAdapter.add(averageItem);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(barEntries, entryDatesList, average, finalValueToPass);
+                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.baactivity_camel_case), barEntries, entryDatesList, average, finalValueToPass);
                                             bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                             if (sortedList.size() > 0) {
                                                 if (getActivity() != null) {
@@ -1434,9 +1437,9 @@ public class InsightBodyFragment extends Fragment {
                                             bestAndAverageItemItemAdapter.clear();
                                             topThreeItemItemAdapter.clear();
                                             recommendationItemItemAdapter.clear();
-                                            InsightBodyAverageItem averageItem = new InsightBodyAverageItem(activity, activitySummaryMap);
+                                            InsightBodyAverageItem averageItem = new InsightBodyAverageItem(getString(R.string.timer_camel_case), activitySummaryMap);
                                             averageItemItemAdapter.add(averageItem);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(barEntries, entryDatesList, average, finalValueToPass);
+                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.timer_camel_case), barEntries, entryDatesList, average, finalValueToPass);
                                             bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                             if (sortedList.size() > 0) {
                                                 if (getActivity() != null) {

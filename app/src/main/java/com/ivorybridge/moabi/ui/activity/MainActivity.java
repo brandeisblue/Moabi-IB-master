@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -14,6 +15,8 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -88,7 +91,70 @@ public class MainActivity extends AppCompatActivity {
         //  Make a new preferences editor
         SharedPreferences getPrefs = PreferenceManager
                 .getDefaultSharedPreferences(getBaseContext());
+        boolean tut1Complete = getPrefs.getBoolean("tut_1_complete", false);
         SharedPreferences.Editor e = getPrefs.edit();
+        e.putBoolean("tut_1_complete", false);
+        e.commit();
+        boolean tut2Complete = getPrefs.getBoolean("tut_2_complete", false);
+        if (!tut1Complete) {
+            showFABMenu();
+            TapTargetView.showFor(this, TapTarget.forView(findViewById(R.id.activity_main_make_entry_linearlayout1),
+                    getString(R.string.tutorial_main_welcome_msg),
+                    getString(R.string.tutorial_main_click_fab))
+                            .outerCircleColor(R.color.colorPrimary)
+                            .outerCircleAlpha(0.7f)
+                            .targetCircleColor(R.color.white)
+                            .titleTextSize(16)
+                            //.titleTextColor(R.color.colorPrimary)      // Specify the color of the title text
+                            .descriptionTextSize(16)            // Specify the size (in sp) of the description text
+                            //.descriptionTextColor(R.color.white)  // Specify the color of the description text
+                            .textColor(R.color.white)
+                            .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+                            .dimColor(R.color.black)            // If set, will dim behind the view with 30% opacity of the given color
+                            .drawShadow(true)                   // Whether to draw a drop shadow or not
+                            .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
+                            .tintTarget(false)                   // Whether to tint the target view's color
+                            .transparentTarget(true)   // Specify whether the target is transparent (displays the content underneath)
+                            //.icon(ContextCompat.getDrawable(this, R.drawable.bg_rectangle_rounded_white))           // Specify a custom drawable to draw as the target
+                            .targetRadius(72),                  // Specify the target radius (in dp)
+                    new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+                        @Override
+                        public void onTargetClick(TapTargetView view) {
+                            super.onTargetClick(view);      // This call is optional
+                            onClickMakeEntry(findViewById(R.id.activity_main_make_entry_linearlayout1));
+                            finish();
+                        }
+                    });
+        } else if (!tut2Complete) {
+            showFABMenu();
+            TapTargetView.showFor(this, TapTarget.forView(findViewById(R.id.activity_main_make_entry_linearlayout1),
+                    getString(R.string.tutorial_2_main_msg),
+                    getString(R.string.tutorial_main_click_fab))
+                            .outerCircleColor(R.color.colorPrimary)
+                            .outerCircleAlpha(0.7f)
+                            .targetCircleColor(R.color.white)
+                            .titleTextSize(16)
+                            //.titleTextColor(R.color.colorPrimary)      // Specify the color of the title text
+                            .descriptionTextSize(16)            // Specify the size (in sp) of the description text
+                            //.descriptionTextColor(R.color.white)  // Specify the color of the description text
+                            .textColor(R.color.white)
+                            .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+                            .dimColor(R.color.black)            // If set, will dim behind the view with 30% opacity of the given color
+                            .drawShadow(true)                   // Whether to draw a drop shadow or not
+                            .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
+                            .tintTarget(false)                   // Whether to tint the target view's color
+                            .transparentTarget(true)   // Specify whether the target is transparent (displays the content underneath)
+                            //.icon(ContextCompat.getDrawable(this, R.drawable.bg_rectangle_rounded_white))           // Specify a custom drawable to draw as the target
+                            .targetRadius(72),                  // Specify the target radius (in dp)
+                    new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+                        @Override
+                        public void onTargetClick(TapTargetView view) {
+                            super.onTargetClick(view);      // This call is optional
+                            onClickMakeEntry(findViewById(R.id.activity_main_make_entry_linearlayout1));
+                            finish();
+                        }
+                    });
+        }
         //  Edit preference to make it false because we don't want this to run again
         e.putBoolean("firstStart", false);
         //  Apply changes
@@ -288,8 +354,8 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "Loading fragment");
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.activity_main_framelayout, fragment);
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-
+        //transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         transaction.addToBackStack(null);
         transaction.commit();
     }
@@ -351,31 +417,31 @@ public class MainActivity extends AppCompatActivity {
                 //.scaleX(0)
                 //.scaleY(0)
                 .setDuration(100)
-        .setListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
 
-            }
+                    }
 
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (!isFABOpen) {
-                    fab1LL.setVisibility(View.GONE);
-                    fab2LL.setVisibility(View.GONE);
-                    fab3LL.setVisibility(View.GONE);
-                }
-            }
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        if (!isFABOpen) {
+                            fab1LL.setVisibility(View.GONE);
+                            fab2LL.setVisibility(View.GONE);
+                            fab3LL.setVisibility(View.GONE);
+                        }
+                    }
 
-            @Override
-            public void onAnimationCancel(Animator animation) {
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
 
-            }
+                    }
 
-            @Override
-            public void onAnimationRepeat(Animator animation) {
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
 
-            }
-        });
+                    }
+                });
         //fab1LL.animate().translationY(72).setDuration(100);
         //fab2LL.animate().translationY(72).setDuration(100);
         /*

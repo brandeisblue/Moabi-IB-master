@@ -148,7 +148,7 @@ public class BuiltInTrackerItem extends AbstractItem<BuiltInTrackerItem, BuiltIn
                         goalMap.put(itemView.getContext().getString(R.string.activity_distance_title), 5d);
                         goalMap.put(itemView.getContext().getString(R.string.activity_active_minutes_title), 65L);
                         goalMap.put(itemView.getContext().getString(R.string.activity_sedentary_minutes_title), 720L);
-                        deviceImageView.setImageResource(R.drawable.ic_logo_monogram_colored);
+                        deviceImageView.setImageResource(R.drawable.ic_monogram_colored);
                         String lastSyncTimeHHMM = "";
                         deviceTextView.setText(itemView.getContext().getString(R.string.moabi_tracker_title));
                         if (item.mDate.equals(formattedTime.getCurrentDateAsYYYYMMDD())) {
