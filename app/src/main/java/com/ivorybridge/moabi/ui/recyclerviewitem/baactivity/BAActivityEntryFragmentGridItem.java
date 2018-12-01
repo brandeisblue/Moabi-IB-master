@@ -103,6 +103,7 @@ public class BAActivityEntryFragmentGridItem extends AbstractItem<BAActivityEntr
                         @Override
                         public void onClick(View v) {
                             Intent intent = new Intent(itemView.getContext(), EditActivitiesActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             itemView.getContext().startActivity(intent);
                         }
                     });

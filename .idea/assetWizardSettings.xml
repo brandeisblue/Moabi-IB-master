@@ -62,8 +62,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_monogram_colored" />
-                            <entry key="sourceFile" value="C:\Users\skim2\OneDrive\AndroidStudioProjects\Assets\Logos_ByTailorBrands\ic_monogram_colored.svg" />
+                            <entry key="outputName" value="ic_connecting" />
+                            <entry key="sourceFile" value="C:\Users\skim2\OneDrive\AndroidStudioProjects\Assets\ic_connecting.svg" />
                           </map>
                         </option>
                       </PersistentState>

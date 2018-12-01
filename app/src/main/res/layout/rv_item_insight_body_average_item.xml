@@ -3,41 +3,61 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="24dp">
+    android:layout_marginBottom="32dp">
 
-    <TextView
-        android:id="@+id/rv_item_insight_body_average_item_title_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/average_title"
-        android:textColor="@color/black"
-        android:textSize="14sp"
-        android:textStyle="bold" />
+    <RelativeLayout
+        android:id="@+id/rv_item_insight_body_average_item_title_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/rv_item_insight_body_average_item_title_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/average_title"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:visibility="visible"
+            android:scaleType="fitXY"
+            android:tint="@color/darker_gray"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_info_outline_black" />
+    </RelativeLayout>
 
     <com.warkiz.widget.IndicatorStayLayout
         android:id="@+id/rv_item_insight_body_average_item_seekbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rv_item_insight_body_average_item_title_textview"
+        android:layout_below="@id/rv_item_insight_body_average_item_title_layout"
         android:layout_marginTop="8dp">
 
         <com.warkiz.widget.IndicatorSeekBar
             android:id="@+id/rv_item_insight_body_average_item_seekbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:isb_indicator_color="#b1000000"
             app:isb_clear_default_padding="true"
+            app:isb_indicator_color="#b1000000"
             app:isb_indicator_text_color="@color/white"
-            app:isb_indicator_text_size="12sp"
+            app:isb_indicator_text_size="14sp"
             app:isb_progress_value_float="true"
             app:isb_seek_smoothly="true"
             app:isb_show_indicator="rectangle"
             app:isb_show_tick_texts="true"
             app:isb_thumb_color="@color/colorPrimaryDark"
+            app:isb_thumb_size="0dp"
             app:isb_thumb_text_color="@color/colorPrimary"
             app:isb_tick_texts_color="@color/darker_gray"
             app:isb_ticks_count="2"
+            app:isb_track_background_size="8dp"
             app:isb_track_progress_color="@color/colorPrimary"
+            app:isb_track_progress_size="8dp"
             app:isb_user_seekable="false" />
     </com.warkiz.widget.IndicatorStayLayout>
 </RelativeLayout>

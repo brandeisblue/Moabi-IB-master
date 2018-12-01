@@ -78,6 +78,14 @@ public class PredictionsRepository {
         return regressionSummaryDao.getAllBodySummaries(start, end, duration);
     }
 
+    public List<SimpleRegressionSummary> getAllMindSummariesNow(Long start, Long end, int duration) {
+        return regressionSummaryDao.getAllMindSummariesNow(start, end, duration);
+    }
+
+    public List<SimpleRegressionSummary> getAllBodySummariesNow(Long start, Long end, int duration) {
+        return regressionSummaryDao.getAllBodySummariesNow(start, end, duration);
+    }
+
 
     public void processGoogleFitXGoogleFitRegression(List<GoogleFitSummary> googleFitSummaries, int duration) {
         Set<String> activitiesSet = new LinkedHashSet<>();

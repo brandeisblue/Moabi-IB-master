@@ -87,7 +87,7 @@
                 android:paddingLeft="12dp"
                 android:paddingRight="12dp"
                 android:stateListAnimator="@null"
-                android:text="@string/empty_view_action_button"
+                android:text="@string/empty_view_survey_button"
                 android:textAllCaps="true"
                 android:textColor="@color/white" />
         </RelativeLayout>

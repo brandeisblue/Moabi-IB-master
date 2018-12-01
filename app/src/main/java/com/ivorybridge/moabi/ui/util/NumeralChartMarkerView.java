@@ -107,6 +107,20 @@ public class NumeralChartMarkerView extends MarkerView {
             } else {
                 score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_activity_sing);
             }
+        } else if (inputType.equals(getContext().getString(R.string.humidity_title))) {
+            score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_percent);
+        } else if (inputType.equals(getContext().getString(R.string.precipitation_title))) {
+            if (unit.equals(getContext().getString(R.string.preference_unit_si_title))) {
+                score = String.format(Locale.US, "%.2f", (e.getY())) + " " + getContext().getString(R.string.unit_precip_si);
+            } else {
+                score = String.format(Locale.US, "%.2f", (e.getY())) + " " + getContext().getString(R.string.unit_precip_usc);
+            }
+        } else if (inputType.equals(getContext().getString(R.string.temperature_title))) {
+            if (unit.equals(getContext().getString(R.string.preference_unit_si_title))) {
+                score = String.format(Locale.US, "%.0f", ((float) e.getY())) + " " + getContext().getString(R.string.unit_temp_si);
+            } else {
+                score = String.format(Locale.US, "%.0f", ((float) e.getY())) + " " + getContext().getString(R.string.unit_temp_usc);
+            }
         }
         if (x >= 0) {
             int index = (int) x;

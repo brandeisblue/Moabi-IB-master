@@ -99,7 +99,6 @@ public class AnxietyRepository {
                     }
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -115,7 +114,6 @@ public class AnxietyRepository {
         inputHistory.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
         inputHistory.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
         inputHistoryRepository.insert(inputHistory);
-
         if (status.equals(AsyncTask.Status.FINISHED)) {
             return true;
         } else {

@@ -95,7 +95,6 @@ public class DepressionRepository {
                                 }
                             }
                         }
-                        firebaseManager.getDaysWithDataRef().child(date).child(application.getString(R.string.depression_phq9_camel_case)).setValue(true);
                     }
                 }
             }

@@ -21,11 +21,20 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.entity.builtinfitness.BuiltInActivitySummary;
 import com.ivorybridge.moabi.database.entity.builtinfitness.BuiltInProfile;
+import com.ivorybridge.moabi.database.entity.fitbit.FitbitActivitySummary;
+import com.ivorybridge.moabi.database.entity.fitbit.FitbitDailySummary;
+import com.ivorybridge.moabi.database.entity.fitbit.FitbitDeviceStatusSummary;
+import com.ivorybridge.moabi.database.entity.fitbit.FitbitSleepSummary;
+import com.ivorybridge.moabi.database.entity.googlefit.GoogleFitSummary;
 import com.ivorybridge.moabi.database.firebase.FirebaseManager;
 import com.ivorybridge.moabi.repository.BuiltInFitnessRepository;
+import com.ivorybridge.moabi.repository.FitbitRepository;
+import com.ivorybridge.moabi.repository.GoogleFitRepository;
 import com.ivorybridge.moabi.ui.activity.MainActivity;
 import com.ivorybridge.moabi.util.FormattedTime;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -78,8 +87,14 @@ public class MotionSensorService extends Service implements SensorEventListener 
     private BuiltInProfile profile;
     private NotificationCompat.Builder builder;
     private SharedPreferences notificationSharedPreferences;
+    private SharedPreferences unitSharedPreferences;
     private FirebaseManager firebaseManager;
+    private FitbitRepository fitbitRepository;
+    private GoogleFitRepository googleFitRepository;
+    private String dataSource;
+    private String mainMeasure;
     private double bmr;
+    private String unit;
 
     @Override
     public void onCreate() {
@@ -92,11 +107,16 @@ public class MotionSensorService extends Service implements SensorEventListener 
         notificationSharedPreferences = getSharedPreferences(
                 getString(R.string.com_ivorybridge_mobai_NOTIFICATION_SHARED_PREFERENCE),
                 Context.MODE_PRIVATE);
+        unitSharedPreferences = getSharedPreferences(
+                getString(R.string.com_ivorybridge_moabi_UNIT_SHARED_PREFERENCE_KEY),
+                Context.MODE_PRIVATE);
         if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) != null) {
             stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
             sensorGravity = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             sensorManager.registerListener(this, stepDetectorSensor, SensorManager.SENSOR_DELAY_FASTEST);
         }
+        fitbitRepository = new FitbitRepository(getApplication());
+        googleFitRepository = new GoogleFitRepository(getApplication());
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -137,6 +157,12 @@ public class MotionSensorService extends Service implements SensorEventListener 
         new Thread(new Runnable() {
             @Override
             public void run() {
+                unit = unitSharedPreferences.getString(getString(R.string.com_ivorybridge_mobai_UNIT_KEY), getString(R.string.preference_unit_si_title));
+                dataSource = notificationSharedPreferences.getString(getString(R.string.preference_fitness_tracker_source_notification),
+                        getString(R.string.moabi_tracker_title));
+                mainMeasure = notificationSharedPreferences.getString(getString(R.string.preference_fitness_tracker_activity_type_notification),
+                        getString(R.string.activity_steps_title));
+                Log.i(TAG, dataSource + ": " + mainMeasure);
                 activitySummary = builtInFitnessRepository.getNow(formattedTime.getCurrentDateAsYYYYMMDD());
                 if (activitySummary == null) {
                     activitySummary = new BuiltInActivitySummary();
@@ -189,24 +215,328 @@ public class MotionSensorService extends Service implements SensorEventListener 
     private void showNotification() {
         Intent notificationIntent = new Intent(MotionSensorService.this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(MotionSensorService.this, 0, notificationIntent, 0);
-        builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
-                .setSmallIcon(R.drawable.ic_monogram_white)
-                .setContentTitle("Today: " + steps + " steps")
-                .setContentText("Today: " + String.format(Locale.US, "%.2f", distance / 1000) + " km, " + TimeUnit.MILLISECONDS.toMinutes(activeMins) + " mins, " + TimeUnit.MILLISECONDS.toMinutes(sedentaryMins) + " mins, " + calories + " Cal")
-                .setColor(getColor(R.color.colorPrimary))
-                .setOngoing(true)
-                .setOnlyAlertOnce(true)
-                .setContentIntent(pendingIntent);
-        Notification notification = builder.build();
-        notification.flags = notification.flags | Notification.FLAG_NO_CLEAR;
-        if (Build.VERSION.SDK_INT >= 26) {
-            NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID),
-                    NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
-            channel.setDescription(NOTIFICATION_CHANNEL_DESC);
-            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.createNotificationChannel(channel);
+        String measure = "Today: ";
+        if (dataSource.equals(getString(R.string.moabi_tracker_title))) {
+            if (mainMeasure.equals(getString(R.string.activity_steps_title))) {
+                measure = getString(R.string.activity_steps_title) + ": " + steps + " " + getString(R.string.unit_step_plur);
+            } else if (mainMeasure.equals(getString(R.string.activity_distance_title))) {
+                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                    measure = getString(R.string.activity_distance_title) + ": " + String.format(Locale.US, "%.2f", distance / 1000) + " " + getString(R.string.unit_distance_si);
+                } else {
+                    measure = getString(R.string.activity_distance_title) + ": " + String.format(Locale.US, "%.2f", distance / 1000 * 0.621371f) + " " + getString(R.string.unit_distance_usc);
+                }
+            } else if (mainMeasure.equals(getString(R.string.activity_active_minutes_title))) {
+                measure = getString(R.string.activity_active_minutes_title) + ": " + TimeUnit.MILLISECONDS.toMinutes(activeMins) + " " + getString(R.string.unit_time_sing);
+            } else if (mainMeasure.equals(getString(R.string.activity_sedentary_minutes_title))) {
+                measure = getString(R.string.activity_sedentary_minutes_title) + ": " + TimeUnit.MILLISECONDS.toMinutes(sedentaryMins) + " " + getString(R.string.unit_time_sing);
+            } else if (mainMeasure.equals(getString(R.string.activity_calories_title))) {
+                measure = getString(R.string.activity_calories_title) + ": " + String.format(Locale.US, "%.0f", calories) + " " + getString(R.string.unit_calories);
+            }
+            builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
+                    .setSmallIcon(R.drawable.ic_monogram_white)
+                    .setContentTitle(measure)
+                    //.setContentText("Today: " + String.format(Locale.US, "%.2f", distance / 1000) + " km, " + TimeUnit.MILLISECONDS.toMinutes(activeMins) + " mins, " + TimeUnit.MILLISECONDS.toMinutes(sedentaryMins) + " mins, " + calories + " Cal")
+                    .setColor(getColor(R.color.colorPrimary))
+                    .setOngoing(true)
+                    .setOnlyAlertOnce(true)
+                    .setContentIntent(pendingIntent);
+            Notification notification = builder.build();
+            notification.flags = notification.flags | Notification.FLAG_NO_CLEAR;
+            if (Build.VERSION.SDK_INT >= 26) {
+                NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID),
+                        NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
+                channel.setDescription(NOTIFICATION_CHANNEL_DESC);
+                notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.createNotificationChannel(channel);
+            }
+            startForeground(NOTIFICATION_ID, notification);
+        } else if (dataSource.equals(getString(R.string.googlefit_title))) {
+            Handler handler = new Handler();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String gFitMeasure = "Today: ";
+                    List<GoogleFitSummary> activitySummaries = googleFitRepository.getAllNow(
+                            formattedTime.getStartOfDay(formattedTime.getCurrentDateAsYYYYMMDD()),
+                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                    if (activitySummaries != null && activitySummaries.size() > 0) {
+                        GoogleFitSummary todaySummary = activitySummaries.get(0);
+                        List<GoogleFitSummary.Summary> todaySummarySummaries = todaySummary.getSummaries();
+                        if (mainMeasure.equals(getString(R.string.activity_steps_title))) {
+                            for (GoogleFitSummary.Summary summary : todaySummarySummaries) {
+                                if (summary.getName().equals(getString(R.string.activity_steps_camel_case))) {
+                                    gFitMeasure = getString(R.string.activity_steps_title) + ": " + summary.getValue().longValue() + " " + getString(R.string.unit_step_plur);
+                                }
+                            }
+                        } else if (mainMeasure.equals(getString(R.string.activity_distance_title))) {
+                            for (GoogleFitSummary.Summary summary : todaySummarySummaries) {
+                                if (summary.getName().equals(getString(R.string.activity_distance_camel_case))) {
+                                    if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                        gFitMeasure = getString(R.string.activity_distance_title) + ": " + String.format(Locale.US, "%.2f", summary.getValue() / 1000) + " " + getString(R.string.unit_distance_si);
+                                    } else {
+                                        gFitMeasure = getString(R.string.activity_distance_title) + ": " + String.format(Locale.US, "%.2f", summary.getValue() / 1000 * 0.621371f) + " " + getString(R.string.unit_distance_usc);
+                                    }
+                                }
+                            }
+                        } else if (mainMeasure.equals(getString(R.string.activity_active_minutes_title))) {
+                            for (GoogleFitSummary.Summary summary : todaySummarySummaries) {
+                                if (summary.getName().equals(getString(R.string.activity_active_minutes_camel_case))) {
+                                    gFitMeasure = getString(R.string.activity_active_minutes_title) + ": " + TimeUnit.MILLISECONDS.toMinutes(summary.getValue().longValue()) + " " + getString(R.string.unit_time_sing);
+                                }
+                            }
+                        } else if (mainMeasure.equals(getString(R.string.activity_sedentary_minutes_title))) {
+                            for (GoogleFitSummary.Summary summary : todaySummarySummaries) {
+                                if (summary.getName().equals(getString(R.string.activity_sedentary_minutes_camel_case))) {
+                                    gFitMeasure = getString(R.string.activity_sedentary_minutes_camel_case) + ": " + TimeUnit.MILLISECONDS.toMinutes(summary.getValue().longValue()) + " " + getString(R.string.unit_time_sing);
+                                }
+                            }
+                        } else if (mainMeasure.equals(getString(R.string.activity_calories_title))) {
+                            for (GoogleFitSummary.Summary summary : todaySummarySummaries) {
+                                if (summary.getName().equals(getString(R.string.activity_calories_camel_case))) {
+                                    gFitMeasure = getString(R.string.activity_calories_camel_case) + ": " + String.format(Locale.US, "%.0f", summary.getValue()) + " " + getString(R.string.unit_calories);
+                                }
+                            }
+                        }
+                        final String s = gFitMeasure;
+                        final String lastSyncTime = todaySummary.getLastSyncTime();
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
+                                        .setSmallIcon(R.drawable.ic_monogram_white)
+                                        .setContentTitle(s)
+                                        .setShowWhen(false)
+                                        .setContentText(getString(R.string.tracker_google_fit_last_sync_prompt) + " " + lastSyncTime)
+                                        .setColor(getColor(R.color.colorPrimary))
+                                        .setOngoing(true)
+                                        .setOnlyAlertOnce(true)
+                                        .setContentIntent(pendingIntent);
+                                Notification notification = builder.build();
+                                notification.flags = notification.flags | Notification.FLAG_NO_CLEAR;
+                                if (Build.VERSION.SDK_INT >= 26) {
+                                    NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID),
+                                            NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
+                                    channel.setDescription(NOTIFICATION_CHANNEL_DESC);
+                                    notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                                    notificationManager.createNotificationChannel(channel);
+                                }
+                                startForeground(NOTIFICATION_ID, notification);
+                            }
+                        });
+                    } else {
+                        if (mainMeasure.equals(getString(R.string.activity_steps_title))) {
+                            gFitMeasure = getString(R.string.activity_steps_title) + ": " + 0 + " " + getString(R.string.unit_step_sing);
+                        } else if (mainMeasure.equals(getString(R.string.activity_distance_title))) {
+                            if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                gFitMeasure = getString(R.string.activity_distance_title) + ": " + 0 + " " + getString(R.string.unit_distance_si);
+                            } else {
+                                gFitMeasure = getString(R.string.activity_distance_title) + ": " + 0 + " " + getString(R.string.unit_distance_usc);
+                            }
+                        } else if (mainMeasure.equals(getString(R.string.activity_active_minutes_title))) {
+                            gFitMeasure = getString(R.string.activity_active_minutes_title) + ": " + 0 + " " + getString(R.string.unit_time_sing);
+                        } else if (mainMeasure.equals(getString(R.string.activity_sedentary_minutes_title))) {
+                            gFitMeasure = getString(R.string.activity_sedentary_minutes_camel_case) + ": " + 0 + " " + getString(R.string.unit_time_sing);
+                        } else if (mainMeasure.equals(getString(R.string.activity_calories_title))) {
+                            gFitMeasure = getString(R.string.activity_calories_camel_case) + ": " + 0 + " " + getString(R.string.unit_calories);
+                        }
+                        final String s = gFitMeasure;
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
+                                        .setSmallIcon(R.drawable.ic_monogram_white)
+                                        .setContentTitle(s)
+                                        .setShowWhen(false)
+                                        .setContentText(getString(R.string.tracker_google_fit_last_sync_prompt) + " " + formattedTime.getCurrentTimeAsHMMA())
+                                        .setColor(getColor(R.color.colorPrimary))
+                                        .setOngoing(true)
+                                        .setOnlyAlertOnce(true)
+                                        .setContentIntent(pendingIntent);
+                                Notification notification = builder.build();
+                                notification.flags = notification.flags | Notification.FLAG_NO_CLEAR;
+                                if (Build.VERSION.SDK_INT >= 26) {
+                                    NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID),
+                                            NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
+                                    channel.setDescription(NOTIFICATION_CHANNEL_DESC);
+                                    notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                                    notificationManager.createNotificationChannel(channel);
+                                }
+                                startForeground(NOTIFICATION_ID, notification);
+                            }
+                        });
+                    }
+                }
+            }).start();
+        } else if (dataSource.equals(getString(R.string.fitbit_title))) {
+            Handler handler = new Handler();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String fitbitMeasure = "Today: ";
+                    List<FitbitDailySummary> activitySummaries = fitbitRepository.getAllNow(
+                            formattedTime.getStartOfDay(formattedTime.getCurrentDateAsYYYYMMDD()),
+                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                    if (activitySummaries != null && activitySummaries.size() > 0) {
+                        FitbitDailySummary todaySummary = activitySummaries.get(0);
+                        FitbitActivitySummary activitySummary = todaySummary.getActivitySummary();
+                        FitbitSleepSummary sleepSummary = todaySummary.getSleepSummary();
+                        FitbitDeviceStatusSummary deviceSummary = todaySummary.getDeviceStatusSummary();
+                        if (mainMeasure.equals(getString(R.string.activity_steps_title))) {
+                            fitbitMeasure = getString(R.string.activity_steps_title) + ": " + activitySummary.getSummary().getSteps() + " " + getString(R.string.unit_step_plur);
+                        } else if (mainMeasure.equals(getString(R.string.activity_distance_title))) {
+                            if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                fitbitMeasure = getString(R.string.activity_distance_title) + ": " + activitySummary.getSummary().getDistances().get(0).getDistance() + " " + getString(R.string.unit_distance_si);
+                            } else {
+                                fitbitMeasure = getString(R.string.activity_distance_title) + ": " + activitySummary.getSummary().getDistances().get(0).getDistance() * 0.621371f + " " + getString(R.string.unit_distance_si);
+                            }
+                        } else if (mainMeasure.equals(getString(R.string.activity_active_minutes_title))) {
+                            int activeMins = activitySummary.getSummary().getFairlyActiveMinutes().intValue() + activitySummary.getSummary().getVeryActiveMinutes().intValue();
+                            fitbitMeasure = getString(R.string.activity_active_minutes_title) + ": " + activeMins + " " + getString(R.string.unit_time_sing);
+                        } else if (mainMeasure.equals(getString(R.string.activity_sedentary_minutes_title))) {
+                            fitbitMeasure = getString(R.string.activity_sedentary_minutes_title) + ": " + activitySummary.getSummary().getSedentaryMinutes() + " " + getString(R.string.unit_time_sing);
+                        } else if (mainMeasure.equals(getString(R.string.activity_calories_title))) {
+                            fitbitMeasure = getString(R.string.activity_calories_title) + ": " + activitySummary.getSummary().getCaloriesOut() + " " + getString(R.string.unit_calories);
+                        } else if (mainMeasure.equals(getString(R.string.activity_floors_title))) {
+                            fitbitMeasure = getString(R.string.activity_floors_title) + ": " + activitySummary.getSummary().getFloors() + " " + getString(R.string.unit_floor_plur);
+                        } else if (mainMeasure.equals(getString(R.string.activity_sleep_title))) {
+                            fitbitMeasure = getString(R.string.activity_sleep_title) + ": " + sleepSummary.getSummary().getTotalMinutesAsleep() + " " + getString(R.string.unit_time_sing);
+                        }
+                        final String s = fitbitMeasure;
+                        String lastSyncTimeHHMM = "";
+                        if (deviceSummary != null) {
+                            if (deviceSummary.getLastSyncTime() != null) {
+                                String lastSyncTime = deviceSummary.getLastSyncTime();
+                                if (lastSyncTime != null) {
+                                    lastSyncTimeHHMM = lastSyncTime.substring(11, lastSyncTime.length() - 7);
+                                }
+                                SimpleDateFormat truncatedDF = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+                                SimpleDateFormat timeOnlyDF = new SimpleDateFormat("h:mm a", Locale.ENGLISH);
+                                try {
+                                    Date truncatedDate = truncatedDF.parse(lastSyncTimeHHMM);
+                                    String timeOnly = timeOnlyDF.format(truncatedDate);
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
+                                                    .setSmallIcon(R.drawable.ic_monogram_white)
+                                                    .setContentTitle(s)
+                                                    .setShowWhen(false)
+                                                    .setContentText(getString(R.string.tracker_fitbit_last_sync_prompt) + " " + timeOnly)
+                                                    .setColor(getColor(R.color.colorPrimary))
+                                                    .setOngoing(true)
+                                                    .setOnlyAlertOnce(true)
+                                                    .setContentIntent(pendingIntent);
+                                            Notification notification = builder.build();
+                                            notification.flags = notification.flags | Notification.FLAG_NO_CLEAR;
+                                            if (Build.VERSION.SDK_INT >= 26) {
+                                                NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID),
+                                                        NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
+                                                channel.setDescription(NOTIFICATION_CHANNEL_DESC);
+                                                notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                                                notificationManager.createNotificationChannel(channel);
+                                            }
+                                            startForeground(NOTIFICATION_ID, notification);
+                                        }
+                                    });
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                    builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
+                                            .setSmallIcon(R.drawable.ic_monogram_white)
+                                            .setContentTitle(s)
+                                            .setShowWhen(false)
+                                            .setContentText(getString(R.string.tracker_fitbit_last_sync_prompt) + " " + lastSyncTimeHHMM)
+                                            .setColor(getColor(R.color.colorPrimary))
+                                            .setOngoing(true)
+                                            .setOnlyAlertOnce(true)
+                                            .setContentIntent(pendingIntent);
+                                    Notification notification = builder.build();
+                                    notification.flags = notification.flags | Notification.FLAG_NO_CLEAR;
+                                    if (Build.VERSION.SDK_INT >= 26) {
+                                        NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID),
+                                                NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
+                                        channel.setDescription(NOTIFICATION_CHANNEL_DESC);
+                                        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                                        notificationManager.createNotificationChannel(channel);
+                                    }
+                                    startForeground(NOTIFICATION_ID, notification);
+                                }
+                            }
+                        } else {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
+                                            .setSmallIcon(R.drawable.ic_monogram_white)
+                                            .setContentTitle(s)
+                                            .setShowWhen(false)
+                                            .setContentText(getString(R.string.tracker_fitbit_last_sync_prompt) + " " + formattedTime.getCurrentTimeAsHMMA())
+                                            .setColor(getColor(R.color.colorPrimary))
+                                            .setOngoing(true)
+                                            .setOnlyAlertOnce(true)
+                                            .setContentIntent(pendingIntent);
+                                    Notification notification = builder.build();
+                                    notification.flags = notification.flags | Notification.FLAG_NO_CLEAR;
+                                    if (Build.VERSION.SDK_INT >= 26) {
+                                        NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID),
+                                                NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
+                                        channel.setDescription(NOTIFICATION_CHANNEL_DESC);
+                                        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                                        notificationManager.createNotificationChannel(channel);
+                                    }
+                                    startForeground(NOTIFICATION_ID, notification);
+                                }
+                            });
+                        }
+                    } else {
+                        if (mainMeasure.equals(getString(R.string.activity_steps_title))) {
+                            fitbitMeasure = getString(R.string.activity_steps_title) + ": " + 0 + " " + getString(R.string.unit_step_sing);
+                        } else if (mainMeasure.equals(getString(R.string.activity_distance_title))) {
+                            if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                fitbitMeasure = getString(R.string.activity_distance_title) + ": " + 0 + " " + getString(R.string.unit_distance_si);
+                            } else {
+                                fitbitMeasure = getString(R.string.activity_distance_title) + ": " + 0 + " " + getString(R.string.unit_distance_si);
+                            }
+                        } else if (mainMeasure.equals(getString(R.string.activity_active_minutes_title))) {
+                            int activeMins = 0;
+                            fitbitMeasure = getString(R.string.activity_active_minutes_title) + ": " + activeMins + " " + getString(R.string.unit_time_sing);
+                        } else if (mainMeasure.equals(getString(R.string.activity_sedentary_minutes_title))) {
+                            fitbitMeasure = getString(R.string.activity_sedentary_minutes_title) + ": " + 0 + " " + getString(R.string.unit_time_sing);
+                        } else if (mainMeasure.equals(getString(R.string.activity_calories_title))) {
+                            fitbitMeasure = getString(R.string.activity_calories_title) + ": " + 0 + " " + getString(R.string.unit_calories);
+                        } else if (mainMeasure.equals(getString(R.string.activity_floors_title))) {
+                            fitbitMeasure = getString(R.string.activity_floors_title) + ": " + 0 + " " + getString(R.string.unit_floor_sing);
+                        } else if (mainMeasure.equals(getString(R.string.activity_sleep_title))) {
+                            fitbitMeasure = getString(R.string.activity_sleep_title) + ": " + 0 + " " + getString(R.string.unit_time_sing);
+                        }
+                        final String s = fitbitMeasure;
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
+                                        .setSmallIcon(R.drawable.ic_monogram_white)
+                                        .setContentTitle(s)
+                                        .setShowWhen(false)
+                                        .setContentText(getString(R.string.tracker_fitbit_last_sync_prompt) + " " + formattedTime.getCurrentTimeAsHMMA())
+                                        .setColor(getColor(R.color.colorPrimary))
+                                        .setOngoing(true)
+                                        .setOnlyAlertOnce(true)
+                                        .setContentIntent(pendingIntent);
+                                Notification notification = builder.build();
+                                notification.flags = notification.flags | Notification.FLAG_NO_CLEAR;
+                                if (Build.VERSION.SDK_INT >= 26) {
+                                    NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID),
+                                            NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
+                                    channel.setDescription(NOTIFICATION_CHANNEL_DESC);
+                                    notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                                    notificationManager.createNotificationChannel(channel);
+                                }
+                                startForeground(NOTIFICATION_ID, notification);
+                            }
+                        });
+                    }
+                }
+            }).start();
         }
-        startForeground(NOTIFICATION_ID, notification);
     }
 
     @Override
@@ -335,7 +665,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
                 activitySummary.setCalories(calories);
                 builtInFitnessRepository.insert(activitySummary, formattedTime.getCurrentDateAsYYYYMMDD());
                 if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                    firebaseManager.getConnectedServicesRef().child(getString(R.string.moabi_tracker_camel_case))
+                    firebaseManager.getBuiltInFitnessTrackerThisDeviceRef()
                             .child(formattedTime.getCurrentDateAsYYYYMMDD())
                             .setValue(activitySummary);
                 }
@@ -343,7 +673,9 @@ public class MotionSensorService extends Service implements SensorEventListener 
                     @Override
                     public void run() {
                         if (notificationSharedPreferences.getBoolean(getString(R.string.preference_fitness_tracker_notification), false)) {
-                            showNotification();
+                            if (dataSource.equals(getString(R.string.moabi_tracker_title))) {
+                                showNotification();
+                            }
                         } else {
                             stopForeground(true);
                         }

@@ -121,7 +121,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         signInPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                startActivity(new Intent(getActivity(), SignInActivity.class));
+                startActivity(new Intent(getActivity(), SignInActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
                 getActivity().finish();
                 return false;
             }
@@ -156,7 +156,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 // user is now signed out
-                                                startActivity(new Intent(getActivity(), IntroActivity.class));
+                                                startActivity(new Intent(getActivity(), IntroActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
                                                 getActivity().finish();
                                             }
                                         });
@@ -204,7 +204,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                                                     e.putBoolean("firstStart", true);
                                                     //  Apply changes
                                                     e.apply();
-                                                    startActivity(new Intent(getActivity(), IntroActivity.class));
+                                                    startActivity(new Intent(getActivity(), IntroActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
                                                     getActivity().finish();
                                                 } else {
                                                     Toast.makeText(getContext(),
@@ -231,6 +231,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(getActivity(), AdvancedSettingsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 intent.putExtra("settings_type", getString(R.string.settings_profile_title));
                 getActivity().startActivity(intent);
                 return false;
@@ -241,6 +242,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(getActivity(), AdvancedSettingsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 intent.putExtra("settings_type", getString(R.string.settings_notifications_title));
                 getActivity().startActivity(intent);
                 return false;
@@ -378,13 +380,17 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         }
         if (key.equals("preference_apps_and_services")) {
             Intent connectDevicesIntent = new Intent(mContext, ConnectServicesActivity.class);
+            connectDevicesIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivity(connectDevicesIntent);
 
         } if (key.equals("preference_surveys")) {
             Intent userInputsIntent = new Intent(mContext, EditSurveyItemsActivity.class);
+            userInputsIntent.putExtra("redirected_from", "settingsFragment");
+            userInputsIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivity(userInputsIntent);
         } if (key.equals("preference_edit_activities")) {
             Intent editActivityIntent = new Intent(mContext, EditActivitiesActivity.class);
+            editActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivity(editActivityIntent);
         } if (key.equals("preference_sync")) {
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {

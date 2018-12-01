@@ -22,6 +22,7 @@ import com.ivorybridge.moabi.service.BodyInsightCalculatorDailyJob;
 import com.ivorybridge.moabi.service.DepressionInsightCalculatorJob;
 import com.ivorybridge.moabi.service.MoodAndEnergyInsightCalculatorDailyJob;
 import com.ivorybridge.moabi.service.MoodAndEnergyInsightCalculatorJob;
+import com.ivorybridge.moabi.service.MotionSensorEndofDayDailyJob;
 import com.ivorybridge.moabi.service.MotionSensorResetDailyJob;
 import com.ivorybridge.moabi.service.DailyReviewInsightCalculatorDailyJob;
 import com.ivorybridge.moabi.service.DailyReviewInsightCalculatorJob;
@@ -78,6 +79,7 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
+        MotionSensorEndofDayDailyJob.scheduleJob();
         MotionSensorResetDailyJob.scheduleJob();
         MoodAndEnergyInsightCalculatorDailyJob.scheduleJob();
         MoodAndEnergyInsightCalculatorJob.scheduleJob();
@@ -160,7 +162,8 @@ public class SplashActivity extends AppCompatActivity {
                     builtInProfile.setUniqueID(UUID.randomUUID().toString());
                     builtInFitnessRepository.insert(builtInProfile);
                     //builtInProfile.setId();
-                    final Intent i = new Intent(SplashActivity.this, IntroActivity.class);
+                    final Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                    i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -171,6 +174,7 @@ public class SplashActivity extends AppCompatActivity {
                 } else {
                     //  Launch app intro
                     final Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                    i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {

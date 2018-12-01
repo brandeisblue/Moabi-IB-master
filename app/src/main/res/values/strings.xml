@@ -10,11 +10,21 @@
         to track your mood and energy level.
 </string>
     <string name="tutorial_connect_services_title">You can use this built-in tracker to
-        track your physical activity and see how it affects your life.
-        \n\nCheck back later if you also want to learn how your phone usage, weather and data from
-        your favorite fitness apps are related to your life.
+        track your physical activity.
+        \n\nCheck back later to connect your favorite fitness apps and services. You will learn
+        how things like phone usage, weather and physical activities affect your life.
 </string>
-    <string name="tutorial_edit_entry_msg"></string>
+    <string name="tutorial_wrap_up_title">\n\nYou are all set!\n\nMake sure to check the settings later.
+    You can sign in to automatically back up your data and personalize the app.
+    \n\nThank you!</string>
+    <string name="tutorial_insight_title">Here, you can select and track one item from a list of factors that affect
+    your life.\n\nClick the highlighted area and then click \"yes\" in the dialogue.\nYou will be able to track its daily progress real-time.</string>
+    <string name="tutorial_insight_info_msg">
+    \n\nNote that the recommendation is based on correlations among your data only.
+        Our calculation assumes that achieving the recommendation will increase the construct of your interest by 1%.
+        The average during the given time period is used as a reference point so that you can
+        make small changes, one day at a time.</string>
+
 
     <!-- Strings for sign-in activity -->
     <string name="sign_in_cancelled">Sign-in was cancelled</string>
@@ -30,6 +40,7 @@
     <!-- Messages -->
     <string name="sync_sign_in_warning">You must be signed in to sync your data.</string>
     <string name="phone_usage_permission_granted">App usage permission is granted.</string>
+    <string name="no_tracker_in_use_msg">No tracker is in use.</string>
 
     <!-- Display Titles -->
     <string name="settings_notifications_title">Notifications</string>
@@ -42,6 +53,7 @@
     <string name="body_insight_title">Body</string>
     <string name="average_title">Average</string>
     <string name="best_day_title">Best Day</string>
+    <string name="worst_day_title">Worst Day</string>
 
     <!-- Fragment Titles -->
     <string name="fragment_today_title">Today</string>
@@ -52,39 +64,49 @@
     <!--Empty view -->
     <string name="empty_view_title">Exercise is Medicine</string>
     <string name="empty_view_content">Activity benefits all age groups.\n<b>Track</b> your activity.\n<b>Get insight</b> into how it affects your\n<i>mood, stress, pain and more!</i></string>
+    <string name="empty_insight_mind_title">Empty</string>
+    <string name="empty_insight_mind_body">Take a survey and get insights on your life.</string>
+    <string name="empty_insight_body_title">Not Connected</string>
+    <string name="empty_insight_body_body">Connect your favorite apps and services.</string>
+    <string name="empty_insight_analysis_title">Not available</string>
+    <string name="empty_insight_analysis_body">The analysis isn\'t ready yet.\n
+        It is yet to find any meaningful connection\n or may need more data.\n\n
+        Check again after a few more daily entries.\nThank you!</string>
+    <string name="empty_view_survey_button">Surveys</string>
+    <string name="empty_view_apps_and_services_button">Apps/Services</string>
 
     <!-- Permission rationales -->
-    <string name="location_rationale"><b>Allow access your location?</b>\n\nYour location data is required to access Google Fit and weather data.</string>
+    <string name="location_rationale"><b>Allow access to your location?</b>\n\nAccess to your location data is required to connect Google Fit and weather to this app.</string>
     <string name="fitbit_permission_title">Connect to Fitbit?</string>
-    <string name="fitbit_permission_prompt">By connecting Fitbit and Shepherd, you will see your <b>daily steps, active minutes, sedentary minutes, sleep</b> and much more.\n\nAlso, in three days, we will calculate how these stats affect you, including <b>moodAndEnergy, energy level and pain!</b></string>
+    <string name="fitbit_permission_prompt">By connecting Fitbit, you will see your steps, distance, active minutes, sedentary minutes, calories, sleep and floors on this app.\n\nAlso, we will calculate how these stats affect different measures of your life, including mood, energy level and stress.</string>
     <string name="googlefit_install_title">Install Google Fit?</string>
     <string name="googlefit_install_prompt">Google Fit must be installed on this device to connect to Google Fit.</string>
     <string name="googlefit_permission_title">Connect to Google Fit?</string>
-    <string name="googlefit_permission_prompt">Google Fit is an open platform that lets you control your fitness data from multiple apps and devices.\n\nBy connecting Google Fit and Shepherd, you will be able to see your <b>daily steps, distance, active minutes</b> and much more.\n\nAlso, in three days, we will calculate how these stats affect you, including <b>moodAndEnergy, energy level and pain!</b></string>
+    <string name="googlefit_permission_prompt">Google Fit is an open platform that lets you control your fitness data from multiple apps and devices.\n\nBy connecting Google Fit, you will see your steps, distance, active minutes, sedentary minutes and calories on this app.\n\nAlso, we will calculate how these stats affect different measures of your life, including mood, energy level and stress.</string>
     <string name="dialog_positive_text">Yes</string>
     <string name="dialog_negative_text">No</string>
-    <string name="phone_usage_permission_title">"Data access must be enabled to track your app usage."</string>
+    <string name="phone_usage_permission_title">Data access must be enabled to track your app usage.</string>
 
 
     <!-- Apps/Services strings -->
     <string name="phone_usage_title">Phone Usage</string>
     <string name="phone_usage_camel_case">phoneUsage</string>
-    <string name="phone_usage_description">Real-time phone usage data.</string>
-    <string name="timer_title">Timer</string>
-    <string name="timer_camel_case">timer</string>
+    <string name="phone_usage_description">Phone and app usage.</string>
+    <string name="timer_title">Stopwatch</string>
+    <string name="timer_camel_case">stopwatch</string>
     <string name="timer_description"></string>
     <string name="fitbit_title">Fitbit</string>
     <string name="fitbit_camel_case">fitbit</string>
-    <string name="fitbit_description">Steps, distance, sleep, and more.</string>
+    <string name="fitbit_description">Steps, distance, active minutes, sedentary minutes, calories, sleep and floors.</string>
     <string name="googlefit_title">Google Fit</string>
     <string name="googlefit_camel_case">googleFit</string>
-    <string name="googlefit_description">Steps, distance, active minutes and more.</string>
+    <string name="googlefit_description">Steps, distance, active minutes, sedentary minutes and calories.</string>
     <string name="weather_title">Weather</string>
     <string name="weather_camel_case">weather</string>
-    <string name="weather_description">Weather condition.</string>
+    <string name="weather_description">Temperature, humidity and precipitation.</string>
     <string name="moabi_tracker_title">Moabi</string>
     <string name="moabi_tracker_camel_case">moabi</string>
-    <string name="moabi_tracker_description">Steps, distance, active minutes and more.</string>
+    <string name="moabi_tracker_description">Steps, distance, active minutes, sedentary minutes and calories.</string>
 
     <!-- Survey strings -->
     <string name="baactivity_title">Activity</string>
@@ -124,13 +146,13 @@
     <string name="this_month">This Month</string>
 
     <!-- Floating action button strings -->
-    <string name="fab_make_entry">Make entry</string>
-    <string name="fab_track_activity">Track activity</string>
+    <string name="fab_make_entry">Surveys</string>
+    <string name="fab_track_activity">Stopwatch</string>
     <string name="fab_edit_connected_services">Edit connected services</string>
     <string name="fab_edit_entry_items">Edit entry items</string>
 
     <!-- Empty view -->
-    <string name="empty_view_action_button">Click to start tracking</string>
+
 
     <!-- Shared Preference -->
     <string name="com.ivorybridge.moabi.FITBIT_SHARED_PREFERENCE_KEY">FITBIT_SHARED_PREFERENCE</string>
@@ -168,10 +190,28 @@
     <!-- Preference -->
     <string name="preference_unit_title">Unit</string>
     <string name="preference_profile_title">Profile</string>
+    <string name="preference_app_settings_title">App Settings</string>
+    <string name="preference_data_settings_title">Data Settings</string>
     <string name="preference_notifications_title">Notifications</string>
     <string name="preference_apps_and_services_title">Apps/Services</string>
     <string name="preference_surveys_title">Surveys</string>
     <string name="preference_edit_activities_title">Edit Activities</string>
+    <string name="preference_sync_title">Sync</string>
+    <string name="preference_account_settings_title">Account Settings</string>
+    <string name="preference_fitness_tracker_title">Fitness Tracker</string>
+    <string name="preference_fitness_tracker_notification_title">Fitness Tracker Notification</string>
+    <string name="preference_fitness_tracker_source_title">Data Source</string>
+    <string name="preference_fitness_tracker_measure_title">Main Measure</string>
+    <string name="preference_fitness_tracker_goal_title">Goal</string>
+    <string name="preference_stopwatch_title">Stopwatch</string>
+    <string name="preference_stopwatch_notification_title">Stopwatch Notification</string>
+    <string name="preference_recommended_goal_title">Recommended Goal</string>
+    <string name="preference_recommended_goal_notification_title">Recommended Goal Notification</string>
+    <string name="preference_current_recommended_goal_notification_summary">Current</string>
+    <string name="preference_cheers_notification_title">Cheers Notification</string>
+    <string name="preference_check_in_time_title">Check-In Time</string>
+    <string name="preference_about_title">About</string>
+    <string name="preference_support_title">Support</string>
     <string name="preference_unit_si_title">SI</string>
     <string name="preference_unit_usc_title">USC</string>
     <string name="preference_sign_in_title">Sign In</string>
@@ -185,6 +225,8 @@
     <string name="preference_unit_si_summary">kilometers/kilograms/°C</string>
     <string name="preference_unit_usc_summary">miles/pounds/°F</string>
     <string name="preference_fitness_tracker_notification">pref_fitness_tracker_notification</string>
+    <string name="preference_fitness_tracker_source_notification">pref_fitness_tracker_source_notification</string>
+    <string name="preference_fitness_tracker_activity_type_notification">pref_fitness_tracker_activity_type_notification</string>
     <string name="preference_timer_notification">pref_timer_notification</string>
     <string name="preference_personal_goal_notification">pref_personal_goal_notification</string>
     <string name="preference_daily_check_in_notification">pref_daily_check_in_notification</string>
@@ -217,9 +259,12 @@
 
     <!-- Insight -->
     <string name="insight_best_and_worst_title">Best &amp; Worst</string>
-    <string name="insight_top3_title">Top3 Factors</string>
-    <string name="correlation">related</string>
-    <string name="recommendation_prompt">Recommended: </string>
+    <string name="insight_top3_title">Top 3 Factors</string>
+    <string name="correlation">\u0020related</string>
+    <string name="recommendation_prompt">Recommended:\u0020</string>
+    <string name="recommendation_camel_case">recommendation</string>
+    <string name="survey_camel_case">survey</string>
+    <string name="apps_and_services_camel_case">appsAndServices</string>
 
     <!-- Activity -->
     <string name="activity_steps_title">Steps</string>
@@ -276,7 +321,7 @@
     <string name="insight_summary_moabi">Summary (Moabi)</string>
     <string name="insight_summary_phone_usage">Summary (Phone Usage)</string>
     <string name="insight_summary_activity">Summary (Activity)</string>
-    <string name="insight_summary_timer">Summary (Timer)</string>
+    <string name="insight_summary_timer">Summary (Stopwatch)</string>
     <string name="insight_summary_mood">Summary (Mood)</string>
     <string name="insight_summary_energy">Summary (Energy)</string>
     <string name="insight_summary_daily_review">Summary (Daily Review)</string>
@@ -289,7 +334,7 @@
     <string name="insight_mind_x_phone_usage">Mind X Phone Usage</string>
     <string name="insight_mind_x_weather">Mind X Weather</string>
     <string name="insight_mind_x_activity">Mind X Activity</string>
-    <string name="insight_mind_x_timer">Mind X Timer</string>
+    <string name="insight_mind_x_timer">Mind X Stopwatch</string>
 
     <!-- Stats -->
     <string name="stats_summary">Summary</string>
@@ -408,4 +453,8 @@
 
     <!-- Phone Usage-->
     <string name="phone_usage_total_title">Total</string>
+
+    <!-- Tracker Notification -->
+    <string name="tracker_google_fit_last_sync_prompt">Google Fit last updated:</string>
+    <string name="tracker_fitbit_last_sync_prompt">Fitbit last updated:</string>
 </resources>

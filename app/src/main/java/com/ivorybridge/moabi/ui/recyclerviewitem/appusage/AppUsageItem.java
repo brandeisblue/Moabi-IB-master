@@ -277,7 +277,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
                     return convertToTimeString(value);
                 }
             });
-            int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white);
+            int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.fui_transparent);
             int startColor2 = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
             List<GradientColor> gradientColors = new ArrayList<>();
             gradientColors.add(new GradientColor(startColor1, startColor2));
@@ -393,7 +393,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             BarDataSet AppUsageDataSet = new BarDataSet(AppUsageBarEntries, "Digital BAActivityFavorited");
             AppUsageDataSet.setDrawValues(false);
             AppUsageDataSet.setColor(itemView.getContext().getColor(R.color.colorPrimary));
-            int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white);
+            int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.fui_transparent);
             int startColor2 = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
             List<GradientColor> gradientColors = new ArrayList<>();
             gradientColors.add(new GradientColor(startColor1, startColor2));

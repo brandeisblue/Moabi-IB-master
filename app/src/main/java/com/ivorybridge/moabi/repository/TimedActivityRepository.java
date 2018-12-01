@@ -100,7 +100,6 @@ public class TimedActivityRepository {
 
                             }
                         }
-                        firebaseManager.getDaysWithDataRef().child(date).child(application.getString(R.string.timer_camel_case)).setValue(true);
                     }
                 }
             }

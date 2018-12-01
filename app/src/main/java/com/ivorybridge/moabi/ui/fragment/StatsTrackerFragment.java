@@ -130,6 +130,8 @@ public class StatsTrackerFragment extends Fragment {
     private SharedPreferences weatherSharedPreferences;
     private SharedPreferences timedActivitySharedPreferences;
     private SharedPreferences phoneUsageSharedPreferences;
+    private SharedPreferences unitSharedPreferences;
+    private String unit;
     private Context context;
 
     @Override
@@ -161,6 +163,8 @@ public class StatsTrackerFragment extends Fragment {
                 getString(R.string.com_ivorybridge_moabi_TIMED_ACTIVITY_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
         phoneUsageSharedPreferences = context.getSharedPreferences(
                 getString(R.string.com_ivorybridge_moabi_APP_USAGE_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
+        unitSharedPreferences = context.getSharedPreferences(
+                getString(R.string.com_ivorybridge_moabi_UNIT_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
         radioGroup.setTintColor(ContextCompat.getColor(context, R.color.colorPrimary), Color.WHITE);
         radioGroup.setUnCheckedTintColor(Color.WHITE, Color.BLACK);
         fitbitViewModel = ViewModelProviders.of(this).get(FitbitViewModel.class);
@@ -184,6 +188,7 @@ public class StatsTrackerFragment extends Fragment {
             radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
+                    unit = unitSharedPreferences.getString(getString(R.string.com_ivorybridge_mobai_UNIT_KEY), getString(R.string.preference_unit_si_title));
                     // This will get the radiobutton that has changed in its check state
                     RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
                     // This puts the value (true/false) into the variable
@@ -213,6 +218,7 @@ public class StatsTrackerFragment extends Fragment {
     }
 
     private void setSpinner(int numOfDays) {
+        unit = unitSharedPreferences.getString(getString(R.string.com_ivorybridge_mobai_UNIT_KEY), getString(R.string.preference_unit_si_title));
         if (inputType.equals(getString(R.string.fitbit_camel_case))) {
             fitbitViewModel.getAll(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
                     formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())).observe(this, new Observer<List<FitbitDailySummary>>() {
@@ -258,11 +264,18 @@ public class StatsTrackerFragment extends Fragment {
                                         if (activitySummaryMap.get(getString(R.string.activity_distance_title)) != null) {
                                             Double old = (Double) activitySummaryMap.get(getString(R.string.activity_distance_title));
                                             if (old != null) {
-                                                activitySummaryMap.put(getString(R.string.activity_distance_title), old + activitySummary.getSummary().getDistances().get(0).getDistance());
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    activitySummaryMap.put(getString(R.string.activity_distance_title), old + activitySummary.getSummary().getDistances().get(0).getDistance());
+                                                } else {
+                                                    activitySummaryMap.put(getString(R.string.activity_distance_title), old + activitySummary.getSummary().getDistances().get(0).getDistance() * 0.621371f);
+                                                }
                                             }
                                         } else {
-                                            Double distance = activitySummary.getSummary().getDistances().get(0).getDistance();
-                                            activitySummaryMap.put(getString(R.string.activity_distance_title), distance);
+                                            if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                activitySummaryMap.put(getString(R.string.activity_distance_title), activitySummary.getSummary().getDistances().get(0).getDistance());
+                                            } else {
+                                                activitySummaryMap.put(getString(R.string.activity_distance_title), activitySummary.getSummary().getDistances().get(0).getDistance() * 0.621371f);
+                                            }
                                         }
                                     } else {
                                         activitySummaryMap.put(getString(R.string.activity_distance_title), 0f);
@@ -326,7 +339,7 @@ public class StatsTrackerFragment extends Fragment {
                                     activitiesSet.add(activity.getKey());
                                 }
 
-                                activitiesSet.add("0 Summary");
+                                //activitiesSet.add("0 Summary");
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {
@@ -448,9 +461,17 @@ public class StatsTrackerFragment extends Fragment {
                                             String title = getString(R.string.activity_distance_title);
                                             if (activitySummaryMap.get(title) != null) {
                                                 Double old = (Double) activitySummaryMap.get(title);
-                                                activitySummaryMap.put(title, old + summary.getValue());
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    activitySummaryMap.put(title, old + summary.getValue() / 1000);
+                                                } else {
+                                                    activitySummaryMap.put(title, old + summary.getValue() / 1000 * 0.621371f);
+                                                }
                                             } else {
-                                                activitySummaryMap.put(title, summary.getValue());
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    activitySummaryMap.put(title, summary.getValue() / 1000);
+                                                } else {
+                                                    activitySummaryMap.put(title, summary.getValue() / 1000 * 0.621371f);
+                                                }
                                             }
                                         } else if (name.equals(getString(R.string.activity_calories_camel_case))) {
                                             String title = getString(R.string.activity_calories_title);
@@ -469,7 +490,7 @@ public class StatsTrackerFragment extends Fragment {
                                 for (Map.Entry<String, Object> activity : activitySummaryMap.entrySet()) {
                                     activitiesSet.add(activity.getKey());
                                 }
-                                activitiesSet.add("0 Summary");
+                                //activitiesSet.add("0 Summary");
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {
@@ -592,11 +613,18 @@ public class StatsTrackerFragment extends Fragment {
                                         if (activitySummaryMap.get(getString(R.string.activity_distance_title)) != null) {
                                             Double old = (Double) activitySummaryMap.get(getString(R.string.activity_distance_title));
                                             if (old != null) {
-                                                activitySummaryMap.put(getString(R.string.activity_distance_title), old + dailySummary.getDistance() / 1000);
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    activitySummaryMap.put(getString(R.string.activity_distance_title), old + dailySummary.getDistance() / 1000);
+                                                } else {
+                                                    activitySummaryMap.put(getString(R.string.activity_distance_title), old + dailySummary.getDistance() / 1000 * 0.621371f);
+                                                }
                                             }
                                         } else {
-                                            Double distance = dailySummary.getDistance() / 1000;
-                                            activitySummaryMap.put(getString(R.string.activity_distance_title), distance);
+                                            if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                activitySummaryMap.put(getString(R.string.activity_distance_title), dailySummary.getDistance() / 1000);
+                                            } else {
+                                                activitySummaryMap.put(getString(R.string.activity_distance_title), dailySummary.getDistance() / 1000 * 0.621371f);
+                                            }
                                         }
                                     } else {
                                         activitySummaryMap.put(getString(R.string.activity_distance_title), 0f);
@@ -634,7 +662,7 @@ public class StatsTrackerFragment extends Fragment {
                                     activitiesSet.add(activity.getKey());
                                 }
 
-                                activitiesSet.add("0 Summary");
+                                //activitiesSet.add("0 Summary");
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {
@@ -720,18 +748,36 @@ public class StatsTrackerFragment extends Fragment {
                             public void run() {
                                 for (WeatherDailySummary dailySummary : summaries) {
                                     if (activitySummaryMap.get(getString(R.string.precipitation_title)) != null) {
-                                        double old = (Double) activitySummaryMap.get(getString(R.string.precipitation_title));
-                                        activitySummaryMap.put(getString(R.string.precipitation_title), old + dailySummary.getTotalPrecipmm());
+                                        if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                            double old = (Double) activitySummaryMap.get(getString(R.string.precipitation_title));
+                                            activitySummaryMap.put(getString(R.string.precipitation_title), old + dailySummary.getTotalPrecipmm());
+                                        } else {
+                                            double old = (Double) activitySummaryMap.get(getString(R.string.precipitation_title));
+                                            activitySummaryMap.put(getString(R.string.precipitation_title), old + dailySummary.getTotalPrecipin());
+                                        }
                                     } else {
-                                        double value = (Double) dailySummary.getTotalPrecipmm();
-                                        activitySummaryMap.put(getString(R.string.precipitation_title), value);
+                                        if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                            activitySummaryMap.put(getString(R.string.precipitation_title), dailySummary.getTotalPrecipmm());
+                                        } else {
+                                            activitySummaryMap.put(getString(R.string.precipitation_title), dailySummary.getTotalPrecipin());
+                                        }
                                     }
                                     if (activitySummaryMap.get(getString(R.string.temperature_title)) != null) {
-                                        double old = (Double) activitySummaryMap.get(getString(R.string.temperature_title));
-                                        activitySummaryMap.put(getString(R.string.temperature_title), old + dailySummary.getAvgTempC());
+                                        if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                            double old = (Double) activitySummaryMap.get(getString(R.string.temperature_title));
+                                            activitySummaryMap.put(getString(R.string.precipitation_title), old + dailySummary.getAvgTempC());
+                                        } else {
+                                            double old = (Double) activitySummaryMap.get(getString(R.string.temperature_title));
+                                            activitySummaryMap.put(getString(R.string.precipitation_title), old + dailySummary.getAvgTempF());
+                                        }
                                     } else {
-                                        double value = (Double) dailySummary.getAvgTempC();
-                                        activitySummaryMap.put(getString(R.string.temperature_title), value);
+                                        if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                            double value = (Double) dailySummary.getAvgTempC();
+                                            activitySummaryMap.put(getString(R.string.temperature_title), value);
+                                        } else {
+                                            double value = (Double) dailySummary.getAvgTempF();
+                                            activitySummaryMap.put(getString(R.string.temperature_title), value);
+                                        }
                                     }
                                     if (activitySummaryMap.get(getString(R.string.humidity_title)) != null) {
                                         double old = (Double) activitySummaryMap.get(getString(R.string.humidity_title));
@@ -748,7 +794,7 @@ public class StatsTrackerFragment extends Fragment {
                                     activitiesSet.add(activity.getKey());
                                 }
 
-                                activitiesSet.add("0 Summary");
+                                //activitiesSet.add("0 Summary");
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {
@@ -853,7 +899,7 @@ public class StatsTrackerFragment extends Fragment {
                             for (Map.Entry<String, Object> activity : activitySummaryMap.entrySet()) {
                                 activitiesSet.add(activity.getKey());
                             }
-                            activitiesSet.add("0 Summary");
+                            //activitiesSet.add("0 Summary");
                             Log.i(TAG, activitiesSet.toString());
                         }
                         handler.post(new Runnable() {
@@ -970,7 +1016,7 @@ public class StatsTrackerFragment extends Fragment {
                                     }
                                 }
                             }
-                            activitiesSet.add("0 Summary");
+                            //activitiesSet.add("0 Summary");
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -1122,8 +1168,13 @@ public class StatsTrackerFragment extends Fragment {
                                             } else if (activity.equals(getString(R.string.activity_distance_title))) {
                                                 FitbitActivitySummary activitySummary = fitbitDailySummary.getActivitySummary();
                                                 //entries.put(fitbitDailySummary.getDate(), activitySummary.getSummary().getDistances().get(0));
-                                                barEntries.add(new BarEntry(i, activitySummary.getSummary().getDistances().get(0).getDistance().floatValue()));
-                                                total += activitySummary.getSummary().getDistances().get(0).getDistance().floatValue();
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    barEntries.add(new BarEntry(i, activitySummary.getSummary().getDistances().get(0).getDistance().floatValue()));
+                                                    total += activitySummary.getSummary().getDistances().get(0).getDistance().floatValue();
+                                                } else {
+                                                    barEntries.add(new BarEntry(i, activitySummary.getSummary().getDistances().get(0).getDistance().floatValue() * 0.621371f));
+                                                    total += activitySummary.getSummary().getDistances().get(0).getDistance().floatValue() * 0.621371f;
+                                                }
                                                 validEntryCounter++;
                                             } else if (activity.equals(getString(R.string.activity_sleep_title))) {
                                                 FitbitSleepSummary sleepSummary = fitbitDailySummary.getSleepSummary();
@@ -1217,8 +1268,13 @@ public class StatsTrackerFragment extends Fragment {
                                                         barEntries.add(new BarEntry(i, minutesLong));
                                                         validEntryCounter++;
                                                     } else if (activity.equals(getString(R.string.activity_distance_title))) {
-                                                        barEntries.add(new BarEntry(i, summary.getValue().floatValue() / 1000));
-                                                        total += summary.getValue().floatValue() / 1000;
+                                                        if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                            barEntries.add(new BarEntry(i, summary.getValue().floatValue() / 1000));
+                                                            total += summary.getValue().floatValue();
+                                                        } else {
+                                                            barEntries.add(new BarEntry(i, summary.getValue().floatValue() / 1000 * 0.621371f));
+                                                            total += summary.getValue().floatValue();
+                                                        }
                                                         validEntryCounter++;
                                                     } else {
                                                         barEntries.add(new BarEntry(i, summary.getValue().floatValue()));
@@ -1324,9 +1380,16 @@ public class StatsTrackerFragment extends Fragment {
                                                 total += dailySummary.getCalories().longValue();
                                                 validEntryCounter++;
                                             } else if (activity.equals(getString(R.string.activity_distance_title))) {
-                                                entries.put(dailySummary.getDate(), dailySummary.getDistance().longValue() / 1000);
-                                                barEntries.add(new BarEntry(i, dailySummary.getDistance().floatValue() / 1000));
-                                                total += dailySummary.getDistance().floatValue() / 1000;
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    entries.put(dailySummary.getDate(), dailySummary.getDistance().longValue() / 1000);
+                                                    barEntries.add(new BarEntry(i, dailySummary.getDistance().floatValue() / 1000));
+                                                    total += dailySummary.getDistance().floatValue() / 1000;
+                                                } else {
+                                                    entries.put(dailySummary.getDate(), Math.round(dailySummary.getDistance().longValue() / 1000 * 0.621371));
+                                                    barEntries.add(new BarEntry(i, dailySummary.getDistance().floatValue() / 1000 * 0.621371f));
+                                                    total += dailySummary.getDistance().floatValue() / 1000 * 0.621371f;
+                                                }
+
                                                 validEntryCounter++;
                                             }
                                         }
@@ -1402,14 +1465,26 @@ public class StatsTrackerFragment extends Fragment {
                                         // find matching record
                                         if (dailySummary.getDate().equals(date)) {
                                             if (activity.equals(getString(R.string.precipitation_title))) {
-                                                entries.put(dailySummary.getDate(), (long) dailySummary.getTotalPrecipmm());
-                                                barEntries.add(new BarEntry(i, (float) dailySummary.getTotalPrecipmm()));
-                                                total += dailySummary.getTotalPrecipmm();
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    entries.put(dailySummary.getDate(), (long) dailySummary.getTotalPrecipmm());
+                                                    barEntries.add(new BarEntry(i, (float) dailySummary.getTotalPrecipmm()));
+                                                    total += dailySummary.getTotalPrecipmm();
+                                                } else {
+                                                    entries.put(dailySummary.getDate(), (long) dailySummary.getTotalPrecipin());
+                                                    barEntries.add(new BarEntry(i, (float) dailySummary.getTotalPrecipin()));
+                                                    total += dailySummary.getTotalPrecipmm();
+                                                }
                                                 validEntryCounter++;
                                             } else if (activity.equals(getString(R.string.temperature_title))) {
-                                                entries.put(dailySummary.getDate(), (long) dailySummary.getAvgTempC());
-                                                barEntries.add(new BarEntry(i, (float) dailySummary.getAvgTempC()));
-                                                total += dailySummary.getAvgTempC();
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    entries.put(dailySummary.getDate(), (long) dailySummary.getAvgTempC());
+                                                    barEntries.add(new BarEntry(i, (float) dailySummary.getAvgTempC()));
+                                                    total += dailySummary.getAvgTempC();
+                                                } else {
+                                                    entries.put(dailySummary.getDate(), (long) dailySummary.getAvgTempF());
+                                                    barEntries.add(new BarEntry(i, (float) dailySummary.getAvgTempF()));
+                                                    total += dailySummary.getAvgTempF();
+                                                }
                                                 validEntryCounter++;
                                             } else if (activity.equals(getString(R.string.humidity_title))) {
                                                 entries.put(dailySummary.getDate(), (long) dailySummary.getAvgHumidity());
@@ -1424,7 +1499,6 @@ public class StatsTrackerFragment extends Fragment {
                                         barEntries.add(new BarEntry(i - 1, 0));
                                     }
                                 }
-
                                 if (validEntryCounter != 0) {
                                     final float average = total / validEntryCounter;
                                     handler.post(new Runnable() {
@@ -1696,10 +1770,17 @@ public class StatsTrackerFragment extends Fragment {
                                                 weeklyTotal += activitySummary.getSummary().getFloors();
                                                 //validEntryCounter++;
                                             } else if (activity.equals(getString(R.string.activity_distance_title))) {
-                                                FitbitActivitySummary activitySummary = fitbitDailySummary.getActivitySummary();
-                                                //entries.put(fitbitDailySummary.getDate(), activitySummary.getSummary().getDistances().get(0));
-                                                //barEntries.add(new BarEntry(i, activitySummary.getSummary().getDistances().get(0).getDistance().floatValue()));
-                                                weeklyTotal += activitySummary.getSummary().getDistances().get(0).getDistance().floatValue();
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    FitbitActivitySummary activitySummary = fitbitDailySummary.getActivitySummary();
+                                                    //entries.put(fitbitDailySummary.getDate(), activitySummary.getSummary().getDistances().get(0));
+                                                    //barEntries.add(new BarEntry(i, activitySummary.getSummary().getDistances().get(0).getDistance().floatValue()));
+                                                    weeklyTotal += activitySummary.getSummary().getDistances().get(0).getDistance().floatValue();
+                                                } else {
+                                                    FitbitActivitySummary activitySummary = fitbitDailySummary.getActivitySummary();
+                                                    //entries.put(fitbitDailySummary.getDate(), activitySummary.getSummary().getDistances().get(0));
+                                                    //barEntries.add(new BarEntry(i, activitySummary.getSummary().getDistances().get(0).getDistance().floatValue()));
+                                                    weeklyTotal += activitySummary.getSummary().getDistances().get(0).getDistance().floatValue() * 0.621371f;
+                                                }
                                                 //validEntryCounter++;
                                             } else if (activity.equals(getString(R.string.activity_sleep_title))) {
                                                 FitbitSleepSummary sleepSummary = fitbitDailySummary.getSleepSummary();
@@ -1795,7 +1876,11 @@ public class StatsTrackerFragment extends Fragment {
                                                         minutesLong = TimeUnit.MILLISECONDS.toMinutes(minutesLong);
                                                         weeklyTotal += minutesLong;
                                                     } else if (activity.equals(getString(R.string.activity_distance_title))) {
-                                                        weeklyTotal += summary.getValue().floatValue() / 1000;
+                                                        if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                            weeklyTotal += summary.getValue().floatValue() / 1000;
+                                                        } else {
+                                                            weeklyTotal += summary.getValue().floatValue() / 1000 * 0.621371f;
+                                                        }
                                                     } else {
                                                         weeklyTotal += summary.getValue().floatValue();
                                                     }
@@ -1899,10 +1984,11 @@ public class StatsTrackerFragment extends Fragment {
                                                 weeklyTotal += activitySummary.getCalories();
                                                 //validEntryCounter++;
                                             } else if (activity.equals(getString(R.string.activity_distance_title))) {
-                                                //entries.put(fitbitDailySummary.getDate(), activitySummary.getSummary().getDistances().get(0));
-                                                //barEntries.add(new BarEntry(i, activitySummary.getSummary().getDistances().get(0).getDistance().floatValue()));
-                                                weeklyTotal += activitySummary.getDistance() / 1000;
-                                                //validEntryCounter++;
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    weeklyTotal += activitySummary.getDistance() / 1000;
+                                                } else {
+                                                    weeklyTotal += activitySummary.getDistance() / 1000 * 0.621371f;
+                                                }
                                             }
                                         }
                                     }
@@ -1981,9 +2067,17 @@ public class StatsTrackerFragment extends Fragment {
                                         // find matching record
                                         if (YYYW.equals(formattedTime.convertLongToYYYYW(dailySummary.getDateInLong()))) {
                                             if (activity.equals(getString(R.string.precipitation_title))) {
-                                                weeklyTotal += dailySummary.getTotalPrecipmm();
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    weeklyTotal += dailySummary.getTotalPrecipmm();
+                                                } else {
+                                                    weeklyTotal += dailySummary.getTotalPrecipin();
+                                                }
                                             } else if (activity.equals(getString(R.string.temperature_title))) {
-                                                weeklyTotal += dailySummary.getAvgTempC();
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    weeklyTotal += dailySummary.getAvgTempC();
+                                                } else {
+                                                    weeklyTotal += dailySummary.getAvgTempF();
+                                                }
                                             } else if (activity.equals(getString(R.string.humidity_title))) {
                                                 weeklyTotal += dailySummary.getAvgHumidity();
                                             }
@@ -2272,10 +2366,13 @@ public class StatsTrackerFragment extends Fragment {
                                                 monthlyTotal += activitySummary.getSummary().getFloors();
                                                 //validEntryCounter++;
                                             } else if (activity.equals(getString(R.string.activity_distance_title))) {
-                                                FitbitActivitySummary activitySummary = fitbitDailySummary.getActivitySummary();
-                                                //entries.put(fitbitDailySummary.getDate(), activitySummary.getSummary().getDistances().get(0));
-                                                //barEntries.add(new BarEntry(i, activitySummary.getSummary().getDistances().get(0).getDistance().floatValue()));
-                                                monthlyTotal += activitySummary.getSummary().getDistances().get(0).getDistance().floatValue();
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    FitbitActivitySummary activitySummary = fitbitDailySummary.getActivitySummary();
+                                                    monthlyTotal += activitySummary.getSummary().getDistances().get(0).getDistance().floatValue();
+                                                } else {
+                                                    FitbitActivitySummary activitySummary = fitbitDailySummary.getActivitySummary();
+                                                    monthlyTotal += activitySummary.getSummary().getDistances().get(0).getDistance().floatValue() * 0.621371f;
+                                                }
                                                 //validEntryCounter++;
                                             } else if (activity.equals(getString(R.string.activity_sleep_title))) {
                                                 FitbitSleepSummary sleepSummary = fitbitDailySummary.getSleepSummary();
@@ -2372,7 +2469,11 @@ public class StatsTrackerFragment extends Fragment {
                                                         minutesLong = TimeUnit.MILLISECONDS.toMinutes(minutesLong);
                                                         monthlyTotal += minutesLong;
                                                     } else if (activity.equals(getString(R.string.activity_distance_title))) {
-                                                        monthlyTotal += summary.getValue().floatValue() / 1000;
+                                                        if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                            monthlyTotal += summary.getValue().floatValue() / 1000;
+                                                        } else {
+                                                            monthlyTotal += summary.getValue().floatValue() / 1000 * 0.621371f;
+                                                        }
                                                     } else {
                                                         monthlyTotal += summary.getValue().floatValue();
                                                     }
@@ -2475,10 +2576,11 @@ public class StatsTrackerFragment extends Fragment {
                                                 monthlyTotal += activitySummary.getCalories();
                                                 //validEntryCounter++;
                                             } else if (activity.equals(getString(R.string.activity_distance_title))) {
-                                                //entries.put(fitbitDailySummary.getDate(), activitySummary.getSummary().getDistances().get(0));
-                                                //barEntries.add(new BarEntry(i, activitySummary.getSummary().getDistances().get(0).getDistance().floatValue()));
-                                                monthlyTotal += activitySummary.getDistance() / 1000;
-                                                //validEntryCounter++;
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    monthlyTotal += activitySummary.getDistance() / 1000;
+                                                } else {
+                                                    monthlyTotal += activitySummary.getDistance() / 1000 * 0.621371f;
+                                                }
                                             }
                                         }
                                     }
@@ -2558,9 +2660,17 @@ public class StatsTrackerFragment extends Fragment {
                                         // find matching record
                                         if (YYYYMM.equals(formattedTime.convertLongToYYYYMM(dailySummary.getDateInLong()))) {
                                             if (activity.equals(getString(R.string.precipitation_title))) {
-                                                monthlyTotal += dailySummary.getTotalPrecipmm();
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    monthlyTotal += dailySummary.getTotalPrecipmm();
+                                                } else {
+                                                    monthlyTotal += dailySummary.getTotalPrecipin();
+                                                }
                                             } else if (activity.equals(getString(R.string.temperature_title))) {
-                                                monthlyTotal += dailySummary.getAvgTempC();
+                                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                                    monthlyTotal += dailySummary.getAvgTempC();
+                                                } else {
+                                                    monthlyTotal += dailySummary.getAvgTempF();
+                                                }
                                             } else if (activity.equals(getString(R.string.humidity_title))) {
                                                 monthlyTotal += dailySummary.getAvgHumidity();
                                             }
@@ -3059,7 +3169,7 @@ public class StatsTrackerFragment extends Fragment {
                     Long means = totalLong / numOfDays;
                     meansAndSumItemAdapter.add(new MeansAndSumItem(activity.getKey(), means, totalLong));
                 } else if (activity.getKey().equals(getString(R.string.activity_distance_title))) {
-                    Double total = (Double) activity.getValue() / 1000;
+                    Double total = (Double) activity.getValue();
                     Double means = total / numOfDays;
                     meansAndSumItemAdapter.add(new MeansAndSumItem(activity.getKey(), means, total));
                 } else {

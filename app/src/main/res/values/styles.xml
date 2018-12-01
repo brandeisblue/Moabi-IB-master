@@ -129,4 +129,9 @@
         <item name="backgroundTint">@color/fui_transparent</item>
     </style>
 
+    <style name="EmptyTextAppearance"/>
+    <style name="EmptyTextAppearance.Title" parent="TextAppearance.AppCompat.Title"/>
+    <style name="EmptyTextAppearance.Body" parent="TextAppearance.AppCompat.Subhead"/>
+    <style name="EmptyTextAppearance.Button" parent="TextAppearance.AppCompat.Button"/>
+
 </resources>

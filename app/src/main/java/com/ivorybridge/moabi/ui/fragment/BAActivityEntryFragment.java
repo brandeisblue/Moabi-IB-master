@@ -130,6 +130,7 @@ public class BAActivityEntryFragment extends Fragment {
             @Override
             public void onChanged(@Nullable List<BAActivityFavorited> baActivitiesInUse) {
                 mFastItemAdapter.clear();
+                entryItems.clear();
                 if (baActivitiesInUse != null && baActivitiesInUse.size() > 0) {
                     Collections.sort(baActivitiesInUse);
                     if (getActivity() != null) {
@@ -137,8 +138,8 @@ public class BAActivityEntryFragment extends Fragment {
                             BAActivityEntryFragmentGridItem entryItem = new BAActivityEntryFragmentGridItem(activityInUse);
                             Log.i(TAG, activityInUse.getName() + ": " + activityInUse.getActivtyType());
                             entryItems.add(entryItem);
-                            mFastItemAdapter.add(entryItem);
                         }
+                        mFastItemAdapter.add(entryItems);
                         BAActivityFavorited addItem = new BAActivityFavorited(getString(R.string.edit_title), 6L, 0L, "ic_add_circle_black_24dp");
                         mFastItemAdapter.add(new BAActivityEntryFragmentGridItem(addItem));
                     }
@@ -205,6 +206,7 @@ public class BAActivityEntryFragment extends Fragment {
                             Log.i(TAG, "# of fragments: " + userInputsInUseList.size() + ", " + "current position: " + currentItem);
                             if (userInputsInUseList.size() == 1 || currentItem == userInputsInUseList.size() - 1) {
                                 Intent intent = new Intent(getActivity(), MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                                 startActivity(intent);
                             } else {
                                 viewPager.setCurrentItem(currentItem + 1, true);

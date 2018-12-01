@@ -293,6 +293,7 @@ public class Phq9EntryFragment extends Fragment {
                                                 Log.i(TAG, "# of fragments: " + userInputsInUseList.size() + ", " + "current position: " + currentItem);
                                                 if (userInputsInUseList.size() == 1 || currentItem == userInputsInUseList.size() - 1) {
                                                     Intent intent = new Intent(getActivity(), MainActivity.class);
+                                                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                                                     startActivity(intent);
                                                 } else {
                                                     viewPager.setCurrentItem(currentItem + 1, true);
@@ -417,6 +418,7 @@ public class Phq9EntryFragment extends Fragment {
                                         Log.i(TAG, "# of fragments: " + userInputsInUseList.size() + ", " + "current position: " + currentItem);
                                         if (userInputsInUseList.size() == 1 || currentItem == userInputsInUseList.size() - 1) {
                                             Intent intent = new Intent(getActivity(), MainActivity.class);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                                             startActivity(intent);
                                         } else {
                                             viewPager.setCurrentItem(currentItem + 1, true);

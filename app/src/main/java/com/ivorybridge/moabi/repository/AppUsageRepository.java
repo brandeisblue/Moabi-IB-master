@@ -191,7 +191,7 @@ public class AppUsageRepository {
             appUsageInputHistory.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
             inputHistoryRepository.insert(appUsageInputHistory);
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                firebaseManager.getAppUsageRef().child(date).updateChildren(mapToUpdate);
+                firebaseManager.getThisDeviceRef().child(date).updateChildren(mapToUpdate);
             }
         }
     }

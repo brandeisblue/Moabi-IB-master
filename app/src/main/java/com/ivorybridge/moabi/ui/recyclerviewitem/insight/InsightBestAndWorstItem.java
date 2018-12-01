@@ -3,12 +3,15 @@ package com.ivorybridge.moabi.ui.recyclerviewitem.insight;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -78,6 +81,8 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
 
         @BindView(R.id.rv_item_insight_bestandworst_item_barchart)
         BarChart barChart;
+        @BindView(R.id.rv_item_insight_bestandworst_item_title_textview)
+        TextView titleTextView;
         private FormattedTime formattedTime;
         private Typeface tf;
 
@@ -99,6 +104,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
         }
 
         private void drawBarChart(List<BarEntry> barEntries, List<String> entryDatesList, double average, float bestValue, String inputType) {
+
             if (barEntries.size() == 0) {
                 barChart.isEmpty();
                 barChart.clear();
@@ -106,6 +112,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 return;
             }
 
+            titleTextView.setText(itemView.getContext().getString(R.string.best_day_title));
             barChart.clear();
             Log.i(TAG, barEntries.toString());
             List<String> formattedEntryDatesList = new ArrayList<>();
@@ -121,8 +128,6 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             xAxis.setDrawGridLines(false);
             barChart.setDragEnabled(false);
             xAxis.setDrawAxisLine(false);
-            xAxis.setSpaceMin(0.5f);
-            xAxis.setSpaceMax(0.5f);
             xAxis.setTextSize(12);
             xAxis.setTextColor(Color.DKGRAY);
             xAxis.setAxisLineColor(ContextCompat.getColor(itemView.getContext(), R.color.transparent_gray));
@@ -161,6 +166,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             leftAxis.setGranularityEnabled(true);
             leftAxis.setLabelCount(5, true);
             leftAxis.setDrawLabels(false);
+            //leftAxis.setLabelCount(3, true);
             rightAxis.setAxisMinimum(0);
             rightAxis.setEnabled(false);
             rightAxis.setDrawGridLines(false);
@@ -173,8 +179,8 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 leftAxis.setDrawAxisLine(false);
                 leftAxis.setAxisMaximum(3.5f);
                 leftAxis.setAxisMinimum(1f);
-                leftAxis.setTypeface(tf);
-                leftAxis.setTextSize(12);
+                //leftAxis.setTypeface(tf);
+                //leftAxis.setTextSize(12);
                 leftAxis.setGranularity(0.5f);
                 leftAxis.setTextColor(Color.DKGRAY);
                 leftAxis.setGranularityEnabled(true);
@@ -193,12 +199,13 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                     }
                 });
             } else if (inputType.equals(itemView.getContext().getString(R.string.stress_camel_case))) {
+                titleTextView.setText(itemView.getContext().getString(R.string.worst_day_title));
                 leftAxis.setDrawGridLines(false);
                 leftAxis.setDrawAxisLine(false);
                 leftAxis.setAxisMaximum(10f);
                 leftAxis.setAxisMinimum(0f);
-                leftAxis.setTypeface(tf);
-                leftAxis.setTextSize(12);
+                //leftAxis.setTypeface(tf);
+                //leftAxis.setTextSize(12);
                 leftAxis.setGranularity(5f);
                 leftAxis.setTextColor(Color.DKGRAY);
                 leftAxis.setGranularityEnabled(true);
@@ -220,8 +227,8 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 leftAxis.setDrawAxisLine(false);
                 leftAxis.setAxisMaximum(5f);
                 leftAxis.setAxisMinimum(1f);
-                leftAxis.setTypeface(tf);
-                leftAxis.setTextSize(12);
+                //leftAxis.setTypeface(tf);
+                //leftAxis.setTextSize(12);
                 leftAxis.setGranularity(1f);
                 leftAxis.setTextColor(Color.DKGRAY);
                 leftAxis.setGranularityEnabled(true);
@@ -239,12 +246,13 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                     }
                 });
             } else if (inputType.equals(itemView.getContext().getString(R.string.depression_phq9_camel_case))) {
+                titleTextView.setText(itemView.getContext().getString(R.string.worst_day_title));
                 leftAxis.setDrawGridLines(false);
                 leftAxis.setDrawAxisLine(false);
                 leftAxis.setAxisMaximum(28f);
                 leftAxis.setAxisMinimum(0f);
-                leftAxis.setTypeface(tf);
-                leftAxis.setTextSize(12);
+                //leftAxis.setTypeface(tf);
+                //leftAxis.setTextSize(12);
                 leftAxis.setGranularity(1.0f);
                 leftAxis.setGranularityEnabled(true);
                 leftAxis.setTextColor(Color.DKGRAY);
@@ -271,12 +279,13 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                     }
                 });
             } else if (inputType.equals(itemView.getContext().getString(R.string.anxiety_gad7_camel_case))) {
+                titleTextView.setText(itemView.getContext().getString(R.string.worst_day_title));
                 leftAxis.setDrawGridLines(false);
                 leftAxis.setDrawAxisLine(false);
                 leftAxis.setAxisMaximum(21f);
                 leftAxis.setAxisMinimum(0f);
-                leftAxis.setTypeface(tf);
-                leftAxis.setTextSize(12);
+                //leftAxis.setTypeface(tf);
+                //leftAxis.setTextSize(12);
                 leftAxis.setGranularity(1.0f);
                 leftAxis.setTextColor(Color.DKGRAY);
                 leftAxis.setGranularityEnabled(true);
@@ -301,8 +310,21 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 });
             }
 
+            leftAxis.removeAllLimitLines();
+            LimitLine averageLL = new LimitLine((float) average, itemView.getContext().getString(R.string.chart_avg_abbr));
+            averageLL.setLineWidth(1f);
+            averageLL.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
+            averageLL.setTypeface(tf);
+            averageLL.setTextStyle(Paint.Style.FILL);
+            averageLL.enableDashedLine(4, 8, 1);
+            averageLL.setTextColor(Color.DKGRAY);
+            averageLL.setTextSize(12);
+            //averageLL.setLineColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+            averageLL.setLineColor(ContextCompat.getColor(itemView.getContext(), R.color.transparent_gray));
+            leftAxis.addLimitLine(averageLL);
+
             BarDataSet set = new BarDataSet(barEntries, "");
-            int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white);
+            int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.fui_transparent);
             int startColor2 = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
             List<GradientColor> gradientColors = new ArrayList<>();
             gradientColors.add(new GradientColor(startColor1, startColor2));
@@ -334,18 +356,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             //barChart.animateY(1000, Easing.EasingOption.Linear);
             barChart.setFitBars(true);
             barChart.setData(barData);
-
-            /*
-            int height = barChart.getHeight();
-            Paint paint = barChart.getRenderer().getPaintRender();
-            int[] colors = new int[]{ContextCompat.getColor(itemView.getContext(), R.color.colorPrimaryDark), ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary),
-                    ContextCompat.getColor(itemView.getContext(), R.color.white)};
-            float[] positions = new float[]{0, 0.5f, 1};
-
-            LinearGradient linearGradient = new LinearGradient(0, 0, 0, height,
-                    colors, positions,
-                    Shader.TileMode.REPEAT);
-            paint.setShader(linearGradient);*/
+            barChart.resetViewPortOffsets();
 
             Bitmap bestBitmap = BitmapFactory.decodeResource(itemView.getResources(), R.drawable.ic_star_filled);
             barChart.setRenderer(new ImageBarChartRenderer(barChart, barChart.getAnimator(), barChart.getViewPortHandler(), bestBitmap, bestValue));
@@ -353,6 +364,9 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                     R.layout.mpchart_chartvalueselectedview, entryDatesList, numOfDays, barChart, inputType);
             barChart.setMarker(chartMarkerView);
             barChart.getLegend().setEnabled(false);
+            barChart.setMinOffset(0);
+            barChart.setExtraBottomOffset(8);
+            barChart.setExtraTopOffset(8);
             barChart.invalidate();
         }
 
@@ -369,7 +383,6 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             //lineChart.setDragEnabled(false);
             barChart.setPinchZoom(true);
             barChart.setDoubleTapToZoomEnabled(true);
-            barChart.setExtraOffsets(8, 0, 8, 8);
         }
     }
 }

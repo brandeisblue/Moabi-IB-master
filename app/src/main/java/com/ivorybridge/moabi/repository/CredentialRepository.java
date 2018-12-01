@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import com.ivorybridge.moabi.database.dao.CredentialDao;
 import com.ivorybridge.moabi.database.db.CredentialDB;
 import com.ivorybridge.moabi.database.entity.util.Credential;
+import com.ivorybridge.moabi.util.FormattedTime;
 
 import java.util.List;
 
@@ -15,9 +16,12 @@ public class CredentialRepository {
 
     private static final String TAG = CredentialRepository.class.getSimpleName();
     private CredentialDao mTaskDao;
+    private FitbitRepository fitbitRepository;
+    private FormattedTime formattedTime;
 
     public CredentialRepository(Application application) {
         CredentialDB db = CredentialDB.getDatabase(application);
+        formattedTime = new FormattedTime();
         mTaskDao = db.dao();
     }
 

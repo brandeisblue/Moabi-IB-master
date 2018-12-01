@@ -64,6 +64,8 @@ public class MakeEntryActivity extends AppCompatActivity {
         if (!tut1Complete) {
             dataInUseViewModel.deleteAllInputs();
             Intent intent = new Intent(MakeEntryActivity.this, EditSurveyItemsActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            intent.putExtra("redirected_from", "makeEntryActivity");
             startActivity(intent);
         }
 
@@ -93,6 +95,8 @@ public class MakeEntryActivity extends AppCompatActivity {
                     Collections.sort(userInputsInUseList);
                     if (userInputsInUseList.size() < 1) {
                         Intent intent = new Intent(MakeEntryActivity.this, EditSurveyItemsActivity.class);
+                        intent.putExtra("redirected_from", "makeEntryActivity");
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                         startActivity(intent);
                     } else {
                         fragmentPagerAdapter = new MakeEntryFragmentPagerAdapter(getApplicationContext(), getSupportFragmentManager(), userInputsInUseList);
@@ -120,7 +124,8 @@ public class MakeEntryActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent(MakeEntryActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
-        finish();
+        //finish();
     }
 }

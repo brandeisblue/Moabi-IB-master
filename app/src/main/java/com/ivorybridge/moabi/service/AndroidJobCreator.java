@@ -48,6 +48,8 @@ public class AndroidJobCreator implements JobCreator {
                 return new AnxietyInsightCalculatorJob(application);
             case MotionSensorResetDailyJob.TAG:
                 return new MotionSensorResetDailyJob(application);
+            case MotionSensorEndofDayDailyJob.TAG:
+                return new MotionSensorEndofDayDailyJob(application);
             default:
                 return null;
         }

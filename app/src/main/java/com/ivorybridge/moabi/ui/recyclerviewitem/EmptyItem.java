@@ -57,6 +57,7 @@ public class EmptyItem extends AbstractItem<EmptyItem, EmptyItem.ViewHolder> {
                 public void onClick(View v) {
                     Intent intent = new Intent(itemView.getContext(), ConnectServicesActivity.class);
                     intent.putExtra("redirected_from", "empty_view");
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     itemView.getContext().startActivity(intent);
                 }
             });

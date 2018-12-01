@@ -96,7 +96,6 @@ public class DailyReviewRepository {
                                 }
                             }
                         }
-                        firebaseManager.getDaysWithDataRef().child(date).child(application.getString(R.string.daily_review_camel_case)).setValue(true);
                     }
                 }
             }

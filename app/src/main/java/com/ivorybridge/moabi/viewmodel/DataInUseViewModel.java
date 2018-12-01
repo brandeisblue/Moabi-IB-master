@@ -41,6 +41,15 @@ public class DataInUseViewModel extends AndroidViewModel {
         }).start();
     }
 
+    public void deleteAllConnectedServices() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mRepository.deleteAllInputsInUse();
+            }
+        }).start();
+    }
+
     public boolean insert(InputInUse selection) {
         return this.mRepository.insert(selection);
     }

@@ -1,7 +1,7 @@
 package com.ivorybridge.moabi.ui.activity;
 
 import android.app.Activity;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -14,15 +14,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.entity.util.ConnectedService;
+import com.ivorybridge.moabi.database.entity.util.DataInUseMediatorLiveData;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.network.auth.AuthStateManager;
 import com.ivorybridge.moabi.network.auth.FitbitAuthTokenHandler;
 import com.ivorybridge.moabi.network.auth.GoogleFitAPI;
+import com.ivorybridge.moabi.service.MotionSensorService;
 import com.ivorybridge.moabi.ui.recyclerviewitem.connectservicesactivity.ServiceItem;
+import com.ivorybridge.moabi.util.FormattedTime;
 import com.ivorybridge.moabi.viewmodel.DataInUseViewModel;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IItem;
@@ -30,11 +31,14 @@ import com.mikepenz.fastadapter.adapters.ItemAdapter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.util.Pair;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -46,7 +50,6 @@ import pub.devrel.easypermissions.EasyPermissions;
 /**
  * This class displays UI for ConnectServicesActivity, which displays a list of services
  * that users can connect to, such as Fitbit, GoogleFitAPI and built-in app usage tracker.
- *
  */
 public class ConnectServicesActivity extends AppCompatActivity implements
         EasyPermissions.PermissionCallbacks {
@@ -65,11 +68,9 @@ public class ConnectServicesActivity extends AppCompatActivity implements
     private FastAdapter<IItem> mFastAdapter;
     private ItemAdapter<ServiceItem> mConnectServicesAdapter;
     private DataInUseViewModel dataInUseViewModel;
-
-
-    static {
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-    }
+    private SharedPreferences notificationSharedPreferences;
+    private SharedPreferences.Editor notificationSPEditor;
+    private FormattedTime formattedTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +91,11 @@ public class ConnectServicesActivity extends AppCompatActivity implements
                 }
             });
         }
+        formattedTime = new FormattedTime();
+        notificationSharedPreferences = getSharedPreferences(
+                getString(R.string.com_ivorybridge_mobai_NOTIFICATION_SHARED_PREFERENCE),
+                Context.MODE_PRIVATE);
+        notificationSPEditor = notificationSharedPreferences.edit();
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(getString(R.string.apps_and_services_title));
@@ -107,24 +113,87 @@ public class ConnectServicesActivity extends AppCompatActivity implements
         mFastAdapter = FastAdapter.with(Arrays.asList(mConnectServicesAdapter));
         mFastAdapter.withSelectable(true);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mFastAdapter);
-
-        mConnectServicesAdapter.add(new ServiceItem(this, getString(R.string.fitbit_camel_case), ConnectServicesActivity.this));
-        mConnectServicesAdapter.add(new ServiceItem(this, getString(R.string.moabi_tracker_camel_case), ConnectServicesActivity.this));
-        mConnectServicesAdapter.add(new ServiceItem(this, getString(R.string.googlefit_camel_case), ConnectServicesActivity.this));
-        mConnectServicesAdapter.add(new ServiceItem(this, getString(R.string.phone_usage_camel_case), ConnectServicesActivity.this));
-        mConnectServicesAdapter.add(new ServiceItem(this, getString(R.string.weather_camel_case), ConnectServicesActivity.this));
-
         fitbitAuthStateSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         authStateManager = AuthStateManager.getInstance(this);
+
+        DataInUseMediatorLiveData dataInUseMediatorLiveData = new DataInUseMediatorLiveData(
+                dataInUseViewModel.getAllInputsInUse(), dataInUseViewModel.getAllConnectedServices());
+        dataInUseMediatorLiveData.observe(this, new Observer<Pair<List<InputInUse>, List<ConnectedService>>>() {
+            @Override
+            public void onChanged(Pair<List<InputInUse>, List<ConnectedService>> listListPair) {
+                Set<String> activitiesSet = new TreeSet<>();
+                if (listListPair.first != null && listListPair.first.size() > 0 &&
+                        listListPair.second != null && listListPair.second.size() > 0) {
+                    for (InputInUse inputInUse : listListPair.first) {
+                        if (inputInUse.isInUse()) {
+                            for (ConnectedService connectedService : listListPair.second) {
+                                if (connectedService.getName().equals(inputInUse.getName()) &&
+                                        connectedService.isConnected()) {
+                                    if (connectedService.getName().equals(getString(R.string.fitbit_camel_case))) {
+                                        activitiesSet.add("3" + connectedService.getName());
+                                        notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_source_notification),
+                                                getString(R.string.fitbit_title));
+                                        notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_activity_type_notification),
+                                                getString(R.string.activity_steps_title));
+                                        notificationSPEditor.commit();
+                                    } else if (connectedService.getName().equals(getString(R.string.googlefit_camel_case))) {
+                                        activitiesSet.add("2" + connectedService.getName());
+                                        notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_source_notification),
+                                                getString(R.string.googlefit_title));
+                                        notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_activity_type_notification),
+                                                getString(R.string.activity_steps_title));
+                                        notificationSPEditor.commit();
+                                    } else if (connectedService.getName().equals(getString(R.string.moabi_tracker_camel_case))) {
+                                        activitiesSet.add("0" + connectedService.getName());
+                                        notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_source_notification),
+                                                getString(R.string.moabi_tracker_title));
+                                        notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_activity_type_notification),
+                                                getString(R.string.activity_steps_title));
+                                        notificationSPEditor.commit();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                String[] activitiesArray = activitiesSet.toArray(new String[0]);
+                if (activitiesArray.length < 1) {
+                    notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_source_notification),
+                            null);
+                    notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_activity_type_notification),
+                            null);
+                    notificationSPEditor.commit();
+                    Intent intent = new Intent(ConnectServicesActivity.this, MotionSensorService.class);
+                    stopService(intent);
+                } else {
+                    Intent intent = new Intent(ConnectServicesActivity.this, MotionSensorService.class);
+                    startService(intent);
+                }
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        SharedPreferences getPrefs = androidx.preference.PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext());
+        boolean tut1Complete = getPrefs.getBoolean("tut_1_complete", false);
+        boolean tut2Complete = getPrefs.getBoolean("tut_2_complete", false);
+        boolean tut3Complete = getPrefs.getBoolean("tut_3_complete", false);
+        boolean tut4Complete = getPrefs.getBoolean("tut_4_complete", false);
+        Log.i(TAG, "Tutorial 1 - " + tut1Complete + " Tutorial 2 - " + tut2Complete
+                + " Tutorial 3 - " + tut3Complete + " Tutorial 4 - " + tut4Complete);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mFastAdapter);
+        mConnectServicesAdapter.clear();
+        mConnectServicesAdapter.add(new ServiceItem(this, getString(R.string.fitbit_camel_case), ConnectServicesActivity.this));
+        mConnectServicesAdapter.add(new ServiceItem(this, getString(R.string.moabi_tracker_camel_case), ConnectServicesActivity.this));
+        mConnectServicesAdapter.add(new ServiceItem(this, getString(R.string.googlefit_camel_case), ConnectServicesActivity.this));
+        mConnectServicesAdapter.add(new ServiceItem(this, getString(R.string.phone_usage_camel_case), ConnectServicesActivity.this));
+        mConnectServicesAdapter.add(new ServiceItem(this, getString(R.string.weather_camel_case), ConnectServicesActivity.this));
         Uri redirectUri = getIntent().getData();
         Log.i(TAG, "onResume() - " + redirectUri);
         if (redirectUri != null) {
@@ -142,26 +211,34 @@ public class ConnectServicesActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i(TAG, "onPause()");
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         Intent intent = this.getIntent();
+        /*
         if (intent.hasExtra("redirected_from")) {
             if (intent.getStringExtra("redirected_from").equals("empty_view")) {
                 inflater.inflate(R.menu.activity_connect_services_menuitem, menu);
             }
-        }
+        }*/
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        /*
         int id = item.getItemId();
-        switch(id) {
+        switch (id) {
             case R.id.activity_connect_services_menuitem_next:
                 Intent intent = new Intent(ConnectServicesActivity.this, EditSurveyItemsActivity.class);
                 startActivity(intent);
                 break;
-        }
+        }*/
         return super.onOptionsItemSelected(item);
     }
 
@@ -181,6 +258,10 @@ public class ConnectServicesActivity extends AppCompatActivity implements
                 connectedService.setName(getString(R.string.googlefit_camel_case));
                 connectedService.setConnected(true);
                 dataInUseViewModel.insert(connectedService);
+                GoogleFitAPI googleFitAPI = new GoogleFitAPI(getApplication());
+                googleFitAPI.downloadData(formattedTime.getCurrentDateAsYYYYMMDD());
+                Intent intent = new Intent(getApplicationContext(), MotionSensorService.class);
+                startService(intent);
                 Log.i(TAG, "Google Fit authentication successful");
             } else {
                 InputInUse inputInUse = new InputInUse();
@@ -220,59 +301,13 @@ public class ConnectServicesActivity extends AppCompatActivity implements
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
         if (requestCode == REQUEST_LOCATION_PERMISSION_REQUEST_CODE) {
-            displayConnectGoogleFitDialog();
+            //displayConnectGoogleFitDialog();
         }
     }
 
     @Override
     public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
-        Toast.makeText(this, "Google Fit requires location permission to provide fitness data", Toast.LENGTH_LONG).show();
-    }
-
-    private void displayConnectGoogleFitDialog() {
-        new MaterialDialog.Builder(this)
-                .title(R.string.googlefit_permission_title)
-                .content(R.string.googlefit_permission_prompt)
-                .limitIconToDefaultSize()
-                .positiveText(R.string.dialog_positive_text)
-                .negativeText(R.string.dialog_negative_text)
-                .autoDismiss(true)
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        dialog.dismiss();
-                        GoogleFitAPI gFit = new GoogleFitAPI(ConnectServicesActivity.this);
-                        gFit.requestPermission();
-                        dialog.dismiss();
-                    }
-                })
-                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        InputInUse inputInUse = new InputInUse();
-                        inputInUse.setType("tracker");
-                        inputInUse.setName(getString(R.string.googlefit_camel_case));
-                        inputInUse.setInUse(false);
-                        dataInUseViewModel.insert(inputInUse);
-                        ConnectedService connectedService = new ConnectedService();
-                        connectedService.setType("tracker");
-                        connectedService.setName(getString(R.string.googlefit_camel_case));
-                        connectedService.setConnected(false);
-                        dataInUseViewModel.insert(connectedService);
-                        dialog.dismiss();
-                        ConnectServicesActivity.this.finish();
-                        ConnectServicesActivity.this.overridePendingTransition(0, 0);
-                        ConnectServicesActivity.this.startActivity(ConnectServicesActivity.this.getIntent().addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
-                    }
-                })
-                .cancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        dialog.dismiss();
-                    }
-                })
-                .iconRes(R.drawable.ic_googlefit)
-                .show();
+        //Toast.makeText(this, getString(R.string.location_rationale), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -280,14 +315,25 @@ public class ConnectServicesActivity extends AppCompatActivity implements
         super.onBackPressed();
         SharedPreferences getPrefs = androidx.preference.PreferenceManager
                 .getDefaultSharedPreferences(getBaseContext());
-        boolean tut1Complete1 = getPrefs.getBoolean("tut_1_complete", false);
-        if (!tut1Complete1) {
+        boolean tut1Complete = getPrefs.getBoolean("tut_1_complete", false);
+        boolean tut2Complete = getPrefs.getBoolean("tut_2_complete", false);
+        boolean tut3Complete = getPrefs.getBoolean("tut_3_complete", false);
+        boolean tut4Complete = getPrefs.getBoolean("tut_4_complete", false);
+        Log.i(TAG, "Tutorial 1 - " + tut1Complete + " Tutorial 2 - " + tut2Complete
+                + " Tutorial 3 - " + tut3Complete + " Tutorial 4 - " + tut4Complete);
+        SharedPreferences.Editor e = getPrefs.edit();
+        if (!tut3Complete) {
+            e.putBoolean("tut_2_complete", false);
+            dataInUseViewModel.deleteAllInputs();
+            e.commit();
             Intent intent = new Intent(ConnectServicesActivity.this, EditSurveyItemsActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivity(intent);
-            finish();
-        } else {
-            onBackPressed();
-            finish();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

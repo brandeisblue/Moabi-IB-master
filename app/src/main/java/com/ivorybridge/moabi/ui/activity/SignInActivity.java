@@ -58,7 +58,7 @@ public class SignInActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     // proceed to main activity after 2 seconds if the user is signed in.
-                    startActivity(new Intent(SignInActivity.this, MainActivity.class));
+                    startActivity(new Intent(SignInActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
                     // close splash activity
                     finish();
                 }
@@ -102,7 +102,7 @@ public class SignInActivity extends AppCompatActivity {
 
             // Successfully signed in
             if (resultCode == RESULT_OK) {
-                startActivity(new Intent(SignInActivity.this, MainActivity.class));
+                startActivity(new Intent(SignInActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
                 finish();
             } else {
                 // Sign in failed
@@ -153,9 +153,9 @@ public class SignInActivity extends AppCompatActivity {
         //  Create a new boolean and preference and set it to true
         boolean isFirstStart = getPrefs.getBoolean("firstStart", true);
         if (isFirstStart) {
-            startActivity(new Intent(SignInActivity.this, IntroActivity.class));
+            startActivity(new Intent(SignInActivity.this, IntroActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
         } else {
-            startActivity(new Intent(SignInActivity.this, SettingsActivity.class));
+            startActivity(new Intent(SignInActivity.this, SettingsActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
         }
     }
 }

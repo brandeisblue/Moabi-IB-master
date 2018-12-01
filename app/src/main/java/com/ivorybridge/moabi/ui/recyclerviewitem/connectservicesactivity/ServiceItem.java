@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.os.Process;
 import android.provider.Settings;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,18 +22,19 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.StackingBehavior;
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 import com.ivorybridge.moabi.R;
+import com.ivorybridge.moabi.database.entity.builtinfitness.BuiltInActivitySummary;
 import com.ivorybridge.moabi.database.entity.util.ConnectedService;
 import com.ivorybridge.moabi.database.entity.util.DataInUseMediatorLiveData;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.database.firebase.FirebaseManager;
 import com.ivorybridge.moabi.network.auth.FitbitAuthorizationRequest;
 import com.ivorybridge.moabi.network.auth.GoogleFitAPI;
+import com.ivorybridge.moabi.repository.BuiltInFitnessRepository;
 import com.ivorybridge.moabi.repository.DataInUseRepository;
+import com.ivorybridge.moabi.service.MotionSensorService;
 import com.ivorybridge.moabi.ui.activity.MainActivity;
+import com.ivorybridge.moabi.util.FormattedTime;
 import com.ivorybridge.moabi.viewmodel.DataInUseViewModel;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.items.AbstractItem;
@@ -102,14 +102,15 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
         SmoothCheckBox checkBox;
         private SharedPreferences usageSharedPreferences;
         private static final String USAGE_PREFERENCES = "UsagePref";
-        private DatabaseReference ConnectServicesRef;
         private FirebaseManager firebaseManager;
         private FitbitAuthorizationRequest fitbitAuthRequestMaker;
         private static final int REQUEST_LOCATION_PERMISSION_REQUEST_CODE = 12;
-        private ValueEventListener inputsInUseValueEventListener;
-        private ValueEventListener isConnectedValueEventListener;
         private DataInUseRepository dataInUseRepository;
+        private BuiltInFitnessRepository builtInFitnessRepository;
         private DataInUseViewModel dataInUseViewModel;
+        private FormattedTime formattedTime;
+        private SharedPreferences.Editor notificationSPEditor;
+        private TapTargetView tapTargetView;
 
         private ViewHolder(View view) {
             super(view);
@@ -119,17 +120,22 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
         @Override
         public void bindView(@NonNull final ServiceItem item, List<Object> payloads) {
             firebaseManager = new FirebaseManager();
-            ConnectServicesRef = firebaseManager.getConnectedServicesRef();
             usageSharedPreferences = item.mContext.getSharedPreferences(USAGE_PREFERENCES, Context.MODE_PRIVATE);
             final SharedPreferences.Editor usageEditor = usageSharedPreferences.edit();
             final Boolean shouldDisplayUsagePrompt = usageSharedPreferences.getBoolean("should_display_usage_permission_permission_prompt", true);
             checkBox.setEnabled(false);
             //inputInUseViewModel = ViewModelProviders.
             dataInUseRepository = new DataInUseRepository(item.mActivity.getApplication());
+            builtInFitnessRepository = new BuiltInFitnessRepository(item.mActivity.getApplication());
+            formattedTime = new FormattedTime();
             SharedPreferences getPrefs = PreferenceManager
                     .getDefaultSharedPreferences(itemView.getContext());
             SharedPreferences.Editor e = getPrefs.edit();
-            boolean tut1Complete = getPrefs.getBoolean("tut_1_complete", false);
+            boolean tut3Complete = getPrefs.getBoolean("tut_3_complete", false);
+            SharedPreferences notificationSharedPreferences = itemView.getContext().getSharedPreferences(
+                    itemView.getContext().getString(R.string.com_ivorybridge_mobai_NOTIFICATION_SHARED_PREFERENCE),
+                    Context.MODE_PRIVATE);
+            notificationSPEditor = notificationSharedPreferences.edit();
             // set each item's image and text
             final String itemType = item.itemType;
             if (itemType.equals(itemView.getContext().getString(R.string.phone_usage_camel_case))) {
@@ -152,10 +158,10 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                 iconImageView.setImageResource(R.drawable.ic_monogram_colored);
                 descriptionTextView.setText(R.string.moabi_tracker_description);
                 titleTextView.setText(R.string.moabi_tracker_title);
-                if (!tut1Complete) {
-                    TapTargetView.showFor(item.mActivity, TapTarget.forView(itemView.getRootView().findViewById(R.id.activity_connected_services_recyclerview_item_cardview),
+                if (!tut3Complete) {
+                    tapTargetView = TapTargetView.showFor(item.mActivity, TapTarget.forView(itemView.getRootView().findViewById(R.id.activity_connected_services_recyclerview_item_cardview),
                             itemView.getContext().getString(R.string.tutorial_connect_services_title),
-                            itemView.getContext().getString(R.string.tutorial_edit_entry_msg))
+                            "")
                                     .outerCircleColor(R.color.colorPrimary)
                                     .outerCircleAlpha(0.7f)
                                     .targetCircleColor(R.color.white)
@@ -187,17 +193,45 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                                     connectedService.setName(itemView.getContext().getString(R.string.moabi_tracker_camel_case));
                                     connectedService.setConnected(true);
                                     dataInUseRepository.insert(connectedService);
-                                    if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                        firebaseManager.getInputsInUseRef().child(itemView.getContext().getString(R.string.moabi_tracker_camel_case)).setValue(true);
-                                        firebaseManager.getIsConnectedRef().child(itemView.getContext().getString(R.string.moabi_tracker_camel_case)).setValue(true);
+                                    e.putBoolean("tut_3_complete", true);
+                                    boolean success = e.commit();
+                                    if (success) {
+                                        new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                BuiltInActivitySummary today = builtInFitnessRepository.getNow(formattedTime.getCurrentDateAsYYYYMMDD());
+                                                if (today == null) {
+                                                    BuiltInActivitySummary activitySummary = new BuiltInActivitySummary();
+                                                    activitySummary.setSteps(0L);
+                                                    activitySummary.setDistance(0d);
+                                                    activitySummary.setActiveMinutes(0L);
+                                                    activitySummary.setSedentaryMinutes(0L);
+                                                    activitySummary.setCalories(0d);
+                                                    activitySummary.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
+                                                    activitySummary.setLastSensorTimeStamp(formattedTime.getCurrentTimeInMilliSecs());
+                                                    activitySummary.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                                                    activitySummary.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                                                    builtInFitnessRepository.insert(activitySummary, formattedTime.getCurrentDateAsYYYYMMDD());
+                                                    notificationSPEditor.putBoolean(itemView.getContext().getString(R.string.preference_fitness_tracker_notification), true);
+                                                    notificationSPEditor.putString(itemView.getContext().getString(R.string.preference_fitness_tracker_source_notification),
+                                                            itemView.getContext().getString(R.string.moabi_tracker_title));
+                                                    notificationSPEditor.putString(itemView.getContext().getString(R.string.preference_fitness_tracker_activity_type_notification),
+                                                            itemView.getContext().getString(R.string.activity_steps_title));
+                                                    boolean writeSuccess = notificationSPEditor.commit();
+                                                    if (writeSuccess) {
+                                                        Intent intent = new Intent(itemView.getContext(), MotionSensorService.class);
+                                                        itemView.getContext().startService(intent);
+                                                    }
+                                                }
+                                            }
+                                        }).start();
                                     }
-                                    e.putBoolean("tut_1_complete", true);
-                                    e.commit();
                                     Handler handler = new Handler();
                                     handler.postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
                                             Intent tutorialIntent = new Intent(item.mActivity, MainActivity.class);
+                                            tutorialIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                                             itemView.getContext().startActivity(tutorialIntent);
                                         }
                                     }, 300);
@@ -205,7 +239,6 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                             });
                 }
             }
-
             initializeCheckBox(item, itemType, checkBox);
 
             cardView.setOnClickListener(new View.OnClickListener() {
@@ -221,11 +254,10 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                         connectedService.setType("tracker");
                         connectedService.setName(itemType);
                         connectedService.setConnected(false);
-                        dataInUseViewModel.insert(connectedService);
-                        dataInUseRepository.insert(inputInUse);
-                        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                            firebaseManager.getIsConnectedRef().child(itemType).setValue(false);
-                            firebaseManager.getInputsInUseRef().child(itemType).setValue(false);
+                        boolean inputInsert = dataInUseRepository.insert(inputInUse);
+                        boolean serviceInsert = dataInUseRepository.insert(connectedService);
+                        if (inputInsert && serviceInsert) {
+                            //resetTrackerNotification();
                         }
                     } else {
                         if (item.mContext != null && item.mActivity != null) {
@@ -241,14 +273,8 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                                     connectedService.setName(itemView.getContext().getString(R.string.phone_usage_camel_case));
                                     connectedService.setConnected(true);
                                     dataInUseRepository.insert(connectedService);
-                                    if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                        firebaseManager.getInputsInUseRef().child(itemView.getContext().getString(R.string.phone_usage_camel_case)).setValue(true);
-                                        firebaseManager.getIsConnectedRef().child(itemView.getContext().getString(R.string.phone_usage_camel_case)).setValue(true);
-                                    }
                                 } else {
-                                    if (shouldDisplayUsagePrompt) {
-                                        displayTrackAppUsageDialog(item, checkBox, usageEditor);
-                                    }
+                                    displayTrackAppUsageDialog(item, checkBox, usageEditor);
                                 }
                             } else if (itemType.equals(itemView.getContext().getString(R.string.fitbit_camel_case))) {
                                 displayConnectFitbitDialog(item, checkBox);
@@ -271,10 +297,6 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                                     connectedService.setName(itemView.getContext().getString(R.string.weather_camel_case));
                                     connectedService.setConnected(true);
                                     dataInUseRepository.insert(connectedService);
-                                    if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                        firebaseManager.getInputsInUseRef().child(itemView.getContext().getString(R.string.weather_camel_case)).setValue(true);
-                                        firebaseManager.getIsConnectedRef().child(itemView.getContext().getString(R.string.weather_camel_case)).setValue(true);
-                                    }
                                 } else {
                                     EasyPermissions.requestPermissions(item.mActivity, itemView.getContext().getString(R.string.location_rationale),
                                             REQUEST_LOCATION_PERMISSION_REQUEST_CODE, perms);
@@ -290,10 +312,33 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                                 connectedService.setName(itemView.getContext().getString(R.string.moabi_tracker_camel_case));
                                 connectedService.setConnected(true);
                                 dataInUseRepository.insert(connectedService);
-                                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                    firebaseManager.getInputsInUseRef().child(itemView.getContext().getString(R.string.moabi_tracker_camel_case)).setValue(true);
-                                    firebaseManager.getIsConnectedRef().child(itemView.getContext().getString(R.string.moabi_tracker_camel_case)).setValue(true);
-                                }
+                                /*
+                                notificationSPEditor.putString(itemView.getContext().getString(R.string.preference_fitness_tracker_source_notification),
+                                        itemView.getContext().getString(R.string.moabi_tracker_title));
+                                notificationSPEditor.putString(itemView.getContext().getString(R.string.preference_fitness_tracker_activity_type_notification),
+                                        itemView.getContext().getString(R.string.activity_steps_title));
+                                boolean success = notificationSPEditor.commit();*/
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        BuiltInActivitySummary today = builtInFitnessRepository.getNow(formattedTime.getCurrentDateAsYYYYMMDD());
+                                        if (today == null) {
+                                            BuiltInActivitySummary activitySummary = new BuiltInActivitySummary();
+                                            activitySummary.setSteps(0L);
+                                            activitySummary.setDistance(0d);
+                                            activitySummary.setActiveMinutes(0L);
+                                            activitySummary.setSedentaryMinutes(0L);
+                                            activitySummary.setCalories(0d);
+                                            activitySummary.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
+                                            activitySummary.setLastSensorTimeStamp(formattedTime.getCurrentTimeInMilliSecs());
+                                            activitySummary.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                                            activitySummary.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                                            builtInFitnessRepository.insert(activitySummary, formattedTime.getCurrentDateAsYYYYMMDD());
+                                            Intent intent = new Intent(itemView.getContext(), MotionSensorService.class);
+                                            itemView.getContext().startService(intent);
+                                        }
+                                    }
+                                }).start();
                             }
                         }
                     }
@@ -324,51 +369,12 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                     }
                 }
             });
-            /*
-            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                inputsInUseValueEventListener = firebaseManager.getInputsInUseRef().child(itemType).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot serviceInUse) {
-                        if (serviceInUse.getKey() != null) {
-                            Boolean isInUse = (Boolean) serviceInUse.getValue();
-                            if (isInUse != null && isInUse) {
-                                isConnectedValueEventListener = firebaseManager.getIsConnectedRef().child(itemType).addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot connectedService) {
-                                        if (connectedService.getKey() != null) {
-                                            Boolean isConnected = (Boolean) connectedService.getValue();
-                                            if (isConnected != null) {
-                                                checkBox.setChecked(isConnected);
-                                            }
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-            }*/
         }
 
         @Override
         public void unbindView(@NonNull ServiceItem item) {
-            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                if (isConnectedValueEventListener != null) {
-                    firebaseManager.getIsConnectedRef().removeEventListener(isConnectedValueEventListener);
-                }
-                if (inputsInUseValueEventListener != null) {
-                    firebaseManager.getInputsInUseRef().removeEventListener(inputsInUseValueEventListener);
-                }
+            if (tapTargetView != null) {
+                tapTargetView.dismiss(true);
             }
         }
 
@@ -405,13 +411,10 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                             connectedService.setName(itemView.getContext().getString(R.string.phone_usage_camel_case));
                             connectedService.setConnected(false);
                             dataInUseRepository.insert(connectedService);
-                            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                firebaseManager.getIsConnectedRef().child(itemView.getContext().getString(R.string.phone_usage_camel_case)).setValue(false);
-                                firebaseManager.getInputsInUseRef().child(itemView.getContext().getString(R.string.phone_usage_camel_case)).setValue(false);
-                            }
                             dialog.dismiss();
                         }
                     })
+                    /*
                     .checkBoxPrompt(itemView.getContext().getString(R.string.dont_ask_again_title), false, new CompoundButton.OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -420,7 +423,7 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                                 usageEditor.commit();
                             }
                         }
-                    })
+                    })*/
                     .show();
         }
 
@@ -456,10 +459,6 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                             connectedService.setName(itemView.getContext().getString(R.string.fitbit_camel_case));
                             connectedService.setConnected(false);
                             dataInUseRepository.insert(connectedService);
-                            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                firebaseManager.getIsConnectedRef().child(itemView.getContext().getString(R.string.fitbit_camel_case)).setValue(false);
-                                firebaseManager.getInputsInUseRef().child(itemView.getContext().getString(R.string.fitbit_camel_case)).setValue(false);
-                            }
                             item.mActivity.finish();
                             item.mActivity.overridePendingTransition(0, 0);
                             item.mActivity.startActivity(item.mActivity.getIntent().addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
@@ -502,10 +501,6 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                             connectedService.setName(itemView.getContext().getString(R.string.googlefit_camel_case));
                             connectedService.setConnected(false);
                             dataInUseRepository.insert(connectedService);
-                            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                firebaseManager.getIsConnectedRef().child(itemView.getContext().getString(R.string.googlefit_camel_case)).setValue(false);
-                                firebaseManager.getInputsInUseRef().child(itemView.getContext().getString(R.string.googlefit_camel_case)).setValue(false);
-                            }
                             dialog.dismiss();
                             item.mActivity.finish();
                             item.mActivity.overridePendingTransition(0, 0);
@@ -552,10 +547,6 @@ public class ServiceItem extends AbstractItem<ServiceItem, ServiceItem.ViewHolde
                             connectedService.setName(itemView.getContext().getString(R.string.googlefit_camel_case));
                             connectedService.setConnected(false);
                             dataInUseRepository.insert(connectedService);
-                            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                firebaseManager.getIsConnectedRef().child(itemView.getContext().getString(R.string.googlefit_camel_case)).setValue(false);
-                                firebaseManager.getInputsInUseRef().child(itemView.getContext().getString(R.string.googlefit_camel_case)).setValue(false);
-                            }
                             dialog.dismiss();
                             item.mActivity.finish();
                             item.mActivity.overridePendingTransition(0, 0);

@@ -5,8 +5,10 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,11 +18,13 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.ivorybridge.moabi.R;
+import com.ivorybridge.moabi.database.entity.util.DataInUseMediatorLiveData;
 import com.ivorybridge.moabi.repository.AsyncCallsMasterRepository;
 import com.ivorybridge.moabi.service.MotionSensorService;
 import com.ivorybridge.moabi.ui.adapter.FragmentAdapter;
@@ -28,6 +32,7 @@ import com.ivorybridge.moabi.ui.fragment.InsightFragment;
 import com.ivorybridge.moabi.ui.fragment.StatsFragment;
 import com.ivorybridge.moabi.ui.fragment.TodayFragment;
 import com.ivorybridge.moabi.util.FormattedTime;
+import com.ivorybridge.moabi.viewmodel.DataInUseViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -38,6 +43,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -76,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
     private Intent motionServiceIntent;
     private MotionSensorService motionSensorService;
     private int currentFragment = -1;
+    private DataInUseViewModel dataInUseViewModel;
+    private TapTargetView tapTargetView;
+    private TapTargetSequence tapTargetSequence;
 
     @Override
     protected void onPostResume() {
@@ -91,70 +100,8 @@ public class MainActivity extends AppCompatActivity {
         //  Make a new preferences editor
         SharedPreferences getPrefs = PreferenceManager
                 .getDefaultSharedPreferences(getBaseContext());
-        boolean tut1Complete = getPrefs.getBoolean("tut_1_complete", false);
         SharedPreferences.Editor e = getPrefs.edit();
-        e.putBoolean("tut_1_complete", false);
-        e.commit();
-        boolean tut2Complete = getPrefs.getBoolean("tut_2_complete", false);
-        if (!tut1Complete) {
-            showFABMenu();
-            TapTargetView.showFor(this, TapTarget.forView(findViewById(R.id.activity_main_make_entry_linearlayout1),
-                    getString(R.string.tutorial_main_welcome_msg),
-                    getString(R.string.tutorial_main_click_fab))
-                            .outerCircleColor(R.color.colorPrimary)
-                            .outerCircleAlpha(0.7f)
-                            .targetCircleColor(R.color.white)
-                            .titleTextSize(16)
-                            //.titleTextColor(R.color.colorPrimary)      // Specify the color of the title text
-                            .descriptionTextSize(16)            // Specify the size (in sp) of the description text
-                            //.descriptionTextColor(R.color.white)  // Specify the color of the description text
-                            .textColor(R.color.white)
-                            .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
-                            .dimColor(R.color.black)            // If set, will dim behind the view with 30% opacity of the given color
-                            .drawShadow(true)                   // Whether to draw a drop shadow or not
-                            .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
-                            .tintTarget(false)                   // Whether to tint the target view's color
-                            .transparentTarget(true)   // Specify whether the target is transparent (displays the content underneath)
-                            //.icon(ContextCompat.getDrawable(this, R.drawable.bg_rectangle_rounded_white))           // Specify a custom drawable to draw as the target
-                            .targetRadius(72),                  // Specify the target radius (in dp)
-                    new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
-                        @Override
-                        public void onTargetClick(TapTargetView view) {
-                            super.onTargetClick(view);      // This call is optional
-                            onClickMakeEntry(findViewById(R.id.activity_main_make_entry_linearlayout1));
-                            finish();
-                        }
-                    });
-        } else if (!tut2Complete) {
-            showFABMenu();
-            TapTargetView.showFor(this, TapTarget.forView(findViewById(R.id.activity_main_make_entry_linearlayout1),
-                    getString(R.string.tutorial_2_main_msg),
-                    getString(R.string.tutorial_main_click_fab))
-                            .outerCircleColor(R.color.colorPrimary)
-                            .outerCircleAlpha(0.7f)
-                            .targetCircleColor(R.color.white)
-                            .titleTextSize(16)
-                            //.titleTextColor(R.color.colorPrimary)      // Specify the color of the title text
-                            .descriptionTextSize(16)            // Specify the size (in sp) of the description text
-                            //.descriptionTextColor(R.color.white)  // Specify the color of the description text
-                            .textColor(R.color.white)
-                            .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
-                            .dimColor(R.color.black)            // If set, will dim behind the view with 30% opacity of the given color
-                            .drawShadow(true)                   // Whether to draw a drop shadow or not
-                            .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
-                            .tintTarget(false)                   // Whether to tint the target view's color
-                            .transparentTarget(true)   // Specify whether the target is transparent (displays the content underneath)
-                            //.icon(ContextCompat.getDrawable(this, R.drawable.bg_rectangle_rounded_white))           // Specify a custom drawable to draw as the target
-                            .targetRadius(72),                  // Specify the target radius (in dp)
-                    new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
-                        @Override
-                        public void onTargetClick(TapTargetView view) {
-                            super.onTargetClick(view);      // This call is optional
-                            onClickMakeEntry(findViewById(R.id.activity_main_make_entry_linearlayout1));
-                            finish();
-                        }
-                    });
-        }
+        dataInUseViewModel = ViewModelProviders.of(this).get(DataInUseViewModel.class);
         //  Edit preference to make it false because we don't want this to run again
         e.putBoolean("firstStart", false);
         //  Apply changes
@@ -165,11 +112,6 @@ public class MainActivity extends AppCompatActivity {
         lastFragEditor = lastFragmentSharedPreference.edit();
         isFABOpen = false;
         formattedTime = new FormattedTime();
-        motionSensorService = new MotionSensorService();
-        motionServiceIntent = new Intent(this, MotionSensorService.class);
-        if (!isMyServiceRunning(motionSensorService.getClass())) {
-            startService(motionServiceIntent);
-        }
         fabBGLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -256,24 +198,32 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         lastFragEditor.apply();
+        if (tapTargetView != null) {
+            tapTargetView.dismiss(true);
+        }
+        if (tapTargetSequence != null) {
+            tapTargetSequence.cancel();
+        }
         //closeFABMenu();
     }
 
     public void onClickMakeEntry(View v) {
         Intent intent = new Intent(MainActivity.this, MakeEntryActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
 
     public void onClickTrackActivity(View v) {
         Intent intent = new Intent(MainActivity.this, TimerActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
 
 
     public void onClickEditEntryTypes(View v) {
         Intent intent = new Intent(MainActivity.this, EditSurveyItemsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
-
     }
 
     @Override
@@ -294,59 +244,230 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Intent dateIntent = getIntent();
-        // if a user has selected a date, it will be passed as intent extra.
-        if (dateIntent != null) {
-            mDate = dateIntent.getStringExtra("date");
+        DataInUseMediatorLiveData dataInUseMediatorLiveData = new DataInUseMediatorLiveData(
+                dataInUseViewModel.getAllInputsInUse(), dataInUseViewModel.getAllConnectedServices());
+        SharedPreferences notificationSharedPreferences = getSharedPreferences(
+                getString(R.string.com_ivorybridge_mobai_NOTIFICATION_SHARED_PREFERENCE),
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor notificationSPEditor = notificationSharedPreferences.edit();
+        /*
+        dataInUseMediatorLiveData.observe(this, new Observer<Pair<List<InputInUse>, List<ConnectedService>>>() {
+            @Override
+            public void onChanged(Pair<List<InputInUse>, List<ConnectedService>> listListPair) {
+                Set<String> activitiesSet = new TreeSet<>();
+                if (listListPair.first != null && listListPair.first.size() > 0 &&
+                        listListPair.second != null && listListPair.second.size() > 0) {
+                    for (InputInUse inputInUse : listListPair.first) {
+                        if (inputInUse.isInUse()) {
+                            for (ConnectedService connectedService : listListPair.second) {
+                                if (connectedService.getName().equals(inputInUse.getName()) &&
+                                        connectedService.isConnected()) {
+                                    if (connectedService.getName().equals(getString(R.string.fitbit_camel_case))) {
+                                        activitiesSet.add("3" + connectedService.getName());
+                                        notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_source_notification),
+                                                getString(R.string.fitbit_title));
+                                        notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_activity_type_notification),
+                                                getString(R.string.activity_steps_title));
+                                        notificationSPEditor.commit();
+                                    } else if (connectedService.getName().equals(getString(R.string.googlefit_camel_case))) {
+                                        activitiesSet.add("2" + connectedService.getName());
+                                        notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_source_notification),
+                                                getString(R.string.googlefit_title));
+                                        notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_activity_type_notification),
+                                                getString(R.string.activity_steps_title));
+                                        notificationSPEditor.commit();
+                                    } else if (connectedService.getName().equals(getString(R.string.moabi_tracker_camel_case))) {
+                                        activitiesSet.add("0" + connectedService.getName());
+                                        notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_source_notification),
+                                                getString(R.string.moabi_tracker_title));
+                                        notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_activity_type_notification),
+                                                getString(R.string.activity_steps_title));
+                                        notificationSPEditor.commit();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                String[] activitiesArray = activitiesSet.toArray(new String[0]);
+                if (activitiesArray.length < 1) {
+                    notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_source_notification),
+                            null);
+                    notificationSPEditor.putString(getString(R.string.preference_fitness_tracker_activity_type_notification),
+                            null);
+                    notificationSPEditor.commit();
+                    Intent intent = new Intent(MainActivity.this, MotionSensorService.class);
+                    stopService(intent);
+                } else {
+                    Intent intent = new Intent(MainActivity.this, MotionSensorService.class);
+                    startService(intent);
+                }
+            }
+        });*/
+        SharedPreferences getPrefs = PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor e = getPrefs.edit();
+        boolean tut1Complete = getPrefs.getBoolean("tut_1_complete", false);
+        boolean tut2Complete = getPrefs.getBoolean("tut_2_complete", false);
+        boolean tut3Complete = getPrefs.getBoolean("tut_3_complete", false);
+        boolean tut4Complete = getPrefs.getBoolean("tut_4_complete", false);
+        Log.i(TAG, "Tutorial 1 - " + tut1Complete + " Tutorial 2 - " + tut2Complete
+        + " Tutorial 3 - " + tut3Complete + " Tutorial 4 - " + tut4Complete);
+        if (!tut1Complete || !tut2Complete || !tut3Complete) {
+            dataInUseViewModel.deleteAllInputs();
+            e.putBoolean("tut_1_complete", false);
+            e.putBoolean("tut_2_complete", false);
+            e.putBoolean("tut_3_complete", false);
+            e.commit();
+            e.apply();
         }
-        // if a user has not selected a date, pass today's date.
-        if (mDate == null) {
-            mDate = setUpDatesForToday();
-        }
-        TodayFragment todayFragment = new TodayFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("date", mDate);
-        Intent intent = getIntent();
-        if (intent.getStringExtra("redirected_from") != null &&
-                intent.getStringExtra("redirected_from").equals("SplashActivity")) {
-            bundle.putString("redirected_from", "SplashActivity");
-        }
-        todayFragment.setArguments(bundle);
-        InsightFragment insightFragment = new InsightFragment();
-        StatsFragment statsFragment = new StatsFragment();
-        switch (currentFragment) {
-            case -1:
-                setFabVisible();
-                loadFragment(todayFragment);
-                break;
-            case 0:
-                setFabVisible();
-                loadFragment(todayFragment);
-                break;
-            case 1:
-                setFabInvisible();
-                loadFragment(insightFragment);
-                break;
-            case 2:
-                setFabInvisible();
-                loadFragment(statsFragment);
-                break;
-        }
-        // set up viewpager to handle fragments on Resume
-        if (isFABOpen) {
-            closeFABMenu();
-        }
-        mAuth = FirebaseAuth.getInstance();
+        tut1Complete = getPrefs.getBoolean("tut_1_complete", false);
+        if (!tut1Complete) {
+            showFABMenu();
+            tapTargetView = TapTargetView.showFor(this, TapTarget.forView(findViewById(R.id.activity_main_make_entry_linearlayout1),
+                    getString(R.string.tutorial_main_welcome_msg),
+                    getString(R.string.tutorial_main_click_fab))
+                            .outerCircleColor(R.color.colorPrimary)
+                            .outerCircleAlpha(0.7f)
+                            .targetCircleColor(R.color.white)
+                            .titleTextSize(16)
+                            //.titleTextColor(R.color.colorPrimary)      // Specify the color of the title text
+                            .descriptionTextSize(16)            // Specify the size (in sp) of the description text
+                            //.descriptionTextColor(R.color.white)  // Specify the color of the description text
+                            .textColor(R.color.white)
+                            .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+                            .dimColor(R.color.black)            // If set, will dim behind the view with 30% opacity of the given color
+                            .drawShadow(true)                   // Whether to draw a drop shadow or not
+                            .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
+                            .tintTarget(false)                   // Whether to tint the target view's color
+                            .transparentTarget(true)   // Specify whether the target is transparent (displays the content underneath)
+                            //.icon(ContextCompat.getDrawable(this, R.drawable.bg_rectangle_rounded_white))           // Specify a custom drawable to draw as the target
+                            .targetRadius(72),                  // Specify the target radius (in dp)
+                    new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+                        @Override
+                        public void onTargetClick(TapTargetView view) {
+                            super.onTargetClick(view);// This call is optional
+                            e.putBoolean("tut_1_complete", true);
+                            e.commit();
+                            onClickMakeEntry(findViewById(R.id.activity_main_make_entry_linearlayout1));
+                        }
+                    });
+        } else {
+            //showFABMenu();
+            int width = this.getResources().getDisplayMetrics().widthPixels;
+            int height = this.getResources().getDisplayMetrics().heightPixels;
+            final Rect target = new Rect( width - convertDptoPixels(44), convertDptoPixels(40), width - convertDptoPixels(20), convertDptoPixels(64));
+            TapTarget tapTarget = TapTarget.forBounds(target, getString(R.string.tutorial_wrap_up_title));
+            //target.offset(display.getWidth() / 2, display.getHeight() / 2);
+            if (!tut4Complete) {
+                tapTargetView = TapTargetView.showFor(this, tapTarget
+                                .outerCircleColor(R.color.colorPrimary)
+                                .outerCircleAlpha(0.7f)
+                                .targetCircleColor(R.color.white)
+                                .titleTextSize(16)
+                                //.titleTextColor(R.color.colorPrimary)      // Specify the color of the title text
+                                .descriptionTextSize(16)            // Specify the size (in sp) of the description text
+                                //.descriptionTextColor(R.color.white)  // Specify the color of the description text
+                                .textColor(R.color.white)
+                                .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+                                .dimColor(R.color.black)            // If set, will dim behind the view with 30% opacity of the given color
+                                .drawShadow(true)                   // Whether to draw a drop shadow or not
+                                .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
+                                .tintTarget(false)                   // Whether to tint the target view's color
+                                .transparentTarget(true)   // Specify whether the target is transparent (displays the content underneath)
+                                //.icon(ContextCompat.getDrawable(this, R.drawable.bg_rectangle_rounded_white))           // Specify a custom drawable to draw as the target
+                                .targetRadius(24),                  // Specify the target radius (in dp)
+                        new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+                            @Override
+                            public void onTargetClick(TapTargetView view) {
+                                super.onTargetClick(view);// This call is optional
+                                e.putBoolean("tut_4_complete", true);
+                                e.commit();
+                            }
+                        });
+                /*
+                tapTargetSequence = new TapTargetSequence(this)
+                        .target(TapTarget.forBounds(target, getString(R.string.tutorial_wrap_up_title),
+                                getString(R.string.tutorial_main_click_fab))
+                                .outerCircleColor(R.color.colorPrimary)
+                                .outerCircleAlpha(0.7f)
+                                .targetCircleColor(R.color.white)
+                                .titleTextSize(16)
+                                //.icon(logo)
+                                .descriptionTextSize(16)            // Specify the size (in sp) of the description text
+                                .textColor(R.color.white)
+                                .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+                                .dimColor(R.color.black)            // If set, will dim behind the view with 30% opacity of the given color
+                                .drawShadow(true)                   // Whether to draw a drop shadow or not
+                                .cancelable(true)                  // Whether tapping outside the outer circle dismisses the view
+                                .tintTarget(false)                   // Whether to tint the target view's color
+                                .transparentTarget(true)
+                                .targetRadius(24));
+                tapTargetSequence.start();
+                tapTargetSequence.listener(new TapTargetSequence.Listener() {
+                    @Override
+                    public void onSequenceFinish() {
+                        e.putBoolean("tut_4_complete", true);
+                        e.commit();
+                    }
 
-        if (mAuth.getCurrentUser() != null) {
-            // set up date that will be passed to the TodayFragment.
+                    @Override
+                    public void onSequenceStep(TapTarget lastTarget, boolean targetClicked) {
 
+                    }
+
+                    @Override
+                    public void onSequenceCanceled(TapTarget lastTarget) {
+                    }
+                });*/
+            }
+            Intent dateIntent = getIntent();
+            // if a user has selected a date, it will be passed as intent extra.
+            if (dateIntent != null) {
+                mDate = dateIntent.getStringExtra("date");
+            }
+            // if a user has not selected a date, pass today's date.
+            if (mDate == null) {
+                mDate = setUpDatesForToday();
+            }
+            TodayFragment todayFragment = new TodayFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("date", mDate);
+            Intent intent = getIntent();
+            if (intent.getStringExtra("redirected_from") != null &&
+                    intent.getStringExtra("redirected_from").equals("SplashActivity")) {
+                bundle.putString("redirected_from", "SplashActivity");
+            }
+            todayFragment.setArguments(bundle);
+            InsightFragment insightFragment = new InsightFragment();
+            StatsFragment statsFragment = new StatsFragment();
+            switch (currentFragment) {
+                case -1:
+                    setFabVisible();
+                    loadFragment(todayFragment);
+                    break;
+                case 0:
+                    setFabVisible();
+                    loadFragment(todayFragment);
+                    break;
+                case 1:
+                    setFabInvisible();
+                    loadFragment(insightFragment);
+                    break;
+                case 2:
+                    setFabInvisible();
+                    loadFragment(statsFragment);
+                    break;
+            }
+            // set up viewpager to handle fragments on Resume
+            if (isFABOpen) {
+                closeFABMenu();
+            }
             if (mDate.equals(formattedTime.getCurrentDateAsYYYYMMDD())) {
                 asyncCallsMasterRepository = new AsyncCallsMasterRepository(this, mDate);
                 asyncCallsMasterRepository.makeCallsToConnectedServices();
             }
-            Log.i(TAG, "User is already signed in!");
-            //setupViewPager(viewPager);
+            mAuth = FirebaseAuth.getInstance();
         }
     }
 
@@ -364,7 +485,7 @@ public class MainActivity extends AppCompatActivity {
         isFABOpen = true;
         fab1LL.setVisibility(View.VISIBLE);
         fab2LL.setVisibility(View.VISIBLE);
-        fab3LL.setVisibility(View.VISIBLE);
+        //fab3LL.setVisibility(View.VISIBLE);
         fabBGLayout.setVisibility(View.VISIBLE);
         mFab.animate().rotationBy(135).setDuration(100);
         mFab.setExpanded(true);
@@ -442,34 +563,6 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
-        //fab1LL.animate().translationY(72).setDuration(100);
-        //fab2LL.animate().translationY(72).setDuration(100);
-        /*
-        fab3LL.animate().translationY(72).setDuration(100).setListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                if (!isFABOpen) {
-                    fab1LL.setVisibility(View.GONE);
-                    fab2LL.setVisibility(View.GONE);
-                    fab3LL.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        });*/
     }
 
     private void setFabVisible() {
@@ -545,7 +638,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finishAffinity();
+        SharedPreferences getPrefs = androidx.preference.PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext());
+        boolean tut4Complete = getPrefs.getBoolean("tut_4_complete", false);
+        boolean tut1Complete = getPrefs.getBoolean("tut_1_complete", false);
+        SharedPreferences.Editor e = getPrefs.edit();
+        if (!tut4Complete && tut1Complete) {
+            e.putBoolean("tut_3_complete", false);
+            //dataInUseViewModel.deleteAllInputs();
+            dataInUseViewModel.deleteAllConnectedServices();
+            e.commit();
+            Intent intent = new Intent(this, ConnectServicesActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivity(intent);
+        } else {
+            finishAffinity();
+        }
     }
 
     public void setNavigationVisibility(boolean shouldHide) {
@@ -585,5 +693,14 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.i("isMyServiceRunning?", false + "");
         return false;
+    }
+
+    public float convertPixelsToDp(float px){
+        return px / ((float) getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
+    public int convertDptoPixels(float dp){
+        float density = getResources().getDisplayMetrics().density;
+        return (int) Math.ceil(dp * density);
     }
 }

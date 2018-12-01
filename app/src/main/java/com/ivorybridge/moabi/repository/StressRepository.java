@@ -102,7 +102,6 @@ public class StressRepository {
                                 }
                             }
                         }
-                        firebaseManager.getDaysWithDataRef().child(date).child(application.getString(R.string.stress_camel_case)).setValue(true);
                     }
                 }
             }

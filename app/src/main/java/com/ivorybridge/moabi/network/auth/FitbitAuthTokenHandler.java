@@ -14,7 +14,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ivorybridge.moabi.R;
@@ -58,11 +57,17 @@ public class FitbitAuthTokenHandler {
     private DataInUseRepository dataInUseRepository;
     private CredentialRepository credentialRepository;
     private FormattedTime formattedTime;
+    private SharedPreferences notificationSharedPreferences;
+    private SharedPreferences.Editor notificationSPEditor;
 
     public FitbitAuthTokenHandler(AppCompatActivity activity, String redirectUri) {
         Log.i(TAG, TAG + " is created");
         mContext = activity.getApplicationContext();
         mRedirectUriString = redirectUri;
+        notificationSharedPreferences = mContext.getSharedPreferences(
+                mContext.getString(R.string.com_ivorybridge_mobai_NOTIFICATION_SHARED_PREFERENCE),
+                Context.MODE_PRIVATE);
+        notificationSPEditor = notificationSharedPreferences.edit();
         sharedpreferences = mContext.getSharedPreferences(
                 FITBIT_TOKEN_PREFERENCES, Context.MODE_PRIVATE);
         mFitbitEditor = sharedpreferences.edit();
@@ -78,7 +83,7 @@ public class FitbitAuthTokenHandler {
         credentialRepository = new CredentialRepository(activity.getApplication());
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putString("encodedCredentials", encodedCodeString);
-        editor.apply();
+        editor.commit();
         queue = Volley.newRequestQueue(mContext);
         StringRequest stringRequest = makePostRequest();
         Log.i(TAG, "Token Request is " + stringRequest);
@@ -113,6 +118,14 @@ public class FitbitAuthTokenHandler {
                         connectedService.setName(mContext.getString(R.string.fitbit_camel_case));
                         connectedService.setConnected(true);
                         dataInUseRepository.insert(connectedService);
+                        /*
+                        notificationSPEditor.putString(mContext.getString(R.string.preference_fitness_tracker_source_notification),
+                                mContext.getString(R.string.fitbit_title));
+                        notificationSPEditor.putString(mContext.getString(R.string.preference_fitness_tracker_activity_type_notification),
+                                mContext.getString(R.string.activity_steps_title));
+                        notificationSPEditor.commit();
+                        Intent intent = new Intent(mContext, MotionSensorService.class);
+                        mContext.startService(intent);*/
                         //firebaseManager.getIsConnectedRef().child(mContext.getString(R.string.fitbit_camel_case)).setValue(true);
                         //firebaseManager.getInputsInUseRef().child(mContext.getString(R.string.fitbit_camel_case)).setValue(true);
                         mFitbitEditor.putBoolean("isFitbitConnected", true);
@@ -127,10 +140,11 @@ public class FitbitAuthTokenHandler {
                         credential.setAccessToken((String) map.get("access_token"));
                         credential.setRefreshToken((String) map.get("refresh_token"));
                         credentialRepository.insert(credential);
+                        /*
                         if (FirebaseAuth.getInstance() != null) {
                             firebaseManager.getFitbitCredentialRef().updateChildren(map);
                             firebaseManager.getFitbitCredentialRef().child("time").setValue(formattedTime.getCurrentTimeAsHMMA());
-                        }
+                        }*/
                     }
                 }, new Response.ErrorListener() {
             @Override

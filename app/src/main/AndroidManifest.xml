@@ -83,16 +83,14 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.ConnectServicesActivity"
-            android:noHistory="true"
+            android:noHistory="false"
             android:parentActivityName=".ui.activity.MainActivity"
             android:screenOrientation="portrait"
             tools:node="replace">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data
                     android:host="logincallback/fitbit"
                     android:scheme="moabi" />

@@ -3,27 +3,45 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="24dp">
+    android:layout_marginTop="32dp">
 
-    <TextView
-        android:id="@+id/rv_item_insight_topthree_item_title_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/insight_top3_title"
-        android:textColor="@color/black"
-        android:textSize="14sp"
-        android:textStyle="bold" />
+    <RelativeLayout
+        android:id="@+id/rv_item_insight_topthree_item_title_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/rv_item_insight_topthree_item_title_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/insight_top3_title"
+            android:textColor="@color/black"
+            android:layout_centerVertical="true"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:tint="@color/darker_gray"
+            android:layout_alignParentEnd="true"
+            android:visibility="gone"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_more_vert_black_24dp" />
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/rv_item_insight_topthree_item_top1_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackground"
-        android:layout_below="@id/rv_item_insight_topthree_item_title_textview"
+        android:layout_below="@id/rv_item_insight_topthree_item_title_layout"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
 
         <LinearLayout
             android:id="@+id/rv_item_insight_topthree_item_top1_average_layout"
@@ -103,10 +121,10 @@
             android:id="@+id/rv_item_insight_topthree_item_top1_recommendation_checkbox"
             android:layout_width="18dp"
             android:layout_height="18dp"
-            android:clickable="false"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_gravity="end"
+            android:clickable="false"
             app:color_checked="@color/colorPrimary" />
     </RelativeLayout>
 
@@ -114,12 +132,12 @@
         android:id="@+id/rv_item_insight_topthree_item_top2_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackground"
         android:layout_below="@id/rv_item_insight_topthree_item_top1_layout"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
 
         <LinearLayout
             android:id="@+id/rv_item_insight_topthree_item_top2_average_layout"
@@ -195,6 +213,7 @@
                 app:srcCompat="@drawable/ic_arrow_downward_black" />
 
         </RelativeLayout>
+
         <cn.refactor.library.SmoothCheckBox
             android:id="@+id/rv_item_insight_topthree_item_top2_recommendation_checkbox"
             android:layout_width="18dp"
@@ -209,12 +228,12 @@
         android:id="@+id/rv_item_insight_topthree_item_top3_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackground"
         android:layout_below="@id/rv_item_insight_topthree_item_top2_layout"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
 
         <LinearLayout
             android:id="@+id/rv_item_insight_topthree_item_top3_average_layout"
@@ -295,8 +314,8 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:layout_alignParentEnd="true"
-            android:layout_gravity="end"
             android:layout_centerVertical="true"
+            android:layout_gravity="end"
             app:color_checked="@color/colorPrimary" />
 
     </RelativeLayout>

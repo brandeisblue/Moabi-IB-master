@@ -45,7 +45,7 @@
     <RelativeLayout
         android:id="@+id/fragment_profile_gender_layout"
         android:layout_width="match_parent"
-        android:layout_height="?android:listPreferredItemHeight"
+        android:layout_height="56dp"
         android:paddingStart="24dp"
         android:clickable="true"
         android:focusable="true"
@@ -74,7 +74,7 @@
     <RelativeLayout
         android:id="@+id/fragment_profile_dob_layout"
         android:layout_width="match_parent"
-        android:layout_height="?android:listPreferredItemHeight"
+        android:layout_height="56dp"
         android:clickable="true"
         android:focusable="true"
         android:background="?android:attr/selectableItemBackground"
@@ -104,7 +104,7 @@
     <RelativeLayout
         android:id="@+id/fragment_profile_age_layout"
         android:layout_width="match_parent"
-        android:layout_height="?android:listPreferredItemHeight"
+        android:layout_height="56dp"
         android:clickable="true"
         android:focusable="true"
         android:background="?android:attr/selectableItemBackground"
@@ -133,7 +133,7 @@
     <RelativeLayout
         android:id="@+id/fragment_profile_height_layout"
         android:layout_width="match_parent"
-        android:layout_height="?android:listPreferredItemHeight"
+        android:layout_height="56dp"
         android:clickable="true"
         android:focusable="true"
         android:background="?android:attr/selectableItemBackground"
@@ -162,7 +162,7 @@
     <RelativeLayout
         android:id="@+id/fragment_profile_weight_layout"
         android:layout_width="match_parent"
-        android:layout_height="?android:listPreferredItemHeight"
+        android:layout_height="56dp"
         android:clickable="true"
         android:focusable="true"
         android:background="?android:attr/selectableItemBackground"

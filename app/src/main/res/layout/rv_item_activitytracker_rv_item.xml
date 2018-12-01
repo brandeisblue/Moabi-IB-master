@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rv_item_activitytracker_item_relativelayout"
     android:layout_width="match_parent"
-    android:layout_height="324dp"
+    android:layout_height="288dp"
+    android:layout_marginTop="16dp"
     android:layout_marginStart="16dp"
     android:layout_marginEnd="16dp">
 
@@ -108,8 +109,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:orientation="horizontal"
-                    android:gravity="center_horizontal">
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/rv_item_activitytracker_item_first_activity_status_textview"
@@ -123,8 +124,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="  /"
                         android:layout_gravity="center_vertical"
+                        android:text="  /"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -141,6 +142,7 @@
                 android:id="@+id/rv_item_activitytracker_item_first_activity_name_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/darker_gray"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:gravity="center"
@@ -151,40 +153,56 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="76dp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/rv_item_activitytracker_item_progress_relativelayout"
-        android:layout_marginStart="36dp"
-        android:layout_marginEnd="36dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
         android:gravity="center">
 
         <LinearLayout
             android:id="@+id/rv_item_activitytracker_item_second_activity_linearlayout"
             android:layout_width="0dp"
             android:layout_height="48dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             android:layout_weight="1"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/rv_item_activitytracker_item_second_activity_status_textview"
+            <ImageView
+                android:id="@+id/rv_item_activitytracker_item_second_activity_imageview"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_steps_black" />
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="0"
-                android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/rv_item_activitytracker_item_second_activity_unit_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="@string/unit_step_sing"/>
+                <TextView
+                    android:id="@+id/rv_item_activitytracker_item_second_activity_status_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="0"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/rv_item_activitytracker_item_second_activity_unit_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="@string/unit_step_sing" />
+            </LinearLayout>
         </LinearLayout>
 
         <View
@@ -198,28 +216,43 @@
             android:layout_height="48dp"
             android:layout_weight="1"
             android:clickable="true"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/rv_item_activitytracker_item_third_activity_status_textview"
+            <ImageView
+                android:id="@+id/rv_item_activitytracker_item_third_activity_imageview"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_distance_black" />
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="0"
-                android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/rv_item_activitytracker_item_third_activity_unit_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="@string/unit_distance_si"/>
+                <TextView
+                    android:id="@+id/rv_item_activitytracker_item_third_activity_status_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="0"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/rv_item_activitytracker_item_third_activity_unit_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="@string/unit_distance_si" />
+            </LinearLayout>
         </LinearLayout>
 
         <View
@@ -231,30 +264,45 @@
             android:id="@+id/rv_item_activitytracker_item_fourth_activity_linearlayout"
             android:layout_width="0dp"
             android:layout_height="48dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             android:layout_weight="1"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/rv_item_activitytracker_item_fourth_activity_status_textview"
+            <ImageView
+                android:id="@+id/rv_item_activitytracker_item_fourth_activity_imageview"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_active_black" />
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="0"
-                android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/rv_item_activitytracker_item_fourth_activity_unit_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="@string/unit_time_sing"/>
+                <TextView
+                    android:id="@+id/rv_item_activitytracker_item_fourth_activity_status_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="0"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/rv_item_activitytracker_item_fourth_activity_unit_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="@string/unit_time_sing" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

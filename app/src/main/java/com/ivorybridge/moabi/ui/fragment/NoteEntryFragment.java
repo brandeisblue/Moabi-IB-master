@@ -78,8 +78,6 @@ public class NoteEntryFragment extends Fragment {
         firebaseManager = new FirebaseManager();
         collectiveHashTagRef = firebaseManager.getCollectiveHashTagsRef();
         personalHashTagRef = firebaseManager.getPersonalHashTagTodayRef();
-        personalHashTagLast30DaysRef = firebaseManager.getPersonalHashTagLast30DaysTodayRef();
-        activityHasDataRef = firebaseManager.getActivityDayWithDataRef();
     }
 
     @Override
@@ -222,6 +220,7 @@ public class NoteEntryFragment extends Fragment {
                 int currentItem = viewPager.getCurrentItem();
                 if (fragments.size() == 1 || currentItem == fragments.size() - 1) {
                     Intent intent = new Intent(getActivity(), MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent);
                 } else {
                     viewPager.setCurrentItem(currentItem + 1, true);

@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetView;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ValueEventListener;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
@@ -81,6 +80,7 @@ public class EntryItemItem extends AbstractItem<EntryItemItem, EntryItemItem.Vie
         private DataInUseRepository dataInUseRepository;
         private DataInUseViewModel dataInUseViewModel;
         private FirebaseManager firebaseManager;
+        private TapTargetView tapTargetView;
 
         public ViewHolder(View view) {
             super(view);
@@ -100,15 +100,15 @@ public class EntryItemItem extends AbstractItem<EntryItemItem, EntryItemItem.Vie
             SharedPreferences getPrefs = PreferenceManager
                     .getDefaultSharedPreferences(itemView.getContext());
             SharedPreferences.Editor e = getPrefs.edit();
-            boolean tut1Complete = getPrefs.getBoolean("tut_1_complete", false);
+            boolean tut2Complete = getPrefs.getBoolean("tut_2_complete", false);
             if (itemType.equals(itemView.getContext().getString(R.string.mood_and_energy_camel_case))) {
                 iconImageView.setImageResource(R.drawable.ic_emotion);
                 descriptionTextView.setText(itemView.getContext().getString(R.string.mood_and_energy_desc));
                 titleTextView.setText(itemView.getContext().getString(R.string.mood_and_energy_title));
-                if (!tut1Complete) {
-                    TapTargetView.showFor(item.activity, TapTarget.forView(itemView.getRootView().findViewById(R.id.activity_connected_services_recyclerview_item_cardview),
+                if (!tut2Complete) {
+                    tapTargetView = TapTargetView.showFor(item.activity, TapTarget.forView(itemView.getRootView().findViewById(R.id.activity_connected_services_recyclerview_item_cardview),
                             itemView.getContext().getString(R.string.tutorial_edit_entry_title),
-                            itemView.getContext().getString(R.string.tutorial_edit_entry_msg))
+                            "")
                                     .outerCircleColor(R.color.colorPrimary)
                                     .outerCircleAlpha(0.7f)
                                     .targetCircleColor(R.color.white)
@@ -135,14 +135,14 @@ public class EntryItemItem extends AbstractItem<EntryItemItem, EntryItemItem.Vie
                                     inputInUse.setName(itemType);
                                     inputInUse.setInUse(true);
                                     dataInUseRepository.insert(inputInUse);
-                                    if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                                        firebaseManager.getInputsInUseRef().child(itemType).setValue(true);
-                                    }
+                                    e.putBoolean("tut_2_complete", true);
+                                    e.commit();
                                     Handler handler = new Handler();
                                     handler.postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
                                             Intent tutorialIntent = new Intent(item.activity, ConnectServicesActivity.class);
+                                            tutorialIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                                             itemView.getContext().startActivity(tutorialIntent);
                                         }
                                     }, 300);
@@ -186,18 +186,12 @@ public class EntryItemItem extends AbstractItem<EntryItemItem, EntryItemItem.Vie
                         inputInUse.setName(itemType);
                         inputInUse.setInUse(false);
                         dataInUseRepository.insert(inputInUse);
-                        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                            firebaseManager.getInputsInUseRef().child(itemType).setValue(false);
-                        }
                     } else {
                         InputInUse inputInUse = new InputInUse();
                         inputInUse.setType("survey");
                         inputInUse.setName(itemType);
                         inputInUse.setInUse(true);
                         dataInUseRepository.insert(inputInUse);
-                        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                            firebaseManager.getInputsInUseRef().child(itemType).setValue(true);
-                        }
                         checkBox.setChecked(true, true);
                     }
                 }
@@ -232,6 +226,11 @@ public class EntryItemItem extends AbstractItem<EntryItemItem, EntryItemItem.Vie
         @Override
         public void unbindView(EntryItemItem item) {
             //personalCustomUserInputsInUseRef.removeEventListener(valueEventListener);
+            if (tapTargetView != null) {
+                tapTargetView.dismiss(true);
+            }
         }
+
+
     }
 }

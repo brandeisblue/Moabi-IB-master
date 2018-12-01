@@ -87,7 +87,6 @@ public class MoodEntryFragment extends Fragment {
         super.onAttach(context);
         mContext = context;
         firebaseManager = new FirebaseManager();
-        moodAndEnergyHasDataRef = firebaseManager.getMoodAndEnergyDayWithDataRef();
     }
 
     @Override
@@ -126,6 +125,7 @@ public class MoodEntryFragment extends Fragment {
         LinearLayout boredLL = (LinearLayout) mView.findViewById(R.id.fragment_mood_entry_bored_linearlayout);
         LinearLayout unhappyLL = (LinearLayout) mView.findViewById(R.id.fragment_mood_entry_unhappy_linearlayout);
         LinearLayout tenseLL = (LinearLayout) mView.findViewById(R.id.fragment_mood_entry_tense_linearlayout);
+        /*
         ImageView alertIV = (ImageView) mView.findViewById(R.id.fragment_mood_entry_alert_imageview);
         ImageView excitedIV = (ImageView) mView.findViewById(R.id.fragment_mood_entry_excited_imageview);
         ImageView happyIV = (ImageView) mView.findViewById(R.id.fragment_mood_entry_happy_imageview);
@@ -141,7 +141,7 @@ public class MoodEntryFragment extends Fragment {
         TextView tiredTV = (TextView) mView.findViewById(R.id.fragment_mood_entry_tired_textview);
         TextView boredTV = (TextView) mView.findViewById(R.id.fragment_mood_entry_bored_textview);
         TextView unhappyTV = (TextView) mView.findViewById(R.id.fragment_mood_entry_unhappy_textview);
-        TextView tenseTV = (TextView) mView.findViewById(R.id.fragment_mood_entry_tense_textview);
+        TextView tenseTV = (TextView) mView.findViewById(R.id.fragment_mood_entry_tense_textview);*/
         if (getActivity() != null) {
             alertLL.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -198,7 +198,6 @@ public class MoodEntryFragment extends Fragment {
                 }
             });
         }
-
         return mView;
     }
 
@@ -425,6 +424,7 @@ public class MoodEntryFragment extends Fragment {
                             Log.i(TAG, "# of fragments: " + userInputsInUseList.size() + ", " + "current position: " + currentItem);
                             if (userInputsInUseList.size() == 1 || currentItem == userInputsInUseList.size() - 1) {
                                 Intent intent = new Intent(getActivity(), MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                                 startActivity(intent);
                                 cancelAnimation(startBounds, startScale);
                             } else {
@@ -436,87 +436,6 @@ public class MoodEntryFragment extends Fragment {
                 }
             }
         });
-
-        /*
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                moodAndEnergyHasDataRef.setValue(true);
-                latestMoodAndEnergy.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
-                firebaseManager.getMoodAndEnergyLevelTodayRef().child(formattedTime.getCurrentTimeAsHHMM())
-                        .setValue(latestMoodAndEnergy);
-                firebaseManager.getMoodAndEnergyLast30DaysTodayRef()
-                        .child(formattedTime.getCurrentTimeAsHHMM()).setValue(latestMoodAndEnergy);
-                moodAndEnergyViewModel.insert(latestMoodAndEnergy, formattedTime.getCurrentDateAsYYYYMMDD());
-                moodAndEnergyViewModel.getEntries(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), 365),
-                        formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())).observe(getViewLifecycleOwner(), new Observer<List<MoodAndEnergy>>() {
-                    @Override
-                    public void onChanged(@Nullable List<MoodAndEnergy> moodAndEnergyList) {
-                        if (moodAndEnergyList != null) {
-                            if (moodAndEnergyList.size() > 0) {
-                                moodAndEnergyViewModel.processMood(moodAndEnergyList);
-                            }
-                        }
-                    }
-                });
-                if (getActivity() != null) {
-                    ViewPager viewPager = (ViewPager) getActivity().findViewById(R.id.activity_make_entry_viewpager);
-                    int currentItem = viewPager.getCurrentItem();
-                    if (fragments.size() == 1 || currentItem == fragments.size() - 1) {
-                        Intent intent = new Intent(getActivity(), MainActivity.class);
-                        startActivity(intent);
-                    } else {
-                        viewPager.setCurrentItem(currentItem + 1, true);
-                    }
-                }
-            }
-        });
-        mSubmitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSubmitButton.doResult(true);
-                moodAndEnergyHasDataRef.setValue(true);
-                latestMoodAndEnergy.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
-                firebaseManager.getMoodAndEnergyLevelTodayRef().child(formattedTime.getCurrentTimeAsHHMM())
-                        .setValue(latestMoodAndEnergy);
-                firebaseManager.getMoodAndEnergyLast30DaysTodayRef()
-                        .child(formattedTime.getCurrentTimeAsHHMM()).setValue(latestMoodAndEnergy);
-                moodAndEnergyViewModel.insert(latestMoodAndEnergy, formattedTime.getCurrentDateAsYYYYMMDD());
-                moodAndEnergyViewModel.getEntries(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), 365),
-                        formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())).observe(getViewLifecycleOwner(), new Observer<List<MoodAndEnergy>>() {
-                    @Override
-                    public void onChanged(@Nullable List<MoodAndEnergy> moodAndEnergyList) {
-                        if (moodAndEnergyList != null) {
-                            if (moodAndEnergyList.size() > 0) {
-                                moodAndEnergyViewModel.processMood(moodAndEnergyList);
-                            }
-                        }
-                    }
-                });
-                //setLineChartForMoodAndEnergy(7);
-            }
-
-        });
-
-        mSubmitButton.setOnResultEndListener(new SubmitButton.OnResultEndListener() {
-            @Override
-            public void onResultEnd() {
-                //FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                //fragmentTransaction.replace(mContainer.getId(), fragments.get(1));
-                //fragmentTransaction.commit();
-                if (getActivity() != null) {
-                    ViewPager viewPager = (ViewPager) getActivity().findViewById(R.id.activity_make_entry_viewpager);
-                    int currentItem = viewPager.getCurrentItem();
-                    if (fragments.size() == 1 || currentItem == fragments.size() - 1) {
-                        Intent intent = new Intent(getActivity(), MainActivity.class);
-                        startActivity(intent);
-
-                    } else {
-                        viewPager.setCurrentItem(currentItem + 1, true);
-                    }
-                }
-            }
-        });*/
     }
 
     private void cancelAnimation(Rect startBounds, float startScaleFinal) {

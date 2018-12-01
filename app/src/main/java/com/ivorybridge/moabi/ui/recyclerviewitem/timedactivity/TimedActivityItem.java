@@ -280,7 +280,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
                                 return convertToTimeString(value);
                             }
                         });
-                        int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white);
+                        int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.fui_transparent);
                         int startColor2 = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
                         List<GradientColor> gradientColors = new ArrayList<>();
                         gradientColors.add(new GradientColor(startColor1, startColor2));
@@ -425,7 +425,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
                                 return convertToTimeString(value);
                             }
                         });
-                        int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white);
+                        int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.fui_transparent);
                         int startColor2 = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
                         List<GradientColor> gradientColors = new ArrayList<>();
                         gradientColors.add(new GradientColor(startColor1, startColor2));
@@ -455,6 +455,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
             //lineChart.setDescription(description);
             barChart.getDescription().setEnabled(false);
             barChart.setNoDataText(itemView.getContext().getString(R.string.chart_no_entry));
+            barChart.setNoDataTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorPrimaryDarkComplt));
             //barChart.animateXY(3000, 3000);
             barChart.setTouchEnabled(true);
             barChart.setPinchZoom(false);

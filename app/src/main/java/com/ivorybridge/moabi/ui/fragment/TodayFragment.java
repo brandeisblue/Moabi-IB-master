@@ -281,6 +281,7 @@ public class TodayFragment extends Fragment implements
                             asyncCallsMasterRepository.makeCallsToConnectedServices();
                             Intent restartActivity = new Intent(getActivity(), MainActivity.class);
                             restartActivity.putExtra("date", formattedTime.getCurrentDateAsYYYYMMDD());
+                            restartActivity.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             startActivity(restartActivity);
                         } else {
                             asyncCallsMasterRepository.makeCallsToConnectedServices();
@@ -301,6 +302,7 @@ public class TodayFragment extends Fragment implements
                             switch (item.getItemId()) {
                                 case R.id.menu_settings:
                                     Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                                     getActivity().startActivity(intent);
                                     break;
                                 case R.id.menu_calendar:
@@ -351,6 +353,7 @@ public class TodayFragment extends Fragment implements
                                                         String date = sf2.format(convertedDate);
                                                         getActivity().finish();
                                                         Intent restartActivity = new Intent(getActivity(), MainActivity.class);
+                                                        restartActivity.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                                                         restartActivity.putExtra("date", date);
                                                         startActivity(restartActivity);
                                                     }
@@ -497,23 +500,36 @@ public class TodayFragment extends Fragment implements
                             }
                             if (inputMethodsWithDataList.size() > 0) {
                                 if (getContext() != null && getActivity() != null) {
-                                    activityTrackerItemItemAdapter.clear();
-                                    activityTrackerItemItemAdapter.add(new ActivityTrackerItem(
-                                            getContext(), (AppCompatActivity) getActivity(), TodayFragment.this,
-                                            inputMethodsWithDataList, mDate, unit));
+                                    if (inputMethodsWithDataList.contains(getString(R.string.fitbit_camel_case)) ||
+                                            inputMethodsWithDataList.contains(getString(R.string.googlefit_camel_case)) ||
+                                            inputMethodsWithDataList.contains(getString(R.string.moabi_tracker_camel_case))) {
+                                        activityTrackerItemItemAdapter.clear();
+                                        activityTrackerItemItemAdapter.add(new ActivityTrackerItem(
+                                                getContext(), (AppCompatActivity) getActivity(), TodayFragment.this,
+                                                inputMethodsWithDataList, mDate, unit));
+                                    } else {
+                                        activityTrackerItemItemAdapter.clear();
+                                    }
                                 }
                                 if (inputMethodsWithDataList.contains(getString(R.string.weather_camel_case))) {
                                     weatherLayout.setVisibility(View.VISIBLE);
                                 } else {
                                     weatherLayout.setVisibility(View.GONE);
                                 }
-                            }
-                            if (inputInUse.getName().equals(getString(R.string.phone_usage_camel_case))) {
-                                if (getContext() != null) {
+                                if (inputMethodsWithDataList.contains(getString(R.string.phone_usage_camel_case))) {
+                                    if (getContext() != null) {
+                                        appUsageItemItemAdapter.clear();
+                                        appUsageItemItemAdapter.add(new AppUsageItem(TodayFragment.this, mDate));
+                                    }
+                                } else {
                                     appUsageItemItemAdapter.clear();
-                                    appUsageItemItemAdapter.add(new AppUsageItem(TodayFragment.this, mDate));
                                 }
+                            } else {
+                                activityTrackerItemItemAdapter.clear();
+                                appUsageItemItemAdapter.clear();
+                                weatherLayout.setVisibility(View.GONE);
                             }
+
                             if (inputInUse.getName().equals(getString(R.string.mood_and_energy_camel_case))) {
                                 moodItemAdapter.clear();
                                 moodItemAdapter.add(new MoodItem(
@@ -550,110 +566,15 @@ public class TodayFragment extends Fragment implements
                                 timedActivityItemAdapter.clear();
                                 timedActivityItemAdapter.add(new TimedActivityItem(TodayFragment.this, mDate));
                             }
-                            if (inputInUse.getName().equals(getString(R.string.weather_camel_case))) {
-                                weatherLayout.setVisibility(View.VISIBLE);
-                            }
                             Log.i(TAG, inputTypes.toString());
                         }
                     }
-                } else {
+                } /*else {
                     mEmptyAdapter.clear();
                     mEmptyAdapter.add(new EmptyItem());
-                }
+                }*/
             }
         });
-        /*
-        dataInUseViewModel.getAllInputsInUse().observe(this, new Observer<List<InputInUse>>() {
-            @Override
-            public void onChanged(@Nullable List<InputInUse> inputInUseList) {
-                activityTrackerItemItemAdapter.clear();
-                appUsageItemItemAdapter.clear();
-                moodItemAdapter.clear();
-                energyItemAdapter.clear();
-                stressItemAdapter.clear();
-                phq9ItemAdapter.clear();
-                gad7ItemAdapter.clear();
-                dailyReviewItemAdapter.clear();
-                bAActivityItemAdapter.clear();
-                timedActivityItemAdapter.clear();
-                mEmptyAdapter.clear();
-                if (inputInUseList != null) {
-                    Set<String> inputTypes = new LinkedHashSet<>();
-                    List<String> inputMethodsWithDataList = new ArrayList<>();
-                    for (InputInUse inputInUse : inputInUseList) {
-                        if (inputInUse.isInUse()) {
-                            if (inputInUse.getName().equals(getString(R.string.fitbit_camel_case))) {
-                                inputMethodsWithDataList.add(getString(R.string.fitbit_camel_case));
-                            } else if (inputInUse.getName().equals(getString(R.string.googlefit_camel_case))) {
-                                inputMethodsWithDataList.add(getString(R.string.googlefit_camel_case));
-                            } else if (inputInUse.getName().equals(getString(R.string.moabi_tracker_camel_case))) {
-                                inputMethodsWithDataList.add(getString(R.string.moabi_tracker_camel_case));
-                            } else {
-                                inputTypes.add(inputInUse.getName());
-                            }
-                        }
-                    }
-                    if (inputMethodsWithDataList.size() > 0) {
-                        if (getContext() != null && getActivity() != null) {
-                            activityTrackerItemItemAdapter.clear();
-                            activityTrackerItemItemAdapter.add(new ActivityTrackerItem(
-                                    getContext(), (AppCompatActivity) getActivity(), TodayFragment.this,
-                                    inputMethodsWithDataList, mDate, unit));
-                        }
-                    }
-                    if (inputTypes.contains(getString(R.string.phone_usage_camel_case))) {
-                        if (getContext() != null) {
-                            appUsageItemItemAdapter.clear();
-                            appUsageItemItemAdapter.add(new AppUsageItem(TodayFragment.this, mDate));
-                        }
-                    }
-                    if (inputTypes.contains(getString(R.string.mood_and_energy_camel_case))) {
-                        moodItemAdapter.clear();
-                        moodItemAdapter.add(new MoodItem(
-                                TodayFragment.this, mDate));
-                        energyItemAdapter.clear();
-                        energyItemAdapter.add(new EnergyItem(
-                                TodayFragment.this, mDate));
-                    }
-                    if (inputTypes.contains(getString(R.string.stress_camel_case))) {
-                        stressItemAdapter.clear();
-                        stressItemAdapter.add(new StressItem(
-                                TodayFragment.this, mDate));
-                    }
-                    if (inputTypes.contains(getString(R.string.daily_review_camel_case))) {
-                        dailyReviewItemAdapter.clear();
-                        dailyReviewItemAdapter.add(new DailyReviewItem(
-                                TodayFragment.this, mDate));
-                    }
-                    if (inputTypes.contains(getString(R.string.depression_phq9_camel_case))) {
-                        phq9ItemAdapter.clear();
-                        phq9ItemAdapter.add(new Phq9Item(
-                                TodayFragment.this, mDate));
-                    }
-                    if (inputTypes.contains(getString(R.string.anxiety_gad7_camel_case))) {
-                        gad7ItemAdapter.clear();
-                        gad7ItemAdapter.add(new Gad7Item(
-                                TodayFragment.this, mDate));
-                    }
-                    if (inputTypes.contains(getString(R.string.baactivity_camel_case))) {
-                        bAActivityItemAdapter.clear();
-                        bAActivityItemAdapter.add(new BAActivityItem(TodayFragment.this, mDate));
-                    }
-                    if (inputTypes.contains(getString(R.string.timer_camel_case))) {
-                        timedActivityItemAdapter.clear();
-                        timedActivityItemAdapter.add(new TimedActivityItem(TodayFragment.this, mDate));
-                    }
-                    if (inputTypes.contains(getString(R.string.weather_camel_case))) {
-                        weatherLayout.setVisibility(View.VISIBLE);
-                    }
-                    Log.i(TAG, inputTypes.toString());
-                }
-                if (inputInUseList == null || inputInUseList.size() == 0) {
-                    mEmptyAdapter.clear();
-                    mEmptyAdapter.add(new EmptyItem());
-                }
-            }
-        });*/
         inputHistoryViewModel.getInputHistory(mDate).observe(this, new Observer<List<InputHistory>>() {
             @Override
             public void onChanged(@Nullable List<InputHistory> inputHistories) {
@@ -763,6 +684,7 @@ public class TodayFragment extends Fragment implements
             getActivity().finish();
         }
         Intent restartActivity = new Intent(getActivity(), MainActivity.class);
+        restartActivity.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         restartActivity.putExtra("date", date);
         startActivity(restartActivity);
         /*

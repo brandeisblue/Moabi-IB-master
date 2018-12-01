@@ -161,7 +161,6 @@ public class TimerService extends Service implements PropertyChangeListener {
                         .child(formattedTime.getCurrentDateAsYYYYMMDD())
                         .child(formattedTime.convertLongToHHMM(timedActivitySummary.getDateInLong()))
                         .child(name).setValue(timedActivitySummary.getDuration());
-                firebaseManager.getDaysWithDataTodayRef().child(getString(R.string.timer_camel_case)).setValue(true);
             }
         };
         registerReceiver(receiverSave, filterSave);

@@ -2,65 +2,72 @@
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.preference.PreferenceCategory android:title="Tracker"
+    <androidx.preference.PreferenceCategory
+        android:title="@string/preference_fitness_tracker_title"
         app:iconSpaceReserved="false">
 
         <androidx.preference.SwitchPreference
             android:key="fitness_tracker_preference"
-            app:iconSpaceReserved="false"
-            android:title="Fitness Tracker Notification" />
+            android:title="@string/preference_fitness_tracker_notification_title"
+            app:iconSpaceReserved="false" />
 
-        <androidx.preference.SwitchPreference
-            android:key="timer_preference"
-            app:iconSpaceReserved="false"
-            android:title="Timer Notification" />
+        <androidx.preference.ListPreference
+            android:dialogTitle="@string/preference_fitness_tracker_source_title"
+            android:fontFamily="@font/source_sans_pro"
+            android:key="fitness_tracker_source_preference"
+            android:title="@string/preference_fitness_tracker_source_title"
+            app:iconSpaceReserved="true" />
 
-        <androidx.preference.SwitchPreference
-            android:key="personal_goal_preference"
-            app:iconSpaceReserved="false"
-            android:title="Personal Goal Notification" />
+        <androidx.preference.ListPreference
+            android:dialogTitle="@string/preference_fitness_tracker_measure_title"
+            android:fontFamily="@font/source_sans_pro"
+            android:key="fitness_tracker_measures_preference"
+            android:title="@string/preference_fitness_tracker_measure_title"
+            app:iconSpaceReserved="true" />
 
     </androidx.preference.PreferenceCategory>
 
-    <androidx.preference.PreferenceCategory android:title="Reminder"
+    <androidx.preference.PreferenceCategory
+        android:title="@string/preference_stopwatch_title"
+        app:iconSpaceReserved="false">
+
+        <androidx.preference.SwitchPreference
+            android:key="timer_preference"
+            android:title="@string/preference_stopwatch_notification_title"
+            app:iconSpaceReserved="false" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:title="@string/preference_recommended_goal_title"
+        app:iconSpaceReserved="false">
+
+        <androidx.preference.SwitchPreference
+            android:key="personal_goal_preference"
+            android:title="@string/preference_recommended_goal_notification_title"
+            app:iconSpaceReserved="false" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:title="Reminder"
         app:iconSpaceReserved="false">
 
         <androidx.preference.SwitchPreference
             android:key="daily_check_in_preference"
-            app:iconSpaceReserved="false"
-            android:title="Daily Check-In Notification" />
+            android:title="Daily Check-In Notification"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:fontFamily="@font/source_sans_pro"
+            android:key="daily_check_in_time_preference"
+            android:title="@string/preference_check_in_time_title" />
 
         <androidx.preference.SwitchPreference
-            android:key="daily_cheers_preference"
-            app:iconSpaceReserved="false"
-            android:title="Daily Cheers Notification" />
+            android:key="cheers_preference"
+            android:title="@string/preference_cheers_notification_title"
+            app:iconSpaceReserved="false" />
 
     </androidx.preference.PreferenceCategory>
-
-    <!--
-    <androidx.preference.PreferenceCategory android:title=getString(R.string.stats_summary)
-        app:iconSpaceReserved="false">
-
-        <androidx.preference.SwitchPreference
-            android:key="daily_summary_preference"
-            app:iconSpaceReserved="false"
-            android:title="Today's Summary Notification" />
-
-        <androidx.preference.SwitchPreference
-            android:key="daily_summary_preference"
-            app:iconSpaceReserved="false"
-            android:title="Yesterday's Summary Notification" />
-
-        <androidx.preference.SwitchPreference
-            android:key="daily_summary_preference"
-            app:iconSpaceReserved="false"
-            android:title="Weekly Summary Notification" />
-
-        <androidx.preference.SwitchPreference
-            android:key="daily_summary_preference"
-            app:iconSpaceReserved="false"
-            android:title="Monthly Summary Notification" />
-
-    </androidx.preference.PreferenceCategory>-->
 
 </androidx.preference.PreferenceScreen>

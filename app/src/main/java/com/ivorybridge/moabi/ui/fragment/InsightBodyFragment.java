@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 
 import com.github.mikephil.charting.data.BarEntry;
@@ -26,20 +27,20 @@ import com.ivorybridge.moabi.database.entity.fitbit.FitbitActivitySummary;
 import com.ivorybridge.moabi.database.entity.fitbit.FitbitDailySummary;
 import com.ivorybridge.moabi.database.entity.fitbit.FitbitSleepSummary;
 import com.ivorybridge.moabi.database.entity.googlefit.GoogleFitSummary;
-import com.ivorybridge.moabi.database.entity.stats.InsightSummaryActivityMediatorLiveData;
-import com.ivorybridge.moabi.database.entity.stats.InsightSummaryBuiltInFitnessMediatorLiveData;
-import com.ivorybridge.moabi.database.entity.stats.InsightSummaryFitbitMediatorLiveData;
-import com.ivorybridge.moabi.database.entity.stats.InsightSummaryGoogleFitMediatorLiveData;
-import com.ivorybridge.moabi.database.entity.stats.InsightSummaryPhoneUsageMediatorLiveData;
-import com.ivorybridge.moabi.database.entity.stats.InsightSummaryTimerMediatorLiveData;
 import com.ivorybridge.moabi.database.entity.stats.SimpleRegressionSummary;
 import com.ivorybridge.moabi.database.entity.timedactivity.TimedActivitySummary;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.repository.AppUsageRepository;
+import com.ivorybridge.moabi.repository.BAActivityRepository;
+import com.ivorybridge.moabi.repository.BuiltInFitnessRepository;
+import com.ivorybridge.moabi.repository.FitbitRepository;
+import com.ivorybridge.moabi.repository.GoogleFitRepository;
 import com.ivorybridge.moabi.repository.TimedActivityRepository;
+import com.ivorybridge.moabi.repository.statistics.PredictionsRepository;
 import com.ivorybridge.moabi.ui.adapter.IconSpinnerAdapter;
 import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightBestAndWorstItem;
 import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightBodyAverageItem;
+import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightEmptyViewItem;
 import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightRecommendationItem;
 import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightTopThreeItem;
 import com.ivorybridge.moabi.util.FormattedTime;
@@ -68,7 +69,6 @@ import java.util.concurrent.TimeUnit;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -96,15 +96,23 @@ public class InsightBodyFragment extends Fragment {
     RadioButton sixMonthsButton;
     @BindView(R.id.fragment_insight_body_year_button)
     RadioButton yearButton;
+    @BindView(R.id.fragment_insight_body_chipgroup_container)
+    ScrollView chipGroupContainer;
     @BindView(R.id.fragment_insight_body_chipgroup)
     ChipGroup chipGroup;
     private GoogleFitViewModel googleFitViewModel;
+    private GoogleFitRepository googleFitRepository;
     private RegressionSummaryViewModel regressionSummaryViewModel;
+    private PredictionsRepository predictionsRepository;
     private DataInUseViewModel dataInUseViewModel;
     private BuiltInFitnessViewModel builtInFitnessViewModel;
+    private BuiltInFitnessRepository builtInFitnessRepository;
     private FitbitViewModel fitbitViewModel;
+    private FitbitRepository fitbitRepository;
     private AppUsageViewModel appUsageViewModel;
+    private AppUsageRepository appUsageRepository;
     private BAActivityViewModel activityViewModel;
+    private BAActivityRepository activityRepository;
     private TimedActivityRepository timedActivityRepository;
     private TimedActivityViewModel timedActivityViewModel;
     private FormattedTime formattedTime;
@@ -121,12 +129,14 @@ public class InsightBodyFragment extends Fragment {
     private Long TIMER = 9L;
     private int numOfDays = 7;
     private SharedPreferences bodyInsightPreferences;
+    private SharedPreferences unitSharedPreferences;
+    private String unit;
     private FastAdapter<IItem> recyclerAdapter;
+    private ItemAdapter<InsightEmptyViewItem> emptyViewItemAdapter;
     private ItemAdapter<InsightBodyAverageItem> averageItemItemAdapter;
     private ItemAdapter<InsightBestAndWorstItem> bestAndAverageItemItemAdapter;
     private ItemAdapter<InsightRecommendationItem> recommendationItemItemAdapter;
     private ItemAdapter<InsightTopThreeItem> topThreeItemItemAdapter;
-    private AppUsageRepository appUsageRepository;
 
 
     @Nullable
@@ -143,22 +153,32 @@ public class InsightBodyFragment extends Fragment {
         bodyInsightPreferences = getContext().getSharedPreferences(
                 getString(R.string.com_ivorybridge_moabi_BODY_INSIGHT_SHARED_PREFERENCE_KEY),
                 Context.MODE_PRIVATE);
+        unitSharedPreferences = getContext().getSharedPreferences(
+                getString(R.string.com_ivorybridge_moabi_UNIT_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
         yesterday = formattedTime.convertStringYYYYMMDDToLong(formattedTime.getYesterdaysDateAsYYYYMMDD());
         googleFitViewModel = ViewModelProviders.of(this).get(GoogleFitViewModel.class);
+        googleFitRepository = new GoogleFitRepository(getActivity().getApplication());
         appUsageViewModel = ViewModelProviders.of(this).get(AppUsageViewModel.class);
+        appUsageRepository = new AppUsageRepository(getActivity().getApplication());
         dataInUseViewModel = ViewModelProviders.of(this).get(DataInUseViewModel.class);
         regressionSummaryViewModel = ViewModelProviders.of(this).get(RegressionSummaryViewModel.class);
+        predictionsRepository = new PredictionsRepository(getActivity().getApplication());
         fitbitViewModel = ViewModelProviders.of(this).get(FitbitViewModel.class);
+        fitbitRepository = new FitbitRepository(getActivity().getApplication());
         builtInFitnessViewModel = ViewModelProviders.of(this).get(BuiltInFitnessViewModel.class);
+        builtInFitnessRepository = new BuiltInFitnessRepository(getActivity().getApplication());
         activityViewModel = ViewModelProviders.of(this).get(BAActivityViewModel.class);
+        activityRepository = new BAActivityRepository(getActivity().getApplication());
         timedActivityViewModel = ViewModelProviders.of(this).get(TimedActivityViewModel.class);
+        timedActivityRepository = new TimedActivityRepository(getActivity().getApplication());
         recyclerAdapter = new FastAdapter<>();
         averageItemItemAdapter = new ItemAdapter<>();
         bestAndAverageItemItemAdapter = new ItemAdapter<>();
         recommendationItemItemAdapter = new ItemAdapter<>();
         topThreeItemItemAdapter = new ItemAdapter<>();
+        emptyViewItemAdapter = new ItemAdapter<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
-        recyclerAdapter = FastAdapter.with(Arrays.asList(averageItemItemAdapter, bestAndAverageItemItemAdapter, topThreeItemItemAdapter, recommendationItemItemAdapter));
+        recyclerAdapter = FastAdapter.with(Arrays.asList(emptyViewItemAdapter, averageItemItemAdapter, bestAndAverageItemItemAdapter, topThreeItemItemAdapter, recommendationItemItemAdapter));
         recyclerview.setLayoutManager(layoutManager);
         recyclerview.setItemAnimator(new DefaultItemAnimator());
         recyclerview.setAdapter(recyclerAdapter);
@@ -200,28 +220,32 @@ public class InsightBodyFragment extends Fragment {
     }
 
     private void setSpinner(int numberOfDays) {
+        unit = unitSharedPreferences.getString(getString(R.string.com_ivorybridge_mobai_UNIT_KEY), getString(R.string.preference_unit_si_title));
         dataInUseViewModel.getAllInputsInUse().observe(getViewLifecycleOwner(), new Observer<List<InputInUse>>() {
             @Override
             public void onChanged(@Nullable List<InputInUse> inputInUses) {
                 if (inputInUses != null && inputInUses.size() > 0) {
                     Set<String> activitiesSet = new TreeSet<>();
                     for (InputInUse inputInUse : inputInUses) {
-                        if (inputInUse.getName().equals(getString(R.string.fitbit_camel_case))) {
-                            activitiesSet.add("5 Fitbit");
-                        } else if (inputInUse.getName().equals(getString(R.string.googlefit_camel_case))) {
-                            activitiesSet.add("6 Google Fit");
-                        } else if (inputInUse.getName().equals(getString(R.string.phone_usage_camel_case))) {
-                            activitiesSet.add("7 App Usage");
-                        } else if (inputInUse.getName().equals(getString(R.string.moabi_tracker_camel_case))) {
-                            activitiesSet.add("4 Moabi");
-                        } else if (inputInUse.getName().equals(getString(R.string.baactivity_camel_case))) {
-                            activitiesSet.add("8 Activity");
-                        } else if (inputInUse.getName().equals(getString(R.string.timer_camel_case))) {
-                            activitiesSet.add("9 Timer");
+                        if (inputInUse.isInUse()) {
+                            if (inputInUse.getName().equals(getString(R.string.fitbit_camel_case))) {
+                                activitiesSet.add("5 Fitbit");
+                            } else if (inputInUse.getName().equals(getString(R.string.googlefit_camel_case))) {
+                                activitiesSet.add("6 Google Fit");
+                            } else if (inputInUse.getName().equals(getString(R.string.phone_usage_camel_case))) {
+                                activitiesSet.add("7 App Usage");
+                            } else if (inputInUse.getName().equals(getString(R.string.moabi_tracker_camel_case))) {
+                                activitiesSet.add("4 Moabi");
+                            } else if (inputInUse.getName().equals(getString(R.string.baactivity_camel_case))) {
+                                activitiesSet.add("8 Activity");
+                            } else if (inputInUse.getName().equals(getString(R.string.timer_camel_case))) {
+                                activitiesSet.add("9 Timer");
+                            }
                         }
                     }
                     Log.i(TAG, activitiesSet.toString());
                     if (activitiesSet.size() > 0) {
+                        chipGroupContainer.setVisibility(View.VISIBLE);
                         String[] activitiesArray = activitiesSet.toArray(new String[0]);
                         int[] imagesArray = new int[activitiesSet.size()];
                         for (int i = 0; i < activitiesArray.length; i++) {
@@ -286,6 +310,15 @@ public class InsightBodyFragment extends Fragment {
                                 }
                             });
                         }
+                    } else {
+                        chipGroupContainer.setVisibility(View.GONE);
+                        emptyViewItemAdapter.clear();
+                        averageItemItemAdapter.clear();
+                        bestAndAverageItemItemAdapter.clear();
+                        topThreeItemItemAdapter.clear();
+                        recommendationItemItemAdapter.clear();
+                        InsightEmptyViewItem emptyViewItem = new InsightEmptyViewItem(getString(R.string.apps_and_services_camel_case));
+                        emptyViewItemAdapter.add(emptyViewItem);
                     }
                 }
             }
@@ -460,7 +493,6 @@ public class InsightBodyFragment extends Fragment {
         } else if (inputType.equals(APPUSAGE)) {
             if (getActivity() != null) {
                 appUsageRepository = new AppUsageRepository(getActivity().getApplication());
-
                 chipGroup.removeAllViews();
                 Set<Long> dates = new TreeSet<>();
                 Set<String> apps = new TreeSet<>();
@@ -553,7 +585,6 @@ public class InsightBodyFragment extends Fragment {
                                 Set<String> activities = new TreeSet<>();
                                 Map<String, Long> dataMap = new LinkedHashMap<>();
                                 Handler handler = new Handler();
-
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -673,305 +704,522 @@ public class InsightBodyFragment extends Fragment {
     }
 
     private void configureSummary(String activity, int numOfDays) {
-        if (inputType == FITBIT) {
-            InsightSummaryFitbitMediatorLiveData insightSummaryFitbitMediatorLiveData =
-                    new InsightSummaryFitbitMediatorLiveData(fitbitViewModel.getAll(
-                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())),
-                            regressionSummaryViewModel.getAllBodySummaries(
-                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                                    now, numOfDays));
-            insightSummaryFitbitMediatorLiveData.observe(getViewLifecycleOwner(), new Observer<Pair<List<FitbitDailySummary>, List<SimpleRegressionSummary>>>() {
+        SharedPreferences unitSharedPreferences = getContext().getSharedPreferences(
+                getString(R.string.com_ivorybridge_moabi_UNIT_SHARED_PREFERENCE_KEY),
+                Context.MODE_PRIVATE);
+        String unit = unitSharedPreferences.getString(getContext()
+                .getString(R.string.com_ivorybridge_mobai_UNIT_KEY),
+                getContext().getString(R.string.preference_unit_si_title));
+        if (inputType.equals(FITBIT)) {
+            Handler handler = new Handler();
+            Map<String, Double> activitySummaryMap = new LinkedHashMap<>();
+            final List<String> entryDatesList = new ArrayList<>();
+            final List<BarEntry> barEntries = new ArrayList<>();
+            Map<String, Double> dataByDayMap = new LinkedHashMap<>();
+            Map<String, Long> countByDayMap = new LinkedHashMap<>();
+            final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
+            new Thread(new Runnable() {
                 @Override
-                public void onChanged(@Nullable Pair<List<FitbitDailySummary>, List<SimpleRegressionSummary>> listListPair) {
-                    if (listListPair != null && listListPair.first != null && listListPair.second != null) {
-                        if (listListPair.first.size() > 0) {
-                            Handler handler = new Handler();
-                            Map<String, Double> activitySummaryMap = new LinkedHashMap<>();
-                            final List<String> entryDatesList = new ArrayList<>();
-                            final List<BarEntry> barEntries = new ArrayList<>();
-                            Map<String, Double> dataByDayMap = new LinkedHashMap<>();
-                            Map<String, Long> countByDayMap = new LinkedHashMap<>();
-                            final List<SimpleRegressionSummary> simpleRegressionSummaries = new ArrayList<>();
-                            final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (listListPair.second.size() > 0) {
-                                        simpleRegressionSummaries.addAll(listListPair.second);
-                                        Collections.sort(simpleRegressionSummaries, new SimpleRegressionSummary.BestFitComparator());
-                                        for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
-                                            if (simpleRegressionSummary.getDepVarTypeString().equals(getString(R.string.fitbit_camel_case)) && activity.replace(" ", "").toLowerCase().trim().equals(simpleRegressionSummary.getDepVar().toLowerCase())) {
-                                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) > 5) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    }
-                                                } else {
-                                                    sortedList.add(simpleRegressionSummary);
-                                                }
-                                                Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
-                                            }
-                                        }
+                public void run() {
+                    List<FitbitDailySummary> summaries = fitbitRepository.getAllNow(
+                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                    formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                    List<SimpleRegressionSummary> regressionSummaries =
+                            predictionsRepository.getAllBodySummariesNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                                    now, numOfDays);
+                    if (regressionSummaries != null && regressionSummaries.size() > 0) {
+                        Collections.sort(regressionSummaries, new SimpleRegressionSummary.BestFitComparator());
+                        for (SimpleRegressionSummary simpleRegressionSummary : regressionSummaries) {
+                            if (simpleRegressionSummary.getDepVarTypeString().equals(getString(R.string.fitbit_camel_case)) && activity.replace(" ", "").toLowerCase().trim().equals(simpleRegressionSummary.getDepVar().toLowerCase())) {
+                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
+                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
+                                        sortedList.add(simpleRegressionSummary);
+                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) > 5) {
+                                        sortedList.add(simpleRegressionSummary);
+                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
                                     }
-                                    for (int i = 1; i <= numOfDays; i++) {
-                                        String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
-                                        String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
-                                        Log.i(TAG, date);
-                                        dataByDayMap.put(date, 0d);
-                                        countByDayMap.put(date, 0L);
-                                    }
-                                    double total = 0;
-                                    for (FitbitDailySummary dailySummary : listListPair.first) {
-                                        FitbitActivitySummary activitySummary = dailySummary.getActivitySummary();
-                                        FitbitSleepSummary sleepSummary = dailySummary.getSleepSummary();
-                                        String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailySummary.getDate());
-                                        if (activity.equals(getString(R.string.activity_active_minutes_title))) {
-                                            activitySummaryMap.put(dailySummary.getDate(), activitySummary.getSummary().getFairlyActiveMinutes().doubleValue() + activitySummary.getSummary().getVeryActiveMinutes().doubleValue());
-                                            Long oldCount = countByDayMap.get(formattedDate);
-                                            countByDayMap.put(formattedDate, oldCount + 1L);
-                                            Double oldData = dataByDayMap.get(formattedDate);
-                                            dataByDayMap.put(formattedDate, oldData + activitySummary.getSummary().getFairlyActiveMinutes().doubleValue() + activitySummary.getSummary().getVeryActiveMinutes().doubleValue());
-                                        } else if (activity.equals(getString(R.string.activity_calories_title))) {
-                                            activitySummaryMap.put(dailySummary.getDate(), activitySummary.getSummary().getCaloriesOut().doubleValue());
-                                            Long oldCount = countByDayMap.get(formattedDate);
-                                            countByDayMap.put(formattedDate, oldCount + 1L);
-                                            Double oldData = dataByDayMap.get(formattedDate);
-                                            dataByDayMap.put(formattedDate, oldData + activitySummary.getSummary().getCaloriesOut().doubleValue());
-                                        } else if (activity.equals(getString(R.string.activity_distance_title))) {
-                                            activitySummaryMap.put(dailySummary.getDate(), activitySummary.getSummary().getDistances().get(0).getDistance());
-                                            Long oldCount = countByDayMap.get(formattedDate);
-                                            countByDayMap.put(formattedDate, oldCount + 1L);
-                                            Double oldData = dataByDayMap.get(formattedDate);
-                                            dataByDayMap.put(formattedDate, oldData + activitySummary.getSummary().getDistances().get(0).getDistance());
-                                        } else if (activity.equals(getString(R.string.activity_floors_title))) {
-                                            activitySummaryMap.put(dailySummary.getDate(), activitySummary.getSummary().getFloors().doubleValue());
-                                            Long oldCount = countByDayMap.get(formattedDate);
-                                            countByDayMap.put(formattedDate, oldCount + 1L);
-                                            Double oldData = dataByDayMap.get(formattedDate);
-                                            dataByDayMap.put(formattedDate, oldData + activitySummary.getSummary().getFloors().doubleValue());
-                                        } else if (activity.equals(getString(R.string.activity_sedentary_minutes_title))) {
-                                            activitySummaryMap.put(dailySummary.getDate(), activitySummary.getSummary().getSedentaryMinutes().doubleValue());
-                                            Long oldCount = countByDayMap.get(formattedDate);
-                                            countByDayMap.put(formattedDate, oldCount + 1L);
-                                            Double oldData = dataByDayMap.get(formattedDate);
-                                            dataByDayMap.put(formattedDate, oldData + activitySummary.getSummary().getSedentaryMinutes().doubleValue());
-                                        } else if (activity.equals(getString(R.string.activity_sleep_title))) {
-                                            activitySummaryMap.put(dailySummary.getDate(), sleepSummary.getSummary().getTotalMinutesAsleep().doubleValue());
-                                            Long oldCount = countByDayMap.get(formattedDate);
-                                            countByDayMap.put(formattedDate, oldCount + 1L);
-                                            Double oldData = dataByDayMap.get(formattedDate);
-                                            dataByDayMap.put(formattedDate, oldData + sleepSummary.getSummary().getTotalMinutesAsleep().doubleValue());
-                                        } else if (activity.equals(getString(R.string.activity_steps_title))) {
-                                            activitySummaryMap.put(dailySummary.getDate(), activitySummary.getSummary().getSteps().doubleValue());
-                                            Long oldCount = countByDayMap.get(formattedDate);
-                                            countByDayMap.put(formattedDate, oldCount + 1L);
-                                            Double oldData = dataByDayMap.get(formattedDate);
-                                            dataByDayMap.put(formattedDate, oldData + activitySummary.getSummary().getSteps().doubleValue());
-                                        }
-                                    }
-
-                                    int i = 0;
-                                    float bestValue = 0;
-                                    for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
-                                        float entryValue = 0;
-                                        total += entry.getValue();
-                                        if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
-                                            entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
-                                        }
-                                        if (entryValue > bestValue) {
-                                            bestValue = entryValue;
-                                        }
-                                        barEntries.add(new BarEntry(i, entryValue));
-                                        entryDatesList.add(entry.getKey());
-                                        i++;
-                                    }
-
-                                    Log.i(TAG, barEntries.toString());
-                                    Log.i(TAG, dataByDayMap.toString());
-                                    Log.i(TAG, countByDayMap.toString());
-                                    double average = total / listListPair.first.size();
-                                    final float finalValueToPass = bestValue;
-
-                                    Log.i(TAG, activitySummaryMap.toString());
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            averageItemItemAdapter.clear();
-                                            bestAndAverageItemItemAdapter.clear();
-                                            topThreeItemItemAdapter.clear();
-                                            recommendationItemItemAdapter.clear();
-                                            InsightBodyAverageItem averageItem = new InsightBodyAverageItem(activity, activitySummaryMap);
-                                            averageItemItemAdapter.add(averageItem);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(activity, barEntries, entryDatesList, average, finalValueToPass);
-                                            bestAndAverageItemItemAdapter.add(bestAndWorstItem);
-                                            if (sortedList.size() > 0) {
-                                                if (getActivity() != null) {
-                                                    topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getString(R.string.mood_camel_case), sortedList));
-                                                }
-                                            }
-                                        }
-                                    });
+                                } else {
+                                    sortedList.add(simpleRegressionSummary);
                                 }
-                            }).start();
+                                Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
+                            }
                         }
                     }
-                }
-            });
-        } else if (inputType == GOOGLEFIT) {
-            InsightSummaryGoogleFitMediatorLiveData insightSummaryGoogleFitMediatorLiveData =
-                    new InsightSummaryGoogleFitMediatorLiveData(googleFitViewModel.getAll(
-                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())),
-                            regressionSummaryViewModel.getAllBodySummaries(
-                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                                    now, numOfDays));
-            insightSummaryGoogleFitMediatorLiveData.observe(getViewLifecycleOwner(), new Observer<Pair<List<GoogleFitSummary>, List<SimpleRegressionSummary>>>() {
-                @Override
-                public void onChanged(@Nullable Pair<List<GoogleFitSummary>, List<SimpleRegressionSummary>> listListPair) {
-                    if (listListPair != null && listListPair.first != null && listListPair.second != null) {
-                        if (listListPair.first.size() > 0) {
-                            Handler handler = new Handler();
-                            Map<String, Double> activitySummaryMap = new LinkedHashMap<>();
-                            final List<String> entryDatesList = new ArrayList<>();
-                            final List<BarEntry> barEntries = new ArrayList<>();
-                            Map<String, Double> dataByDayMap = new LinkedHashMap<>();
-                            Map<String, Long> countByDayMap = new LinkedHashMap<>();
-                            final List<SimpleRegressionSummary> simpleRegressionSummaries = new ArrayList<>();
-                            final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (listListPair.second.size() > 0) {
-                                        simpleRegressionSummaries.addAll(listListPair.second);
-                                        Collections.sort(simpleRegressionSummaries, new SimpleRegressionSummary.BestFitComparator());
-                                        for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
-                                            if (simpleRegressionSummary.getDepVarTypeString().equals(getString(R.string.googlefit_camel_case)) && activity.replace(" ", "").toLowerCase().trim().equals(simpleRegressionSummary.getDepVar().toLowerCase())) {
-                                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) > 5) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    }
-                                                } else {
-                                                    sortedList.add(simpleRegressionSummary);
-                                                }
-                                                Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
-                                            }
-                                        }
-                                    }
-                                    for (int i = 1; i <= numOfDays; i++) {
-                                        String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
-                                        String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
-                                        Log.i(TAG, date);
-                                        dataByDayMap.put(date, 0d);
-                                        countByDayMap.put(date, 0L);
-                                    }
-                                    double total = 0;
-                                    for (GoogleFitSummary dailySummary : listListPair.first) {
-                                        List<GoogleFitSummary.Summary> summaries = dailySummary.getSummaries();
-                                        String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailySummary.getDate());
-                                        for (GoogleFitSummary.Summary summary : summaries) {
-                                            String name = summary.getName();
-                                            if (activity.equals(getString(R.string.activity_active_minutes_title))) {
-                                                if (name.equals(getString(R.string.activity_active_minutes_camel_case))) {
-                                                    Long minutes = TimeUnit.MILLISECONDS.toMinutes(summary.getValue().longValue());
-                                                    activitySummaryMap.put(dailySummary.getDate(), minutes.doubleValue());
-                                                    Long oldCount = countByDayMap.get(formattedDate);
-                                                    countByDayMap.put(formattedDate, oldCount + 1L);
-                                                    Double oldData = dataByDayMap.get(formattedDate);
-                                                    dataByDayMap.put(formattedDate, oldData + minutes.doubleValue());
-                                                }
-                                            } else if (activity.equals(getString(R.string.activity_calories_title))) {
-                                                if (name.equals(getString(R.string.activity_calories_camel_case))) {
-                                                    activitySummaryMap.put(dailySummary.getDate(), summary.getValue());
-                                                    Long oldCount = countByDayMap.get(formattedDate);
-                                                    countByDayMap.put(formattedDate, oldCount + 1L);
-                                                    Double oldData = dataByDayMap.get(formattedDate);
-                                                    dataByDayMap.put(formattedDate, oldData + summary.getValue());
-                                                }
-                                            } else if (activity.equals(getString(R.string.activity_distance_title))) {
-                                                if (name.equals(getString(R.string.activity_distance_camel_case))) {
-                                                    activitySummaryMap.put(dailySummary.getDate(), summary.getValue() / 1000);
-                                                    Long oldCount = countByDayMap.get(formattedDate);
-                                                    countByDayMap.put(formattedDate, oldCount + 1L);
-                                                    Double oldData = dataByDayMap.get(formattedDate);
-                                                    dataByDayMap.put(formattedDate, oldData + summary.getValue() / 1000);
-                                                }
-                                            } else if (activity.equals(getString(R.string.activity_sedentary_minutes_title))) {
-                                                if (name.equals(getString(R.string.activity_sedentary_minutes_camel_case))) {
-                                                    Long minutes = TimeUnit.MILLISECONDS.toMinutes(summary.getValue().longValue());
-                                                    activitySummaryMap.put(dailySummary.getDate(), minutes.doubleValue());
-                                                    Long oldCount = countByDayMap.get(formattedDate);
-                                                    countByDayMap.put(formattedDate, oldCount + 1L);
-                                                    Double oldData = dataByDayMap.get(formattedDate);
-                                                    dataByDayMap.put(formattedDate, oldData + minutes.doubleValue());
-                                                }
-                                            } else if (activity.equals(getString(R.string.activity_steps_title))) {
-                                                if (name.equals(getString(R.string.activity_steps_camel_case))) {
-                                                    activitySummaryMap.put(dailySummary.getDate(), summary.getValue());
-                                                    Long oldCount = countByDayMap.get(formattedDate);
-                                                    countByDayMap.put(formattedDate, oldCount + 1L);
-                                                    Double oldData = dataByDayMap.get(formattedDate);
-                                                    dataByDayMap.put(formattedDate, oldData + summary.getValue());
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    int i = 0;
-                                    float bestValue = 0;
-                                    for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
-                                        float entryValue = 0;
-                                        total += entry.getValue();
-                                        if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
-                                            entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
-                                        }
-                                        if (entryValue > bestValue) {
-                                            bestValue = entryValue;
-                                        }
-                                        barEntries.add(new BarEntry(i, entryValue));
-                                        entryDatesList.add(entry.getKey());
-                                        i++;
-                                    }
-
-                                    Log.i(TAG, barEntries.toString());
-                                    Log.i(TAG, dataByDayMap.toString());
-                                    Log.i(TAG, countByDayMap.toString());
-                                    double average = total / listListPair.first.size();
-                                    final float finalValueToPass = bestValue;
-
-                                    Log.i(TAG, activitySummaryMap.toString());
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            averageItemItemAdapter.clear();
-                                            bestAndAverageItemItemAdapter.clear();
-                                            topThreeItemItemAdapter.clear();
-                                            recommendationItemItemAdapter.clear();
-                                            InsightBodyAverageItem averageItem = new InsightBodyAverageItem(activity, activitySummaryMap);
-                                            averageItemItemAdapter.add(averageItem);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(activity, barEntries, entryDatesList, average, finalValueToPass);
-                                            bestAndAverageItemItemAdapter.add(bestAndWorstItem);
-                                            if (sortedList.size() > 0) {
-                                                if (getActivity() != null) {
-                                                    topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getString(R.string.mood_camel_case), sortedList));
-                                                }
-                                            }
-                                        }
-                                    });
-                                }
-                            }).start();
+                    if (summaries != null && summaries.size() > 0) {
+                        for (int i = 1; i <= numOfDays; i++) {
+                            String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                            String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
+                            Log.i(TAG, date);
+                            dataByDayMap.put(date, 0d);
+                            countByDayMap.put(date, 0L);
                         }
+                        for (FitbitDailySummary dailySummary : summaries) {
+                            FitbitActivitySummary activitySummary = dailySummary.getActivitySummary();
+                            FitbitSleepSummary sleepSummary = dailySummary.getSleepSummary();
+                            String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailySummary.getDate());
+                            if (activity.equals(getString(R.string.activity_active_minutes_title))) {
+                                activitySummaryMap.put(dailySummary.getDate(), activitySummary.getSummary().getFairlyActiveMinutes().doubleValue() + activitySummary.getSummary().getVeryActiveMinutes().doubleValue());
+                                Long oldCount = countByDayMap.get(formattedDate);
+                                countByDayMap.put(formattedDate, oldCount + 1L);
+                                Double oldData = dataByDayMap.get(formattedDate);
+                                dataByDayMap.put(formattedDate, oldData + activitySummary.getSummary().getFairlyActiveMinutes().doubleValue() + activitySummary.getSummary().getVeryActiveMinutes().doubleValue());
+                            } else if (activity.equals(getString(R.string.activity_calories_title))) {
+                                activitySummaryMap.put(dailySummary.getDate(), activitySummary.getSummary().getCaloriesOut().doubleValue());
+                                Long oldCount = countByDayMap.get(formattedDate);
+                                countByDayMap.put(formattedDate, oldCount + 1L);
+                                Double oldData = dataByDayMap.get(formattedDate);
+                                dataByDayMap.put(formattedDate, oldData + activitySummary.getSummary().getCaloriesOut().doubleValue());
+                            } else if (activity.equals(getString(R.string.activity_distance_title))) {
+                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                    activitySummaryMap.put(dailySummary.getDate(), activitySummary.getSummary().getDistances().get(0).getDistance());
+                                    Long oldCount = countByDayMap.get(formattedDate);
+                                    countByDayMap.put(formattedDate, oldCount + 1L);
+                                    Double oldData = dataByDayMap.get(formattedDate);
+                                    dataByDayMap.put(formattedDate, oldData + activitySummary.getSummary().getDistances().get(0).getDistance());
+                                } else {
+                                    activitySummaryMap.put(dailySummary.getDate(), activitySummary.getSummary().getDistances().get(0).getDistance() * 0.621371f);
+                                    Long oldCount = countByDayMap.get(formattedDate);
+                                    countByDayMap.put(formattedDate, oldCount + 1L);
+                                    Double oldData = dataByDayMap.get(formattedDate);
+                                    dataByDayMap.put(formattedDate, oldData + activitySummary.getSummary().getDistances().get(0).getDistance() * 0.62137f);
+                                }
+                            } else if (activity.equals(getString(R.string.activity_floors_title))) {
+                                activitySummaryMap.put(dailySummary.getDate(), activitySummary.getSummary().getFloors().doubleValue());
+                                Long oldCount = countByDayMap.get(formattedDate);
+                                countByDayMap.put(formattedDate, oldCount + 1L);
+                                Double oldData = dataByDayMap.get(formattedDate);
+                                dataByDayMap.put(formattedDate, oldData + activitySummary.getSummary().getFloors().doubleValue());
+                            } else if (activity.equals(getString(R.string.activity_sedentary_minutes_title))) {
+                                activitySummaryMap.put(dailySummary.getDate(), activitySummary.getSummary().getSedentaryMinutes().doubleValue());
+                                Long oldCount = countByDayMap.get(formattedDate);
+                                countByDayMap.put(formattedDate, oldCount + 1L);
+                                Double oldData = dataByDayMap.get(formattedDate);
+                                dataByDayMap.put(formattedDate, oldData + activitySummary.getSummary().getSedentaryMinutes().doubleValue());
+                            } else if (activity.equals(getString(R.string.activity_sleep_title))) {
+                                activitySummaryMap.put(dailySummary.getDate(), sleepSummary.getSummary().getTotalMinutesAsleep().doubleValue());
+                                Long oldCount = countByDayMap.get(formattedDate);
+                                countByDayMap.put(formattedDate, oldCount + 1L);
+                                Double oldData = dataByDayMap.get(formattedDate);
+                                dataByDayMap.put(formattedDate, oldData + sleepSummary.getSummary().getTotalMinutesAsleep().doubleValue());
+                            } else if (activity.equals(getString(R.string.activity_steps_title))) {
+                                activitySummaryMap.put(dailySummary.getDate(), activitySummary.getSummary().getSteps().doubleValue());
+                                Long oldCount = countByDayMap.get(formattedDate);
+                                countByDayMap.put(formattedDate, oldCount + 1L);
+                                Double oldData = dataByDayMap.get(formattedDate);
+                                dataByDayMap.put(formattedDate, oldData + activitySummary.getSummary().getSteps().doubleValue());
+                            }
+                        }
+
+                        int i = 0;
+                        float bestValue = 0;
+                        for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
+                            float entryValue = 0;
+                            if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
+                                entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
+                            }
+                            if (entryValue > bestValue) {
+                                bestValue = entryValue;
+                            }
+                            barEntries.add(new BarEntry(i, entryValue));
+                            entryDatesList.add(entry.getKey());
+                            i++;
+                        }
+
+                        double lowest = 0;
+                        double highest = 0;
+                        double total = 0;
+                        int index = 0;
+                        for (Map.Entry<String, Double> entry : activitySummaryMap.entrySet()) {
+                            if (index == 0) {
+                                lowest = entry.getValue();
+                                highest = entry.getValue();
+                            } else {
+                                if (entry.getValue() < lowest) {
+                                    lowest = entry.getValue();
+                                }
+                                else if (entry.getValue() > highest) {
+                                    highest = entry.getValue();
+                                }
+                            }
+                            total += entry.getValue();
+                            index++;
+                        }
+                        if (lowest == highest) {
+                            lowest = 0;
+                        }
+                        Log.i(TAG, activitySummaryMap.toString());
+                        Log.i(TAG, barEntries.toString());
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+                        double a = total / activitySummaryMap.size();
+                        final double average = a;
+                        final double lowestToPass = lowest;
+                        final double highestToPass = highest;
+                        final float finalValueToPass = bestValue;
+                        Log.i(TAG, average + ", " + lowestToPass + ", " + highestToPass);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                emptyViewItemAdapter.clear();
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightBodyAverageItem averageItem = new InsightBodyAverageItem(activity, lowestToPass, highestToPass, average);
+                                averageItemItemAdapter.add(averageItem);
+                                InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(activity, barEntries, entryDatesList, average, finalValueToPass);
+                                bestAndAverageItemItemAdapter.add(bestAndWorstItem);
+                                if (sortedList.size() > 0) {
+                                    if (getActivity() != null) {
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(),getString(R.string.mood_camel_case), sortedList));
+                                    }
+                                }
+                            }
+                        });
                     }
                 }
-            });
-        } else if (inputType == MOABI) {
+            }).start();
+        } else if (inputType.equals(GOOGLEFIT)) {
+            Handler handler = new Handler();
+            Map<String, Double> activitySummaryMap = new LinkedHashMap<>();
+            final List<String> entryDatesList = new ArrayList<>();
+            final List<BarEntry> barEntries = new ArrayList<>();
+            Map<String, Double> dataByDayMap = new LinkedHashMap<>();
+            Map<String, Long> countByDayMap = new LinkedHashMap<>();
+            final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    List<GoogleFitSummary> summaries = googleFitRepository.getAllNow(
+                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                    formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                    List<SimpleRegressionSummary> regressionSummaries =
+                            predictionsRepository.getAllBodySummariesNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                                    now, numOfDays);
+                    if (regressionSummaries != null && regressionSummaries.size() > 0) {
+                        Collections.sort(regressionSummaries, new SimpleRegressionSummary.BestFitComparator());
+                        for (SimpleRegressionSummary simpleRegressionSummary : regressionSummaries) {
+                            if (simpleRegressionSummary.getDepVarTypeString().equals(getString(R.string.googlefit_camel_case)) && activity.replace(" ", "").toLowerCase().trim().equals(simpleRegressionSummary.getDepVar().toLowerCase())) {
+                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
+                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
+                                        sortedList.add(simpleRegressionSummary);
+                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) > 5) {
+                                        sortedList.add(simpleRegressionSummary);
+                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                    }
+                                } else {
+                                    sortedList.add(simpleRegressionSummary);
+                                }
+                                Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
+                            }
+                        }
+                    }
+                    if (summaries != null && summaries.size() > 0) {
+                        for (int i = 1; i <= numOfDays; i++) {
+                            String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                            String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
+                            Log.i(TAG, date);
+                            dataByDayMap.put(date, 0d);
+                            countByDayMap.put(date, 0L);
+                        }
+                        for (GoogleFitSummary dailySummary : summaries) {
+                            List<GoogleFitSummary.Summary> gFitSummaries = dailySummary.getSummaries();
+                            String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailySummary.getDate());
+                            for (GoogleFitSummary.Summary summary : gFitSummaries) {
+                                String name = summary.getName();
+                                if (activity.equals(getString(R.string.activity_active_minutes_title))) {
+                                    if (name.equals(getString(R.string.activity_active_minutes_camel_case))) {
+                                        Long minutes = TimeUnit.MILLISECONDS.toMinutes(summary.getValue().longValue());
+                                        activitySummaryMap.put(dailySummary.getDate(), minutes.doubleValue());
+                                        Long oldCount = countByDayMap.get(formattedDate);
+                                        countByDayMap.put(formattedDate, oldCount + 1L);
+                                        Double oldData = dataByDayMap.get(formattedDate);
+                                        dataByDayMap.put(formattedDate, oldData + minutes.doubleValue());
+                                    }
+                                } else if (activity.equals(getString(R.string.activity_calories_title))) {
+                                    if (name.equals(getString(R.string.activity_calories_camel_case))) {
+                                        activitySummaryMap.put(dailySummary.getDate(), summary.getValue());
+                                        Long oldCount = countByDayMap.get(formattedDate);
+                                        countByDayMap.put(formattedDate, oldCount + 1L);
+                                        Double oldData = dataByDayMap.get(formattedDate);
+                                        dataByDayMap.put(formattedDate, oldData + summary.getValue());
+                                    }
+                                } else if (activity.equals(getString(R.string.activity_distance_title))) {
+                                    if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                        if (name.equals(getString(R.string.activity_distance_camel_case))) {
+                                            activitySummaryMap.put(dailySummary.getDate(), summary.getValue() / 1000);
+                                            Long oldCount = countByDayMap.get(formattedDate);
+                                            countByDayMap.put(formattedDate, oldCount + 1L);
+                                            Double oldData = dataByDayMap.get(formattedDate);
+                                            dataByDayMap.put(formattedDate, oldData + summary.getValue() / 1000);
+                                        }
+                                    } else {
+                                        if (name.equals(getString(R.string.activity_distance_camel_case))) {
+                                            activitySummaryMap.put(dailySummary.getDate(), summary.getValue() / 1000 * 0.62137f);
+                                            Long oldCount = countByDayMap.get(formattedDate);
+                                            countByDayMap.put(formattedDate, oldCount + 1L);
+                                            Double oldData = dataByDayMap.get(formattedDate);
+                                            dataByDayMap.put(formattedDate, oldData + summary.getValue() / 1000 * 0.62137f);
+                                        }
+                                    }
+                                } else if (activity.equals(getString(R.string.activity_sedentary_minutes_title))) {
+                                    if (name.equals(getString(R.string.activity_sedentary_minutes_camel_case))) {
+                                        Long minutes = TimeUnit.MILLISECONDS.toMinutes(summary.getValue().longValue());
+                                        activitySummaryMap.put(dailySummary.getDate(), minutes.doubleValue());
+                                        Long oldCount = countByDayMap.get(formattedDate);
+                                        countByDayMap.put(formattedDate, oldCount + 1L);
+                                        Double oldData = dataByDayMap.get(formattedDate);
+                                        dataByDayMap.put(formattedDate, oldData + minutes.doubleValue());
+                                    }
+                                } else if (activity.equals(getString(R.string.activity_steps_title))) {
+                                    if (name.equals(getString(R.string.activity_steps_camel_case))) {
+                                        activitySummaryMap.put(dailySummary.getDate(), summary.getValue());
+                                        Long oldCount = countByDayMap.get(formattedDate);
+                                        countByDayMap.put(formattedDate, oldCount + 1L);
+                                        Double oldData = dataByDayMap.get(formattedDate);
+                                        dataByDayMap.put(formattedDate, oldData + summary.getValue());
+                                    }
+                                }
+                            }
+                        }
+
+                        int i = 0;
+                        float bestValue = 0;
+                        for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
+                            float entryValue = 0;
+                            if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
+                                entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
+                            }
+                            if (entryValue > bestValue) {
+                                bestValue = entryValue;
+                            }
+                            barEntries.add(new BarEntry(i, entryValue));
+                            entryDatesList.add(entry.getKey());
+                            i++;
+                        }
+
+                        double lowest = 0;
+                        double highest = 0;
+                        double total = 0;
+                        int index = 0;
+                        for (Map.Entry<String, Double> entry : activitySummaryMap.entrySet()) {
+                            if (index == 0) {
+                                lowest = entry.getValue();
+                                highest = entry.getValue();
+                            } else {
+                                if (entry.getValue() < lowest) {
+                                    lowest = entry.getValue();
+                                }
+                                else if (entry.getValue() > highest) {
+                                    highest = entry.getValue();
+                                }
+                            }
+                            total += entry.getValue();
+                            index++;
+                        }
+                        if (lowest == highest) {
+                            lowest = 0;
+                        }
+                        Log.i(TAG, activitySummaryMap.toString());
+                        Log.i(TAG, barEntries.toString());
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+                        double a = total / activitySummaryMap.size();
+                        final double average = a;
+                        final double lowestToPass = lowest;
+                        final double highestToPass = highest;
+                        final float finalValueToPass = bestValue;
+                        Log.i(TAG, average + ", " + lowestToPass + ", " + highestToPass);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                emptyViewItemAdapter.clear();
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightBodyAverageItem averageItem = new InsightBodyAverageItem(activity, lowestToPass, highestToPass, average);
+                                averageItemItemAdapter.add(averageItem);
+                                InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(activity, barEntries, entryDatesList, average, finalValueToPass);
+                                bestAndAverageItemItemAdapter.add(bestAndWorstItem);
+                                if (sortedList.size() > 0) {
+                                    if (getActivity() != null) {
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(),getString(R.string.mood_camel_case), sortedList));
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            }).start();
+        } else if (inputType.equals(MOABI)) {
+            Handler handler = new Handler();
+            Map<String, Double> activitySummaryMap = new LinkedHashMap<>();
+            final List<String> entryDatesList = new ArrayList<>();
+            final List<BarEntry> barEntries = new ArrayList<>();
+            Map<String, Double> dataByDayMap = new LinkedHashMap<>();
+            Map<String, Long> countByDayMap = new LinkedHashMap<>();
+            final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    List<BuiltInActivitySummary> summaries = builtInFitnessRepository.getActivitySummariesNow(
+                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                    formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                    List<SimpleRegressionSummary> regressionSummaries =
+                            predictionsRepository.getAllBodySummariesNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                                    now, numOfDays);
+                    if (regressionSummaries != null && regressionSummaries.size() > 0) {
+                        Collections.sort(regressionSummaries, new SimpleRegressionSummary.BestFitComparator());
+                        for (SimpleRegressionSummary simpleRegressionSummary : regressionSummaries) {
+                            if (simpleRegressionSummary.getDepVarTypeString().equals(getString(R.string.moabi_tracker_camel_case)) && activity.replace(" ", "").toLowerCase().trim().equals(simpleRegressionSummary.getDepVar().toLowerCase())) {
+                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
+                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
+                                        sortedList.add(simpleRegressionSummary);
+                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) > 5) {
+                                        sortedList.add(simpleRegressionSummary);
+                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                    }
+                                } else {
+                                    sortedList.add(simpleRegressionSummary);
+                                }
+                                Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
+                            }
+                        }
+                    }
+                    if (summaries != null && summaries.size() > 0) {
+                        for (int i = 1; i <= numOfDays; i++) {
+                            String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                            String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
+                            Log.i(TAG, date);
+                            dataByDayMap.put(date, 0d);
+                            countByDayMap.put(date, 0L);
+                        }
+                        for (BuiltInActivitySummary dailySummary : summaries) {
+                            String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailySummary.getDate());
+                            if (activity.equals(getString(R.string.activity_active_minutes_title))) {
+                                activitySummaryMap.put(dailySummary.getDate(), (double) TimeUnit.MILLISECONDS.toMinutes(dailySummary.getActiveMinutes()));
+                                Long oldCount = countByDayMap.get(formattedDate);
+                                countByDayMap.put(formattedDate, oldCount + 1L);
+                                Double oldData = dataByDayMap.get(formattedDate);
+                                dataByDayMap.put(formattedDate, oldData + (double) TimeUnit.MILLISECONDS.toMinutes(dailySummary.getActiveMinutes()));
+                            } else if (activity.equals(getString(R.string.activity_calories_title))) {
+                                activitySummaryMap.put(dailySummary.getDate(), dailySummary.getCalories());
+                                Long oldCount = countByDayMap.get(formattedDate);
+                                countByDayMap.put(formattedDate, oldCount + 1L);
+                                Double oldData = dataByDayMap.get(formattedDate);
+                                dataByDayMap.put(formattedDate, oldData + dailySummary.getCalories());
+                            } else if (activity.equals(getString(R.string.activity_distance_title))) {
+                                if (unit.equals(getString(R.string.preference_unit_si_title))) {
+                                    activitySummaryMap.put(dailySummary.getDate(), dailySummary.getDistance() / 1000);
+                                    Long oldCount = countByDayMap.get(formattedDate);
+                                    countByDayMap.put(formattedDate, oldCount + 1L);
+                                    Double oldData = dataByDayMap.get(formattedDate);
+                                    dataByDayMap.put(formattedDate, oldData + dailySummary.getDistance() / 1000);
+                                } else {
+                                    activitySummaryMap.put(dailySummary.getDate(), dailySummary.getDistance() / 1000 * 0.62137f);
+                                    Long oldCount = countByDayMap.get(formattedDate);
+                                    countByDayMap.put(formattedDate, oldCount + 1L);
+                                    Double oldData = dataByDayMap.get(formattedDate);
+                                    dataByDayMap.put(formattedDate, oldData + dailySummary.getDistance() / 1000 * 0.62137f);
+                                }
+                            } else if (activity.equals(getString(R.string.activity_sedentary_minutes_title))) {
+                                activitySummaryMap.put(dailySummary.getDate(), (double) TimeUnit.MILLISECONDS.toMinutes(dailySummary.getSedentaryMinutes()));
+                                Long oldCount = countByDayMap.get(formattedDate);
+                                countByDayMap.put(formattedDate, oldCount + 1L);
+                                Double oldData = dataByDayMap.get(formattedDate);
+                                dataByDayMap.put(formattedDate, oldData + (double) TimeUnit.MILLISECONDS.toMinutes(dailySummary.getSedentaryMinutes()));
+                            } else if (activity.equals(getString(R.string.activity_steps_title))) {
+                                activitySummaryMap.put(dailySummary.getDate(), dailySummary.getSteps().doubleValue());
+                                Long oldCount = countByDayMap.get(formattedDate);
+                                countByDayMap.put(formattedDate, oldCount + 1L);
+                                Double oldData = dataByDayMap.get(formattedDate);
+                                dataByDayMap.put(formattedDate, oldData + dailySummary.getSteps().doubleValue());
+                            }
+                        }
+
+                        int i = 0;
+                        float bestValue = 0;
+                        for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
+                            float entryValue = 0;
+                            if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
+                                entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
+                            }
+                            if (entryValue > bestValue) {
+                                bestValue = entryValue;
+                            }
+                            barEntries.add(new BarEntry(i, entryValue));
+                            entryDatesList.add(entry.getKey());
+                            i++;
+                        }
+
+                        double lowest = 0;
+                        double highest = 0;
+                        double total = 0;
+                        int index = 0;
+                        for (Map.Entry<String, Double> entry : activitySummaryMap.entrySet()) {
+                            if (index == 0) {
+                                lowest = entry.getValue();
+                                highest = entry.getValue();
+                            } else {
+                                if (entry.getValue() < lowest) {
+                                    lowest = entry.getValue();
+                                }
+                                else if (entry.getValue() > highest) {
+                                    highest = entry.getValue();
+                                }
+                            }
+                            total += entry.getValue();
+                            index++;
+                        }
+                        if (lowest == highest) {
+                            lowest = 0;
+                        }
+                        Log.i(TAG, activitySummaryMap.toString());
+                        Log.i(TAG, barEntries.toString());
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+                        double a = total / activitySummaryMap.size();
+                        final double average = a;
+                        final double lowestToPass = lowest;
+                        final double highestToPass = highest;
+                        final float finalValueToPass = bestValue;
+                        Log.i(TAG, average + ", " + lowestToPass + ", " + highestToPass);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                emptyViewItemAdapter.clear();
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightBodyAverageItem averageItem = new InsightBodyAverageItem(activity, lowestToPass, highestToPass, average);
+                                averageItemItemAdapter.add(averageItem);
+                                InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(activity, barEntries, entryDatesList, average, finalValueToPass);
+                                bestAndAverageItemItemAdapter.add(bestAndWorstItem);
+                                if (sortedList.size() > 0) {
+                                    if (getActivity() != null) {
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(),getString(R.string.mood_camel_case), sortedList));
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            }).start();
+            /*
             InsightSummaryBuiltInFitnessMediatorLiveData insightSummaryBuiltInFitnessMediatorLiveData =
                     new InsightSummaryBuiltInFitnessMediatorLiveData(builtInFitnessViewModel.getAllSummaries(
                             formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
@@ -1094,7 +1342,7 @@ public class InsightBodyFragment extends Fragment {
                                             bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                             if (sortedList.size() > 0) {
                                                 if (getActivity() != null) {
-                                                    topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getString(R.string.mood_camel_case), sortedList));
+                                                    topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(),getString(R.string.mood_camel_case), sortedList));
                                                 }
                                             }
                                         }
@@ -1104,8 +1352,137 @@ public class InsightBodyFragment extends Fragment {
                         }
                     }
                 }
-            });
+            });*/
         } else if (inputType.equals(APPUSAGE)) {
+            Handler handler = new Handler();
+            Map<String, Double> activitySummaryMap = new LinkedHashMap<>();
+            final List<String> entryDatesList = new ArrayList<>();
+            final List<BarEntry> barEntries = new ArrayList<>();
+            Map<String, Double> dataByDayMap = new LinkedHashMap<>();
+            Map<String, Long> countByDayMap = new LinkedHashMap<>();
+            final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    List<AppUsageSummary> summaries = appUsageRepository.getAllNow(
+                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                    formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                    List<SimpleRegressionSummary> regressionSummaries =
+                            predictionsRepository.getAllBodySummariesNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                                    now, numOfDays);
+                    if (regressionSummaries != null && regressionSummaries.size() > 0) {
+                        Collections.sort(regressionSummaries, new SimpleRegressionSummary.BestFitComparator());
+                        for (SimpleRegressionSummary simpleRegressionSummary : regressionSummaries) {
+                            if (simpleRegressionSummary.getDepVarTypeString().equals(getString(R.string.phone_usage_camel_case))) {
+                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
+                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
+                                        sortedList.add(simpleRegressionSummary);
+                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) > 5) {
+                                        sortedList.add(simpleRegressionSummary);
+                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                    }
+                                } else {
+                                    sortedList.add(simpleRegressionSummary);
+                                }
+                                //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
+                            }
+                        }
+                    }
+                    if (summaries != null && summaries.size() > 0) {
+                        for (int i = 1; i <= numOfDays; i++) {
+                            String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                            String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
+                            Log.i(TAG, date);
+                            dataByDayMap.put(date, 0d);
+                            countByDayMap.put(date, 0L);
+                        }
+                        for (AppUsageSummary dailySummary : summaries) {
+                            String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailySummary.getDate());
+                            List<AppUsage> activities = dailySummary.getActivities();
+                            for (AppUsage appUsage : activities) {
+                                if (appUsage.getAppName().equals(activity)) {
+                                    activitySummaryMap.put(dailySummary.getDate(), (double) TimeUnit.MILLISECONDS.toMinutes(appUsage.getTotalTime()));
+                                    Long oldCount = countByDayMap.get(formattedDate);
+                                    countByDayMap.put(formattedDate, oldCount + 1L);
+                                    Double oldData = dataByDayMap.get(formattedDate);
+                                    dataByDayMap.put(formattedDate, oldData + (double) TimeUnit.MILLISECONDS.toMinutes(appUsage.getTotalTime()));
+                                }
+                            }
+                        }
+
+                        int i = 0;
+                        float bestValue = 0;
+                        for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
+                            float entryValue = 0;
+                            if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
+                                entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
+                            }
+                            if (entryValue > bestValue) {
+                                bestValue = entryValue;
+                            }
+                            barEntries.add(new BarEntry(i, entryValue));
+                            entryDatesList.add(entry.getKey());
+                            i++;
+                        }
+
+                        double lowest = 0;
+                        double highest = 0;
+                        double total = 0;
+                        int index = 0;
+                        for (Map.Entry<String, Double> entry : activitySummaryMap.entrySet()) {
+                            if (index == 0) {
+                                lowest = entry.getValue();
+                                highest = entry.getValue();
+                            } else {
+                                if (entry.getValue() < lowest) {
+                                    lowest = entry.getValue();
+                                }
+                                else if (entry.getValue() > highest) {
+                                    highest = entry.getValue();
+                                }
+                            }
+                            total += entry.getValue();
+                            index++;
+                        }
+                        if (lowest == highest) {
+                            lowest = 0;
+                        }
+                        Log.i(TAG, activitySummaryMap.toString());
+                        Log.i(TAG, barEntries.toString());
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+                        double a = total / activitySummaryMap.size();
+                        final double average = a;
+                        final double lowestToPass = lowest;
+                        final double highestToPass = highest;
+                        final float finalValueToPass = bestValue;
+                        Log.i(TAG, average + ", " + lowestToPass + ", " + highestToPass);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                emptyViewItemAdapter.clear();
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightBodyAverageItem averageItem = new InsightBodyAverageItem(getString(R.string.phone_usage_camel_case), lowestToPass, highestToPass, average);
+                                averageItemItemAdapter.add(averageItem);
+                                InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.phone_usage_camel_case), barEntries, entryDatesList, average, finalValueToPass);
+                                bestAndAverageItemItemAdapter.add(bestAndWorstItem);
+                                if (sortedList.size() > 0) {
+                                    if (getActivity() != null) {
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(),getString(R.string.mood_camel_case), sortedList));
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            }).start();
+            /*
             InsightSummaryPhoneUsageMediatorLiveData insightSummaryPhoneUsageMediatorLiveData =
                     new InsightSummaryPhoneUsageMediatorLiveData(appUsageViewModel.getAll(
                             formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
@@ -1208,6 +1585,7 @@ public class InsightBodyFragment extends Fragment {
                                                     topThreeItemItemAdapter.add(
                                                             new InsightTopThreeItem(
                                                                     InsightBodyFragment.this,
+                                                                    getActivity(),
                                                                     getString(R.string.mood_camel_case), sortedList));
                                                 }
                                             }
@@ -1218,8 +1596,143 @@ public class InsightBodyFragment extends Fragment {
                         }
                     }
                 }
-            });
+            });*/
         } else if (inputType.equals(ACTIVITY)) {
+            Handler handler = new Handler();
+            Map<String, Double> activitySummaryMap = new LinkedHashMap<>();
+            final List<String> entryDatesList = new ArrayList<>();
+            final List<BarEntry> barEntries = new ArrayList<>();
+            Map<String, Double> dataByDayMap = new LinkedHashMap<>();
+            Map<String, Long> countByDayMap = new LinkedHashMap<>();
+            final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    List<BAActivityEntry> summaries = activityRepository.getActivityEntriesNow(
+                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                    formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                    List<SimpleRegressionSummary> regressionSummaries =
+                            predictionsRepository.getAllBodySummariesNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                                    now, numOfDays);
+                    if (regressionSummaries != null && regressionSummaries.size() > 0) {
+                        Collections.sort(regressionSummaries, new SimpleRegressionSummary.BestFitComparator());
+                        for (SimpleRegressionSummary simpleRegressionSummary : regressionSummaries) {
+                            if (simpleRegressionSummary.getDepVarTypeString().equals(getString(R.string.baactivity_camel_case))) {
+                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
+                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
+                                        sortedList.add(simpleRegressionSummary);
+                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) > 5) {
+                                        sortedList.add(simpleRegressionSummary);
+                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                    }
+                                } else {
+                                    sortedList.add(simpleRegressionSummary);
+                                }
+                                //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
+                            }
+                        }
+                    }
+                    if (summaries != null && summaries.size() > 0) {
+                        for (int i = 1; i <= numOfDays; i++) {
+                            String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                            String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
+                            Log.i(TAG, date);
+                            dataByDayMap.put(date, 0d);
+                            countByDayMap.put(date, 0L);
+                        }
+
+                        double lowest = 0;
+                        double highest = 0;
+                        double total = 0;
+                        int index = 0;
+                        for (BAActivityEntry entry : summaries) {
+                            String yyyyMMDDDate = formattedTime.convertLongToYYYYMMDD(entry.getDateInLong());
+                            if (entry.getName().equals(activity)) {
+                                if (activitySummaryMap.get(yyyyMMDDDate) != null) {
+                                    Double count = activitySummaryMap.get(yyyyMMDDDate);
+                                    activitySummaryMap.put(yyyyMMDDDate, count + 1d);
+                                } else {
+                                    activitySummaryMap.put(yyyyMMDDDate, 1d);
+                                }
+                            }
+                        }
+
+                        for (Map.Entry<String, Double> entry : activitySummaryMap.entrySet()) {
+                            if (index == 0) {
+                                lowest = entry.getValue();
+                                highest = entry.getValue();
+                            } else {
+                                if (entry.getValue() < lowest) {
+                                    lowest = entry.getValue();
+                                }
+                                else if (entry.getValue() > highest) {
+                                    highest = entry.getValue();
+                                }
+                            }
+                            total += entry.getValue();
+                            index++;
+                            String eeeDate = formattedTime.convertStringYYYYMMDDToEEE(entry.getKey());
+                            Long oldCount = countByDayMap.get(eeeDate);
+                            countByDayMap.put(eeeDate, oldCount + 1L);
+                            Double oldData = dataByDayMap.get(eeeDate);
+                            dataByDayMap.put(eeeDate, oldData + entry.getValue());
+                        }
+                        if (lowest == highest) {
+                            lowest = 0;
+                        }
+
+                        int i = 0;
+                        float bestValue = 0;
+                        for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
+                            float entryValue = 0;
+                            if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
+                                entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
+                            }
+                            if (entryValue > bestValue) {
+                                bestValue = entryValue;
+                            }
+                            barEntries.add(new BarEntry(i, entryValue));
+                            entryDatesList.add(entry.getKey());
+                            i++;
+                        }
+
+                        Log.i(TAG, activitySummaryMap.toString());
+                        Log.i(TAG, barEntries.toString());
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+                        double a = total / activitySummaryMap.size();
+                        final double average = a;
+                        final double lowestToPass = lowest;
+                        final double highestToPass = highest;
+                        final float finalValueToPass = bestValue;
+
+                        Log.i(TAG, activitySummaryMap.toString());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                emptyViewItemAdapter.clear();
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightBodyAverageItem averageItem = new InsightBodyAverageItem(getString(R.string.baactivity_camel_case), lowestToPass, highestToPass, average);
+                                averageItemItemAdapter.add(averageItem);
+                                InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.baactivity_camel_case), barEntries, entryDatesList, average, finalValueToPass);
+                                bestAndAverageItemItemAdapter.add(bestAndWorstItem);
+                                if (sortedList.size() > 0) {
+                                    if (getActivity() != null) {
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(),getString(R.string.mood_camel_case), sortedList));
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            }).start();
+            /*
             InsightSummaryActivityMediatorLiveData insightSummaryActivityMediatorLiveData =
                     new InsightSummaryActivityMediatorLiveData(activityViewModel.getActivityEntries(
                             formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
@@ -1327,6 +1840,7 @@ public class InsightBodyFragment extends Fragment {
                                                     topThreeItemItemAdapter.add(
                                                             new InsightTopThreeItem(
                                                                     InsightBodyFragment.this,
+                                                                    getActivity(),
                                                                     getString(R.string.mood_camel_case), sortedList));
                                                 }
                                             }
@@ -1337,8 +1851,138 @@ public class InsightBodyFragment extends Fragment {
                         }
                     }
                 }
-            });
+            });*/
         } else if (inputType.equals(TIMER)) {
+            Handler handler = new Handler();
+            Map<String, Double> activitySummaryMap = new LinkedHashMap<>();
+            final List<String> entryDatesList = new ArrayList<>();
+            final List<BarEntry> barEntries = new ArrayList<>();
+            Map<String, Double> dataByDayMap = new LinkedHashMap<>();
+            Map<String, Long> countByDayMap = new LinkedHashMap<>();
+            final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    List<TimedActivitySummary> summaries = timedActivityRepository.getAllNow(
+                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                    formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                    List<SimpleRegressionSummary> regressionSummaries =
+                            predictionsRepository.getAllBodySummariesNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
+                                    now, numOfDays);
+                    if (regressionSummaries != null && regressionSummaries.size() > 0) {
+                        Collections.sort(regressionSummaries, new SimpleRegressionSummary.BestFitComparator());
+                        for (SimpleRegressionSummary simpleRegressionSummary : regressionSummaries) {
+                            if (simpleRegressionSummary.getDepVarTypeString().equals(getString(R.string.timer_camel_case))) {
+                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
+                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
+                                        sortedList.add(simpleRegressionSummary);
+                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) > 5) {
+                                        sortedList.add(simpleRegressionSummary);
+                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                    }
+                                } else {
+                                    sortedList.add(simpleRegressionSummary);
+                                }
+                                //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
+                            }
+                        }
+                    }
+                    if (summaries != null && summaries.size() > 0) {
+                        for (int i = 1; i <= numOfDays; i++) {
+                            String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                            String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
+                            //Log.i(TAG, date);
+                            dataByDayMap.put(date, 0d);
+                            countByDayMap.put(date, 0L);
+                        }
+                        for (TimedActivitySummary entry : summaries) {
+                            String yyyyMMDDDate = formattedTime.convertLongToYYYYMMDD(entry.getDateInLong());
+                            if (entry.getInputName().equals(activity)) {
+                                if (activitySummaryMap.get(yyyyMMDDDate) != null) {
+                                    Double old = activitySummaryMap.get(yyyyMMDDDate);
+                                    activitySummaryMap.put(yyyyMMDDDate, old + TimeUnit.MILLISECONDS.toMinutes(entry.getDuration()));
+                                } else {
+                                    activitySummaryMap.put(yyyyMMDDDate, (double) TimeUnit.MILLISECONDS.toMinutes(entry.getDuration()));
+                                }
+                            }
+                        }
+                        double lowest = 0;
+                        double highest = 0;
+                        double total = 0;
+                        int index = 0;
+                        for (Map.Entry<String, Double> entry : activitySummaryMap.entrySet()) {
+                            if (index == 0) {
+                                lowest = entry.getValue();
+                                highest = entry.getValue();
+                            } else {
+                                if (entry.getValue() < lowest) {
+                                    lowest = entry.getValue();
+                                }
+                                else if (entry.getValue() > highest) {
+                                    highest = entry.getValue();
+                                }
+                            }
+                            total += entry.getValue();
+                            index++;
+                            String eeeDate = formattedTime.convertStringYYYYMMDDToEEE(entry.getKey());
+                            Long oldCount = countByDayMap.get(eeeDate);
+                            countByDayMap.put(eeeDate, oldCount + 1L);
+                            Double oldData = dataByDayMap.get(eeeDate);
+                            dataByDayMap.put(eeeDate, oldData + entry.getValue());
+                        }
+                        int i = 0;
+                        float bestValue = 0;
+                        for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
+                            float entryValue = 0;
+                            if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
+                                entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
+                            }
+                            if (entryValue > bestValue) {
+                                bestValue = entryValue;
+                            }
+                            barEntries.add(new BarEntry(i, entryValue));
+                            entryDatesList.add(entry.getKey());
+                            i++;
+                        }
+                        if (lowest == highest) {
+                            lowest = 0;
+                        }
+                        Log.i(TAG, barEntries.toString());
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+                        double a = total / activitySummaryMap.size();
+                        final double average = a;
+                        final double lowestToPass = lowest;
+                        final double highestToPass = highest;
+                        final float finalValueToPass = bestValue;
+
+                        Log.i(TAG, activitySummaryMap.toString());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                emptyViewItemAdapter.clear();
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightBodyAverageItem averageItem = new InsightBodyAverageItem(getString(R.string.timer_camel_case), lowestToPass, highestToPass, average);
+                                averageItemItemAdapter.add(averageItem);
+                                InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.timer_camel_case), barEntries, entryDatesList, average, finalValueToPass);
+                                bestAndAverageItemItemAdapter.add(bestAndWorstItem);
+                                if (sortedList.size() > 0) {
+                                    if (getActivity() != null) {
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(),getString(R.string.mood_camel_case), sortedList));
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            }).start();
+            /*
             InsightSummaryTimerMediatorLiveData insightSummaryTimerMediatorLiveData =
                     new InsightSummaryTimerMediatorLiveData(timedActivityViewModel.getAll(
                             formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
@@ -1446,6 +2090,7 @@ public class InsightBodyFragment extends Fragment {
                                                     topThreeItemItemAdapter.add(
                                                             new InsightTopThreeItem(
                                                                     InsightBodyFragment.this,
+                                                                    getActivity(),
                                                                     getString(R.string.mood_camel_case), sortedList));
                                                 }
                                             }
@@ -1456,7 +2101,7 @@ public class InsightBodyFragment extends Fragment {
                         }
                     }
                 }
-            });
+            });*/
         }
     }
 

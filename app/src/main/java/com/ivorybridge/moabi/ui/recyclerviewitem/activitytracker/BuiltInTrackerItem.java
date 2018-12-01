@@ -106,6 +106,12 @@ public class BuiltInTrackerItem extends AbstractItem<BuiltInTrackerItem, BuiltIn
         TextView lastSyncTextTimeView;
         @BindView(R.id.rv_item_activitytracker_item_lastsynctime_linearlayout)
         LinearLayout lastSyncTimeLL;
+        @BindView(R.id.rv_item_activitytracker_item_second_activity_imageview)
+        ImageView secondActImageView;
+        @BindView(R.id.rv_item_activitytracker_item_third_activity_imageview)
+        ImageView thirdActImageView;
+        @BindView(R.id.rv_item_activitytracker_item_fourth_activity_imageview)
+        ImageView fourthActImageView;
         private SharedPreferences builtInFitnessSharedPreferences;
         private SharedPreferences.Editor builtInFitnessSPEditor;
         private SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener;
@@ -195,6 +201,7 @@ public class BuiltInTrackerItem extends AbstractItem<BuiltInTrackerItem, BuiltIn
             String activityStatusString = "";
             String activityGoalString = "";
             String activityUnitString = "";
+            int imageResource = R.drawable.ic_steps_black;
 
             int i = 0;
             for (String selectedActivity : selectedActivitiesInOrder) {
@@ -206,15 +213,17 @@ public class BuiltInTrackerItem extends AbstractItem<BuiltInTrackerItem, BuiltIn
                             activityGoalDouble = (double) goalMap.get(selectedActivity);
                             activityProgress = (float) activityStatusDouble / (float) activityGoalDouble * 10000;
                             activityStatusString = String.format(Locale.US, "%.2f", activityStatusDouble);
-                            activityGoalString = String.format(Locale.US, "%.2f", activityGoalDouble) + " " + itemView.getContext().getString(R.string.unit_distance_si);
+                            activityGoalString = String.format(Locale.US, "%.2f", activityGoalDouble) + " ";
                             activityUnitString = " " + itemView.getContext().getString(R.string.unit_distance_si);
+                            imageResource = R.drawable.ic_distance_black;
                         } else {
                             activityStatusDouble = (double) summaryMap.get(selectedActivity) / 1000 * 0.62137119;
                             activityGoalDouble = (double) goalMap.get(selectedActivity) * 0.62137119;
                             activityProgress = (float) activityStatusDouble / (float) activityGoalDouble * 10000;
                             activityStatusString = String.format(Locale.US, "%.2f", activityStatusDouble);
-                            activityGoalString = String.format(Locale.US, "%.2f", activityGoalDouble) + " " + itemView.getContext().getString(R.string.unit_distance_usc);
+                            activityGoalString = String.format(Locale.US, "%.2f", activityGoalDouble) + " ";
                             activityUnitString = " " + itemView.getContext().getString(R.string.unit_distance_usc);
+                            imageResource = R.drawable.ic_distance_black;
                         }
                     } else {
                         activityStatusLong = (long) summaryMap.get(selectedActivity);
@@ -229,32 +238,38 @@ public class BuiltInTrackerItem extends AbstractItem<BuiltInTrackerItem, BuiltIn
                             } else {
                                 activityUnitString = " " + itemView.getContext().getString(R.string.unit_time_sing);
                             }
+                            imageResource = R.drawable.ic_sleep_black;
                         } else if (selectedActivity.equals(itemView.getContext().getString(R.string.activity_active_minutes_title))) {
                             if (activityStatusLong > 1) {
                                 activityUnitString = " " + itemView.getContext().getString(R.string.unit_time_plur);
                             } else {
                                 activityUnitString = " " + itemView.getContext().getString(R.string.unit_time_sing);
                             }
+                            imageResource = R.drawable.ic_active_black;
                         } else if (selectedActivity.equals(itemView.getContext().getString(R.string.activity_sedentary_minutes_title))) {
                             if (activityStatusLong > 1) {
                                 activityUnitString = " " + itemView.getContext().getString(R.string.unit_time_plur);
                             } else {
                                 activityUnitString = " " + itemView.getContext().getString(R.string.unit_time_sing);
                             }
+                            imageResource = R.drawable.ic_sedentary_black;
                         } else if (selectedActivity.equals(itemView.getContext().getString(R.string.activity_steps_title))) {
                             if (activityStatusLong > 1) {
                                 activityUnitString = " " + itemView.getContext().getString(R.string.unit_step_plur);
                             } else {
                                 activityUnitString = " " + itemView.getContext().getString(R.string.unit_step_sing);
                             }
+                            imageResource = R.drawable.ic_steps_black;
                         } else if (selectedActivity.equals(itemView.getContext().getString(R.string.activity_calories_title))) {
-                                activityUnitString = " " + itemView.getContext().getString(R.string.unit_calories);
+                            activityUnitString = " " + itemView.getContext().getString(R.string.unit_calories);
+                            imageResource = R.drawable.ic_calories_black;
                         } else if (selectedActivity.equals(itemView.getContext().getString(R.string.activity_floors_title))) {
                             if (activityStatusLong > 1) {
                                 activityUnitString = " " + itemView.getContext().getString(R.string.unit_floor_plur);
                             } else {
                                 activityUnitString = " " + itemView.getContext().getString(R.string.unit_floor_sing);
                             }
+                            imageResource = R.drawable.ic_floors_black;
                         }
                     }
                     activityPercent = (int) Math.ceil(activityProgress);
@@ -276,14 +291,17 @@ public class BuiltInTrackerItem extends AbstractItem<BuiltInTrackerItem, BuiltIn
                             case 1:
                                 secondActStatusTextView.setText(activityStatusString);
                                 secondActUnitTextView.setText(activityUnitString);
+                                secondActImageView.setImageResource(imageResource);
                                 break;
                             case 2:
                                 thirdActStatusTextView.setText(activityStatusString);
                                 thirdActUnitTextView.setText(activityUnitString);
+                                thirdActImageView.setImageResource(imageResource);
                                 break;
                             case 3:
                                 fourthActStatusTextView.setText(activityStatusString);
                                 fourthActUnitTextView.setText(activityUnitString);
+                                fourthActImageView.setImageResource(imageResource);
                                 break;
                         }
                     }

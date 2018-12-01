@@ -2,6 +2,8 @@ package com.ivorybridge.moabi.repository;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
 import com.ivorybridge.moabi.R;
@@ -11,6 +13,9 @@ import com.ivorybridge.moabi.database.entity.util.AsyncTaskBoolean;
 import com.ivorybridge.moabi.database.entity.util.ConnectedService;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.network.auth.GoogleFitAPI;
+import com.ivorybridge.moabi.service.MotionSensorService;
+import com.ivorybridge.moabi.service.UserGoalJob;
+import com.ivorybridge.moabi.service.UserGoalPeriodicJob;
 import com.ivorybridge.moabi.util.FormattedTime;
 
 import java.util.List;
@@ -141,6 +146,17 @@ public class AsyncCallsMasterRepository {
                                             weatherRepository.queryCurrentWeather();
                                         }
                                     }
+                                    Intent intent = new Intent(application, MotionSensorService.class);
+                                    application.startService(intent);
+                                    SharedPreferences notificationSharedPreferences =
+                                            application.getSharedPreferences(application.getString(R.string.com_ivorybridge_mobai_NOTIFICATION_SHARED_PREFERENCE),
+                                    Context.MODE_PRIVATE);
+                                    boolean isPersonalGoalNotifEnabled = notificationSharedPreferences.getBoolean(
+                                            application.getString(R.string.preference_personal_goal_notification), false);
+                                    if (isPersonalGoalNotifEnabled) {
+                                        UserGoalJob.runJobImmediately();
+                                        UserGoalPeriodicJob.schedulePeriodicJob();
+                                    }
                                 }
                             }
                         }
@@ -151,7 +167,6 @@ public class AsyncCallsMasterRepository {
     }
 
     public void sync() {
-        // if has data...
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {

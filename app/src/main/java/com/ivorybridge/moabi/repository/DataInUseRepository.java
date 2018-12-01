@@ -43,6 +43,10 @@ public class DataInUseRepository {
         mTaskDao.deleteAllInputsInUse();
     }
 
+    public void deleteAllConnectedServices() {
+        mTaskDao.deleteAllConnectedServices();
+    }
+
     private static class insertAsyncTask extends AsyncTask<InputInUse, Void, Void> {
 
         private DataInUseDao mAsyncTaskDao;

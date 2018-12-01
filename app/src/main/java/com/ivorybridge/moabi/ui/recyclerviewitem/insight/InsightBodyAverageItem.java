@@ -2,6 +2,7 @@ package com.ivorybridge.moabi.ui.recyclerviewitem.insight;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -21,21 +22,23 @@ public class InsightBodyAverageItem extends AbstractItem<InsightBodyAverageItem,
 
     private static final String TAG = InsightBodyAverageItem.class.getSimpleName();
     private String inputType;
-    private double average;
     private Map<String, Double> activitySummaryMap;
+    private int numOfDays;
+    private double lowest;
+    private double highest;
+    private double average;
 
-    public InsightBodyAverageItem() {
-
-    }
-
-    public InsightBodyAverageItem(String inputType, double average) {
-        this.inputType = inputType;
-        this.average = average;
-    }
-
-    public InsightBodyAverageItem(String inputType, Map<String, Double> activitySummaryMap) {
+    public InsightBodyAverageItem(String inputType, Map<String, Double> activitySummaryMap, int numOfDays) {
         this.inputType = inputType;
         this.activitySummaryMap = activitySummaryMap;
+        this.numOfDays = numOfDays;
+    }
+
+    public InsightBodyAverageItem(String inputType, double lowest, double highest, double average) {
+        this.inputType = inputType;
+        this.lowest = lowest;
+        this.highest = highest;
+        this.average = average;
     }
 
 
@@ -71,136 +74,79 @@ public class InsightBodyAverageItem extends AbstractItem<InsightBodyAverageItem,
 
         @Override
         public void bindView(final InsightBodyAverageItem item, List<Object> payloads) {
-            if (item.activitySummaryMap != null) {
-                unitSharedPreferences = itemView.getContext().getSharedPreferences(
-                        itemView.getContext().getString(
-                                R.string.com_ivorybridge_moabi_UNIT_SHARED_PREFERENCE_KEY),
-                        Context.MODE_PRIVATE);
-                String unit = unitSharedPreferences.getString(itemView.getContext()
-                                .getString(R.string.com_ivorybridge_mobai_UNIT_KEY),
-                        itemView.getContext().getString(R.string.preference_unit_si_title));
-                double lowest = 0;
-                double highest = 0;
-                double total = 0;
-                int i = 0;
-                for (Map.Entry<String, Double> entry : item.activitySummaryMap.entrySet()) {
-                    if (i == 0) {
-                        lowest = entry.getValue();
-                        highest = entry.getValue();
-                    } else {
-                        if (entry.getValue() < lowest) {
-                            lowest = entry.getValue();
-                        }
-                        if (entry.getValue() > highest) {
-                            highest = entry.getValue();
-                        }
-                    }
-                    total += entry.getValue();
-                    i++;
-                }
-                if (lowest == highest) {
-                    lowest = 0;
-                }
-                seekBar.setMin((float) lowest);
-                seekBar.setMax((float) highest);
-                float average = (float) total / item.activitySummaryMap.size();
-                seekBar.setProgress(average);
-                String unitString = itemView.getContext().getString(R.string.unit_time_sing);
-                if (item.inputType.equals(itemView.getContext().getString(R.string.activity_steps_title))) {
-                    seekBar.setMin((int) lowest);
-                    seekBar.setMax((int) highest);
-                    seekBar.setDecimalScale(0);
-                    if (average == 1) {
-                        unitString = itemView.getContext().getString(R.string.unit_step_sing);
-                    } else {
-                        unitString = itemView.getContext().getString(R.string.unit_step_plur);
-                    }
-                } else if (item.inputType.contains("Minutes") || item.inputType.equals(itemView.getContext().getString(R.string.activity_sleep_title)) ||
-                        item.inputType.contains(itemView.getContext().getString(R.string.phone_usage_camel_case))) {
-                    seekBar.setDecimalScale(0);
-                    unitString = itemView.getContext().getString(R.string.unit_time_sing);
-                } else if (item.inputType.equals(itemView.getContext().getString(R.string.activity_distance_title))) {
-                    seekBar.setDecimalScale(2);
-                    if (unit.equals(itemView.getContext().getString(R.string.preference_unit_si_title))) {
-                        unitString = itemView.getContext().getString(R.string.unit_distance_si);
-                    } else {
-                        unitString = itemView.getContext().getString(R.string.unit_distance_usc);
-                        seekBar.setMin((float) lowest * 0.62137f);
-                        seekBar.setMin((float) highest * 0.62137f);
-                        seekBar.setProgress(average * 0.62137f);
-                    }
-                } else if (item.inputType.equals(itemView.getContext().getString(R.string.activity_calories_title))) {
-                    seekBar.setDecimalScale(0);
-                    unitString = itemView.getContext().getString(R.string.unit_calories);
-                } else if (item.inputType.equals(itemView.getContext().getString(R.string.activity_floors_title))) {
-                    seekBar.setDecimalScale(0);
-                    if (average == 1) {
-                        unitString = itemView.getContext().getString(R.string.unit_floor_sing);
-                    } else {
-                        unitString = itemView.getContext().getString(R.string.unit_floor_plur);
-                    }
-                } else if (item.inputType.equals(itemView.getContext().getString(R.string.timer_camel_case))) {
-                    seekBar.setDecimalScale(0);
-                    unitString = itemView.getContext().getString(R.string.unit_time_sing);
-                } else if (item.inputType.equals(itemView.getContext().getString(R.string.baactivity_camel_case))) {
-                    seekBar.setDecimalScale(0);
-                    seekBar.setMin((int) lowest);
-                    seekBar.setMax((int) highest);
-                    if (average == 1) {
-                        unitString = itemView.getContext().getString(R.string.unit_activity_sing);
-                    } else {
-                        unitString = itemView.getContext().getString(R.string.unit_activity_plur);
-                    }
-                }if (item.inputType.equals(itemView.getContext().getString(R.string.activity_steps_title))) {
-                    seekBar.setMin((int) lowest);
-                    seekBar.setMax((int) highest);
-                    seekBar.setDecimalScale(0);
-                    if (average > 1) {
-                        unitString = itemView.getContext().getString(R.string.unit_step_plur);
-                    } else {
-                        unitString = itemView.getContext().getString(R.string.unit_step_sing);
-                    }
-                } else if (item.inputType.contains("Minutes") || item.inputType.equals(itemView.getContext().getString(R.string.activity_sleep_title)) ||
-                        item.inputType.contains(itemView.getContext().getString(R.string.phone_usage_camel_case))) {
-                    seekBar.setDecimalScale(0);
-                    unitString = itemView.getContext().getString(R.string.unit_time_sing);
-                } else if (item.inputType.equals(itemView.getContext().getString(R.string.activity_distance_title))) {
-                    seekBar.setDecimalScale(2);
-                    if (unit.equals(itemView.getContext().getString(R.string.preference_unit_si_title))) {
-                        unitString = itemView.getContext().getString(R.string.unit_distance_si);
-                    } else {
-                        unitString = itemView.getContext().getString(R.string.unit_distance_usc);
-                        seekBar.setMin((float) lowest * 0.62137f);
-                        seekBar.setMin((float) highest * 0.62137f);
-                        seekBar.setProgress(average * 0.62137f);
-                    }
-                } else if (item.inputType.equals(itemView.getContext().getString(R.string.activity_calories_title))) {
-                    seekBar.setDecimalScale(0);
-                    unitString = itemView.getContext().getString(R.string.unit_calories);
-                } else if (item.inputType.equals(itemView.getContext().getString(R.string.activity_floors_title))) {
-                    seekBar.setDecimalScale(0);
-                    if (average == 1) {
-                        unitString = itemView.getContext().getString(R.string.unit_floor_sing);
-                    } else {
-                        unitString = itemView.getContext().getString(R.string.unit_floor_plur);
-                    }
-                } else if (item.inputType.equals(itemView.getContext().getString(R.string.timer_camel_case))) {
-                    seekBar.setDecimalScale(0);
-                    unitString = itemView.getContext().getString(R.string.unit_time_sing);
-                } else if (item.inputType.equals(itemView.getContext().getString(R.string.baactivity_camel_case))) {
-                    seekBar.setDecimalScale(0);
-                    seekBar.setMin((int) lowest);
-                    seekBar.setMax((int) highest);
-                    if (average > 1) {
-                        unitString = itemView.getContext().getString(R.string.unit_activity_plur);
-                    } else {
-                        unitString = itemView.getContext().getString(R.string.unit_activity_sing);
-                    }
-                }
-                seekBar.setIndicatorTextFormat("${PROGRESS} " + unitString);
-            } else {
+            unitSharedPreferences = itemView.getContext().getSharedPreferences(
+                    itemView.getContext().getString(
+                            R.string.com_ivorybridge_moabi_UNIT_SHARED_PREFERENCE_KEY),
+                    Context.MODE_PRIVATE);
+            String unit = unitSharedPreferences.getString(itemView.getContext()
+                            .getString(R.string.com_ivorybridge_mobai_UNIT_KEY),
+                    itemView.getContext().getString(R.string.preference_unit_si_title));
+            seekBar.setMax(0);
+            seekBar.setMin(0);
+            seekBar.setProgress(0);
+            seekBar.setDecimalScale(2);
+            Log.i(TAG, item.average + ", " + item.lowest + ", " + item.highest);
+            String unitString = itemView.getContext().getString(R.string.unit_time_sing);
+            if (item.inputType.equals(itemView.getContext().getString(R.string.activity_steps_title))) {
+                seekBar.setMax((float) item.highest);
+                seekBar.setMin((float) item.lowest);
                 seekBar.setProgress((float) item.average);
+                if (item.average <= 1) {
+                    unitString = itemView.getContext().getString(R.string.unit_step_sing);
+                } else {
+                    unitString = itemView.getContext().getString(R.string.unit_step_plur);
+                }
+            } else if (item.inputType.equals(itemView.getContext().getString(R.string.activity_active_minutes_title)) ||
+                    item.inputType.equals(itemView.getContext().getString(R.string.activity_sleep_title)) ||
+                    item.inputType.contains(itemView.getContext().getString(R.string.phone_usage_camel_case)) ||
+                    item.inputType.equals(itemView.getContext().getString(R.string.activity_sedentary_minutes_title))) {
+                seekBar.setMax((float) item.highest);
+                seekBar.setMin((float) item.lowest);
+                seekBar.setProgress((float) item.average);
+                unitString = itemView.getContext().getString(R.string.unit_time_sing);
+            } else if (item.inputType.equals(itemView.getContext().getString(R.string.activity_distance_title))) {
+                seekBar.setMax((float) item.highest);
+                seekBar.setMin((float) item.lowest);
+                seekBar.setProgress((float) item.average);
+                if (unit.equals(itemView.getContext().getString(R.string.preference_unit_si_title))) {
+                    unitString = itemView.getContext().getString(R.string.unit_distance_si);
+                } else {
+                    unitString = itemView.getContext().getString(R.string.unit_distance_usc);
+                    /*
+                    seekBar.setMax((float) item.highest * 0.62137f);
+                    seekBar.setMin((float) item.lowest * 0.62137f);
+                    seekBar.setProgress((float) item.average * 0.62137f);*/
+                }
+            } else if (item.inputType.equals(itemView.getContext().getString(R.string.activity_calories_title))) {
+                seekBar.setMax((float) item.highest);
+                seekBar.setMin((float) item.lowest);
+                seekBar.setProgress((float) item.average);
+                unitString = itemView.getContext().getString(R.string.unit_calories);
+            } else if (item.inputType.equals(itemView.getContext().getString(R.string.activity_floors_title))) {
+                seekBar.setMax((float) item.highest);
+                seekBar.setMin((float) item.lowest);
+                seekBar.setProgress((float) item.average);
+                if (item.average <= 1) {
+                    unitString = itemView.getContext().getString(R.string.unit_floor_sing);
+                } else {
+                    unitString = itemView.getContext().getString(R.string.unit_floor_plur);
+                }
+            } else if (item.inputType.equals(itemView.getContext().getString(R.string.timer_camel_case))) {
+                seekBar.setMax((float) item.highest);
+                seekBar.setMin((float) item.lowest);
+                seekBar.setProgress((float) item.average);
+                unitString = itemView.getContext().getString(R.string.unit_time_sing);
+            } else if (item.inputType.equals(itemView.getContext().getString(R.string.baactivity_camel_case))) {
+                seekBar.setMax((float) item.highest);
+                seekBar.setMin((float) item.lowest);
+                seekBar.setProgress((float) item.average);
+                if (item.average <= 1) {
+                    unitString = itemView.getContext().getString(R.string.unit_activity_sing);
+                } else {
+                    unitString = itemView.getContext().getString(R.string.unit_activity_plur);
+                }
             }
+            seekBar.setIndicatorTextFormat("${PROGRESS} " + unitString);
         }
 
         @Override

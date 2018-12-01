@@ -61,6 +61,9 @@ public class InsightMindAverageItem extends AbstractItem<InsightMindAverageItem,
 
         @Override
         public void bindView(final InsightMindAverageItem item, List<Object> payloads) {
+            seekBar.setMax(0);
+            seekBar.setMin(0);
+            seekBar.setProgress(0);
             if (item.inputType.equals(itemView.getContext().getString(R.string.mood_camel_case)) || item.inputType.equals(itemView.getContext().getString(R.string.energy_camel_case))) {
                 String[] tickTexts = itemView.getContext().getResources().getStringArray(R.array.moodandenergy_seekbar_array);
                 seekBar.setTickCount(2);

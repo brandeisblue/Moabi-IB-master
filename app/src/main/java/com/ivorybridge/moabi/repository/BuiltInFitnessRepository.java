@@ -93,7 +93,7 @@ public class BuiltInFitnessRepository {
     }
 
     public void sync() {
-        firebaseManager.getConnectedServicesRef().child(application.getString(R.string.moabi_tracker_camel_case))
+        firebaseManager.getBuiltInFitnessTrackerThisDeviceRef()
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

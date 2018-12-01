@@ -23,29 +23,28 @@ import com.ivorybridge.moabi.database.entity.depression.DailyPhq9;
 import com.ivorybridge.moabi.database.entity.googlefit.GoogleFitSummary;
 import com.ivorybridge.moabi.database.entity.moodandenergy.DailyEnergy;
 import com.ivorybridge.moabi.database.entity.moodandenergy.DailyMood;
-import com.ivorybridge.moabi.database.entity.stats.InsightSummaryAnxietyMediatorLiveData;
-import com.ivorybridge.moabi.database.entity.stats.InsightSummaryDepressionMediatorLiveData;
-import com.ivorybridge.moabi.database.entity.stats.InsightSummaryEnergyMediatorLiveData;
-import com.ivorybridge.moabi.database.entity.stats.InsightSummaryMoodMediatorLiveData;
-import com.ivorybridge.moabi.database.entity.stats.InsightSummaryDailyReviewMediatorLiveData;
-import com.ivorybridge.moabi.database.entity.stats.InsightSummaryStressMediatorLiveData;
 import com.ivorybridge.moabi.database.entity.stats.SimpleRegressionSummary;
 import com.ivorybridge.moabi.database.entity.stress.DailyStress;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
+import com.ivorybridge.moabi.repository.AnxietyRepository;
+import com.ivorybridge.moabi.repository.DailyReviewRepository;
+import com.ivorybridge.moabi.repository.DepressionRepository;
+import com.ivorybridge.moabi.repository.MoodAndEnergyRepository;
+import com.ivorybridge.moabi.repository.StressRepository;
+import com.ivorybridge.moabi.repository.statistics.PredictionsRepository;
+import com.ivorybridge.moabi.ui.adapter.IconSpinnerAdapter;
 import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightBestAndWorstItem;
+import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightEmptyViewItem;
 import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightMindAverageItem;
 import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightRecommendationItem;
 import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightTopThreeItem;
-import com.ivorybridge.moabi.ui.adapter.IconSpinnerAdapter;
 import com.ivorybridge.moabi.util.FormattedTime;
 import com.ivorybridge.moabi.viewmodel.AnxietyViewModel;
-import com.ivorybridge.moabi.viewmodel.AppUsageViewModel;
+import com.ivorybridge.moabi.viewmodel.DailyReviewViewModel;
 import com.ivorybridge.moabi.viewmodel.DataInUseViewModel;
 import com.ivorybridge.moabi.viewmodel.DepressionViewModel;
-import com.ivorybridge.moabi.viewmodel.FitbitViewModel;
 import com.ivorybridge.moabi.viewmodel.GoogleFitViewModel;
 import com.ivorybridge.moabi.viewmodel.MoodAndEnergyViewModel;
-import com.ivorybridge.moabi.viewmodel.DailyReviewViewModel;
 import com.ivorybridge.moabi.viewmodel.RegressionSummaryViewModel;
 import com.ivorybridge.moabi.viewmodel.StressViewModel;
 import com.mikepenz.fastadapter.FastAdapter;
@@ -65,7 +64,6 @@ import java.util.concurrent.TimeUnit;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -114,8 +112,12 @@ public class InsightMindFragment extends Fragment {
     private GoogleFitViewModel googleFitViewModel;
     private RegressionSummaryViewModel regressionSummaryViewModel;
     private DataInUseViewModel dataInUseViewModel;
-    private FitbitViewModel fitbitViewModel;
-    private AppUsageViewModel appUsageViewModel;
+    private MoodAndEnergyRepository moodAndEnergyRepository;
+    private StressRepository stressRepository;
+    private DailyReviewRepository dailyReviewRepository;
+    private DepressionRepository depressionRepository;
+    private AnxietyRepository anxietyRepository;
+    private PredictionsRepository predictionsRepository;
     private FormattedTime formattedTime;
     private Long startOfMonth;
     private Long now;
@@ -124,6 +126,7 @@ public class InsightMindFragment extends Fragment {
     private Long depVarType = 0L;
     private SharedPreferences mindInsightPreferences;
     private FastAdapter<IItem> recyclerAdapter;
+    private ItemAdapter<InsightEmptyViewItem> emptyViewItemAdapter;
     private ItemAdapter<InsightMindAverageItem> averageItemItemAdapter;
     private ItemAdapter<InsightBestAndWorstItem> bestAndAverageItemItemAdapter;
     private ItemAdapter<InsightRecommendationItem> recommendationItemItemAdapter;
@@ -148,19 +151,24 @@ public class InsightMindFragment extends Fragment {
         stressViewModel = ViewModelProviders.of(this).get(StressViewModel.class);
         dailyReviewViewModel = ViewModelProviders.of(this).get(DailyReviewViewModel.class);
         googleFitViewModel = ViewModelProviders.of(this).get(GoogleFitViewModel.class);
-        appUsageViewModel = ViewModelProviders.of(this).get(AppUsageViewModel.class);
         dataInUseViewModel = ViewModelProviders.of(this).get(DataInUseViewModel.class);
         regressionSummaryViewModel = ViewModelProviders.of(this).get(RegressionSummaryViewModel.class);
-        fitbitViewModel = ViewModelProviders.of(this).get(FitbitViewModel.class);
+        moodAndEnergyRepository = new MoodAndEnergyRepository(getActivity().getApplication());
+        dailyReviewRepository = new DailyReviewRepository(getActivity().getApplication());
+        stressRepository = new StressRepository(getActivity().getApplication());
+        depressionRepository = new DepressionRepository(getActivity().getApplication());
+        anxietyRepository = new AnxietyRepository(getActivity().getApplication());
+        predictionsRepository = new PredictionsRepository(getActivity().getApplication());
         depressionViewModel = ViewModelProviders.of(this).get(DepressionViewModel.class);
         anxietyViewModel = ViewModelProviders.of(this).get(AnxietyViewModel.class);
         recyclerAdapter = new FastAdapter<>();
+        emptyViewItemAdapter = new ItemAdapter<>();
         averageItemItemAdapter = new ItemAdapter<>();
         bestAndAverageItemItemAdapter = new ItemAdapter<>();
         recommendationItemItemAdapter = new ItemAdapter<>();
         topThreeItemItemAdapter = new ItemAdapter<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
-        recyclerAdapter = FastAdapter.with(Arrays.asList(averageItemItemAdapter, bestAndAverageItemItemAdapter, topThreeItemItemAdapter, recommendationItemItemAdapter));
+        recyclerAdapter = FastAdapter.with(Arrays.asList(emptyViewItemAdapter, averageItemItemAdapter, bestAndAverageItemItemAdapter, topThreeItemItemAdapter, recommendationItemItemAdapter));
         recyclerview.setLayoutManager(layoutManager);
         recyclerview.setItemAnimator(new DefaultItemAnimator());
         recyclerview.setAdapter(recyclerAdapter);
@@ -346,6 +354,14 @@ public class InsightMindFragment extends Fragment {
                                 }
                             });
                         }
+                    } else {
+                        emptyViewItemAdapter.clear();
+                        averageItemItemAdapter.clear();
+                        bestAndAverageItemItemAdapter.clear();
+                        topThreeItemItemAdapter.clear();
+                        recommendationItemItemAdapter.clear();
+                        InsightEmptyViewItem emptyViewItem = new InsightEmptyViewItem(getString(R.string.survey_camel_case));
+                        emptyViewItemAdapter.add(emptyViewItem);
                     }
                 }
             }
@@ -354,702 +370,762 @@ public class InsightMindFragment extends Fragment {
 
     private void configureSummary(int itemType, int numOfDays) {
         if (itemType == MOOD) {
-            InsightSummaryMoodMediatorLiveData insightMoodMediatorLiveData =
-                    new InsightSummaryMoodMediatorLiveData(moodAndEnergyViewModel.getDailyMoods(
-                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())),
-                            regressionSummaryViewModel.getAllMindSummaries(
-                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                                    now, numOfDays));
-            insightMoodMediatorLiveData.observe(getViewLifecycleOwner(), new Observer<Pair<List<DailyMood>, List<SimpleRegressionSummary>>>() {
+            Handler handler = new Handler();
+            new Thread(new Runnable() {
                 @Override
-                public void onChanged(@Nullable Pair<List<DailyMood>, List<SimpleRegressionSummary>> listListPair) {
-                    if (listListPair != null && listListPair.first != null && listListPair.second != null) {
-                        if (listListPair.first.size() > 0) {
-                            Handler handler = new Handler();
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    double total = 0;
-                                    final List<String> entryDatesList = new ArrayList<>();
-                                    final List<BarEntry> barEntries = new ArrayList<>();
-                                    Map<String, Double> dataByDayMap = new LinkedHashMap<>();
-                                    Map<String, Long> countByDayMap = new LinkedHashMap<>();
-                                    String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
-                                    for (int i = 1; i <= numOfDays; i++) {
-                                        String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
-                                        Log.i(TAG, date);
-                                        dataByDayMap.put(date, 0d);
-                                        countByDayMap.put(date, 0L);
-                                    }
-                                    Log.i(TAG, dataByDayMap.toString());
-                                    Log.i(TAG, countByDayMap.toString());
-
-                                    for (DailyMood dailyMood : listListPair.first) {
-                                        // find matching record
-                                        total += dailyMood.getAverageMood();
-                                        String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailyMood.getDate());
-                                        Long oldCount = countByDayMap.get(formattedDate);
-                                        countByDayMap.put(formattedDate, oldCount + 1L);
-                                        Double oldData = dataByDayMap.get(formattedDate);
-                                        dataByDayMap.put(formattedDate, oldData + dailyMood.getAverageMood());
-                                    }
-                                    int i = 0;
-                                    float bestValue = 0;
-                                    for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
-                                        float entryValue = 0;
-                                        if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
-                                            entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
-                                        }
-                                        if (entryValue > bestValue) {
-                                            bestValue = entryValue;
-                                        }
-                                        barEntries.add(new BarEntry(i, entryValue));
-                                        entryDatesList.add(entry.getKey());
-                                        i++;
-                                    }
-
-                                    Log.i(TAG, barEntries.toString());
-                                    Log.i(TAG, dataByDayMap.toString());
-                                    Log.i(TAG, countByDayMap.toString());
-                                    double average = total / listListPair.first.size();
-                                    final float finalValueToPass = bestValue;
-                                    //displayAllInsights(itemType);
-                                    Log.i(TAG, "Average is " + average);
-                                    final List<SimpleRegressionSummary> simpleRegressionSummaries = new ArrayList<>();
-                                    final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
-                                    if (listListPair.second.size() > 0) {
-                                        simpleRegressionSummaries.addAll(listListPair.second);
-                                        Collections.sort(simpleRegressionSummaries, new SimpleRegressionSummary.BestFitComparator());
-                                        for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
-                                            if (simpleRegressionSummary.getDepVar().equals(getString(R.string.mood_camel_case))) {
-                                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    }
-                                                } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.timer_camel_case))) {
-                                                    if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                    }
-                                                } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
-                                                    if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                    }
-                                                } else {
-                                                    sortedList.add(simpleRegressionSummary);
-                                                }
-                                                Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
-                                            }
-                                        }
-                                    }
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            averageItemItemAdapter.clear();
-                                            bestAndAverageItemItemAdapter.clear();
-                                            topThreeItemItemAdapter.clear();
-                                            recommendationItemItemAdapter.clear();
-                                            InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.mood_camel_case), average);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.mood_camel_case), barEntries, entryDatesList, average, finalValueToPass);
-                                            averageItemItemAdapter.add(moodAverageItem);
-                                            bestAndAverageItemItemAdapter.add(bestAndWorstItem);
-                                            if (sortedList.size() > 0) {
-                                                if (getActivity() != null) {
-                                                    topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightMindFragment.this, getString(R.string.mood_camel_case), sortedList));
-                                                }
-                                            }
-                                        }
-                                    });
-                                }
-                            }).start();
+                public void run() {
+                    List<DailyMood> dailyMoods =
+                            moodAndEnergyRepository.getDailyMoodsNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(),
+                                            numOfDays - 1),
+                                    formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                    List<SimpleRegressionSummary> regressionSummaries =
+                            predictionsRepository.getAllMindSummariesNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(),
+                                            numOfDays - 1), now, numOfDays);
+                    if (dailyMoods != null & dailyMoods.size() > 0) {
+                        double total = 0;
+                        final List<String> entryDatesList = new ArrayList<>();
+                        final List<BarEntry> barEntries = new ArrayList<>();
+                        Map<String, Double> dataByDayMap = new LinkedHashMap<>();
+                        Map<String, Long> countByDayMap = new LinkedHashMap<>();
+                        String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                        for (int i = 1; i <= numOfDays; i++) {
+                            String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
+                            Log.i(TAG, date);
+                            dataByDayMap.put(date, 0d);
+                            countByDayMap.put(date, 0L);
                         }
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+
+                        for (DailyMood dailyMood : dailyMoods) {
+                            // find matching record
+                            total += dailyMood.getAverageMood();
+                            String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailyMood.getDate());
+                            Long oldCount = countByDayMap.get(formattedDate);
+                            countByDayMap.put(formattedDate, oldCount + 1L);
+                            Double oldData = dataByDayMap.get(formattedDate);
+                            dataByDayMap.put(formattedDate, oldData + dailyMood.getAverageMood());
+                        }
+                        int i = 0;
+                        float bestValue = 0;
+                        for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
+                            float entryValue = 0;
+                            if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
+                                entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
+                            }
+                            if (entryValue > bestValue) {
+                                bestValue = entryValue;
+                            }
+                            barEntries.add(new BarEntry(i, entryValue));
+                            entryDatesList.add(entry.getKey());
+                            i++;
+                        }
+
+                        Log.i(TAG, barEntries.toString());
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+                        double average = total / dailyMoods.size();
+                        final float finalValueToPass = bestValue;
+                        //displayAllInsights(itemType);
+                        Log.i(TAG, "Average is " + average);
+
+                        final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
+                        if (regressionSummaries != null && regressionSummaries.size() > 0) {
+                            Collections.sort(regressionSummaries, new SimpleRegressionSummary.BestFitComparator());
+                            for (SimpleRegressionSummary simpleRegressionSummary : regressionSummaries) {
+                                if (simpleRegressionSummary.getDepVar().equals(getString(R.string.mood_camel_case))) {
+                                    if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
+                                        if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
+                                            sortedList.add(simpleRegressionSummary);
+                                            //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                        } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
+                                            sortedList.add(simpleRegressionSummary);
+                                            //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                        }
+                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.timer_camel_case))) {
+                                        if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
+                                            sortedList.add(simpleRegressionSummary);
+                                        }
+                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
+                                        if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
+                                            sortedList.add(simpleRegressionSummary);
+                                        }
+                                    } else {
+                                        sortedList.add(simpleRegressionSummary);
+                                    }
+                                    Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
+                                }
+                            }
+                        }
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                emptyViewItemAdapter.clear();
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.mood_camel_case), average);
+                                InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.mood_camel_case), barEntries, entryDatesList, average, finalValueToPass);
+                                averageItemItemAdapter.add(moodAverageItem);
+                                bestAndAverageItemItemAdapter.add(bestAndWorstItem);
+                                if (sortedList.size() > 0) {
+                                    if (getActivity() != null) {
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightMindFragment.this, getActivity(), getString(R.string.mood_camel_case), sortedList));
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                emptyViewItemAdapter.clear();
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightEmptyViewItem emptyViewItem = new InsightEmptyViewItem(getString(R.string.survey_camel_case));
+                                emptyViewItemAdapter.add(emptyViewItem);
+                            }
+                        });
                     }
                 }
-            });
+            }).start();
         } else if (itemType == ENERGY) {
-            InsightSummaryEnergyMediatorLiveData insightEnergyMediatorLiveData =
-                    new InsightSummaryEnergyMediatorLiveData(moodAndEnergyViewModel.getDailyEnergies(
-                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())),
-                            regressionSummaryViewModel.getAllMindSummaries(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                                    now, numOfDays));
-            insightEnergyMediatorLiveData.observe(getViewLifecycleOwner(), new Observer<Pair<List<DailyEnergy>, List<SimpleRegressionSummary>>>() {
+            Handler handler = new Handler();
+            new Thread(new Runnable() {
                 @Override
-                public void onChanged(@Nullable Pair<List<DailyEnergy>, List<SimpleRegressionSummary>> listListPair) {
-                    if (listListPair != null && listListPair.first != null && listListPair.second != null) {
-                        if (listListPair.first.size() > 0) {
-                            Handler handler = new Handler();
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    double total = 0;
-                                    final List<String> entryDatesList = new ArrayList<>();
-                                    final List<BarEntry> barEntries = new ArrayList<>();
-                                    Map<String, Double> dataByDayMap = new LinkedHashMap<>();
-                                    Map<String, Long> countByDayMap = new LinkedHashMap<>();
-                                    String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
-                                    for (int i = 1; i <= numOfDays; i++) {
-                                        String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
-                                        Log.i(TAG, date);
-                                        dataByDayMap.put(date, 0d);
-                                        countByDayMap.put(date, 0L);
-                                    }
-                                    Log.i(TAG, dataByDayMap.toString());
-                                    Log.i(TAG, countByDayMap.toString());
-
-                                    for (DailyEnergy dailyEnergy : listListPair.first) {
-                                        // find matching record
-                                        total += dailyEnergy.getAverageEnergy();
-                                        String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailyEnergy.getDate());
-                                        Long oldCount = countByDayMap.get(formattedDate);
-                                        countByDayMap.put(formattedDate, oldCount + 1L);
-                                        Double oldData = dataByDayMap.get(formattedDate);
-                                        dataByDayMap.put(formattedDate, oldData + dailyEnergy.getAverageEnergy());
-                                    }
-                                    int i = 0;
-                                    float bestValue = 0;
-                                    for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
-                                        float entryValue = 0;
-                                        if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
-                                            entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
-                                        }
-                                        if (entryValue > bestValue) {
-                                            bestValue = entryValue;
-                                        }
-                                        barEntries.add(new BarEntry(i, entryValue));
-                                        entryDatesList.add(entry.getKey());
-                                        i++;
-                                    }
-
-                                    Log.i(TAG, barEntries.toString());
-                                    Log.i(TAG, dataByDayMap.toString());
-                                    Log.i(TAG, countByDayMap.toString());
-                                    double average = total / listListPair.first.size();
-                                    final float finalValueToPass = bestValue;
-                                    //displayAllInsights(itemType);
-                                    Log.i(TAG, "Average is " + average);
-                                    final List<SimpleRegressionSummary> simpleRegressionSummaries = new ArrayList<>();
-                                    final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
-                                    if (listListPair.second.size() > 0) {
-                                        simpleRegressionSummaries.addAll(listListPair.second);
-                                        Collections.sort(simpleRegressionSummaries, new SimpleRegressionSummary.BestFitComparator());
-                                        for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
-                                            if (simpleRegressionSummary.getDepVar().equals(getString(R.string.energy_camel_case))) {
-                                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    }
-                                                } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.timer_camel_case))) {
-                                                    if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                    }
-                                                } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
-                                                    if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                    }
-                                                } else {
-                                                    sortedList.add(simpleRegressionSummary);
-                                                }
-                                                Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
-                                            }
-                                        }
-                                    }
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            averageItemItemAdapter.clear();
-                                            bestAndAverageItemItemAdapter.clear();
-                                            topThreeItemItemAdapter.clear();
-                                            recommendationItemItemAdapter.clear();
-                                            InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.energy_camel_case), average);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.energy_camel_case), barEntries, entryDatesList, average, finalValueToPass);
-                                            averageItemItemAdapter.add(moodAverageItem);
-                                            bestAndAverageItemItemAdapter.add(bestAndWorstItem);
-                                            if (sortedList.size() > 0) {
-                                                if (getActivity() != null) {
-                                                    topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightMindFragment.this, getString(R.string.energy_camel_case), sortedList));
-                                                }
-                                            }
-                                        }
-                                    });
-                                }
-                            }).start();
+                public void run() {
+                    List<DailyEnergy> dailyEnergies =
+                            moodAndEnergyRepository.getDailyEnergiesNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(),
+                                            numOfDays - 1),
+                                    formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                    List<SimpleRegressionSummary> regressionSummaries =
+                            predictionsRepository.getAllMindSummariesNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(),
+                                            numOfDays - 1), now, numOfDays);
+                    if (dailyEnergies != null & dailyEnergies.size() > 0) {
+                        double total = 0;
+                        final List<String> entryDatesList = new ArrayList<>();
+                        final List<BarEntry> barEntries = new ArrayList<>();
+                        Map<String, Double> dataByDayMap = new LinkedHashMap<>();
+                        Map<String, Long> countByDayMap = new LinkedHashMap<>();
+                        String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                        for (int i = 1; i <= numOfDays; i++) {
+                            String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
+                            Log.i(TAG, date);
+                            dataByDayMap.put(date, 0d);
+                            countByDayMap.put(date, 0L);
                         }
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+
+                        for (DailyEnergy dailyEnergy : dailyEnergies) {
+                            // find matching record
+                            total += dailyEnergy.getAverageEnergy();
+                            String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailyEnergy.getDate());
+                            Long oldCount = countByDayMap.get(formattedDate);
+                            countByDayMap.put(formattedDate, oldCount + 1L);
+                            Double oldData = dataByDayMap.get(formattedDate);
+                            dataByDayMap.put(formattedDate, oldData + dailyEnergy.getAverageEnergy());
+                        }
+                        int i = 0;
+                        float bestValue = 0;
+                        for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
+                            float entryValue = 0;
+                            if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
+                                entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
+                            }
+                            if (entryValue > bestValue) {
+                                bestValue = entryValue;
+                            }
+                            barEntries.add(new BarEntry(i, entryValue));
+                            entryDatesList.add(entry.getKey());
+                            i++;
+                        }
+
+                        Log.i(TAG, barEntries.toString());
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+                        double average = total / dailyEnergies.size();
+                        final float finalValueToPass = bestValue;
+                        //displayAllInsights(itemType);
+                        Log.i(TAG, "Average is " + average);
+
+                        final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
+                        if (regressionSummaries != null && regressionSummaries.size() > 0) {
+                            Collections.sort(regressionSummaries, new SimpleRegressionSummary.BestFitComparator());
+                            for (SimpleRegressionSummary simpleRegressionSummary : regressionSummaries) {
+                                if (simpleRegressionSummary.getDepVar().equals(getString(R.string.energy_camel_case))) {
+                                    if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
+                                        if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
+                                            sortedList.add(simpleRegressionSummary);
+                                            //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                        } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
+                                            sortedList.add(simpleRegressionSummary);
+                                            //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                        }
+                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.timer_camel_case))) {
+                                        if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
+                                            sortedList.add(simpleRegressionSummary);
+                                        }
+                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
+                                        if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
+                                            sortedList.add(simpleRegressionSummary);
+                                        }
+                                    } else {
+                                        sortedList.add(simpleRegressionSummary);
+                                    }
+                                    Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
+                                }
+                            }
+                        }
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.energy_camel_case), average);
+                                InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.energy_camel_case), barEntries, entryDatesList, average, finalValueToPass);
+                                averageItemItemAdapter.add(moodAverageItem);
+                                bestAndAverageItemItemAdapter.add(bestAndWorstItem);
+                                if (sortedList.size() > 0) {
+                                    if (getActivity() != null) {
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightMindFragment.this, getActivity(), getString(R.string.energy_camel_case), sortedList));
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                emptyViewItemAdapter.clear();
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightEmptyViewItem emptyViewItem = new InsightEmptyViewItem(getString(R.string.survey_camel_case));
+                                emptyViewItemAdapter.add(emptyViewItem);
+                            }
+                        });
                     }
                 }
-            });
+            }).start();
         } else if (itemType == STRESS) {
-            InsightSummaryStressMediatorLiveData insightEnergyMediatorLiveData =
-                    new InsightSummaryStressMediatorLiveData(stressViewModel.getDailyStress(
-                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())),
-                            regressionSummaryViewModel.getAllMindSummaries(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                                    now, numOfDays));
-            insightEnergyMediatorLiveData.observe(getViewLifecycleOwner(), new Observer<Pair<List<DailyStress>, List<SimpleRegressionSummary>>>() {
+            Handler handler = new Handler();
+            new Thread(new Runnable() {
                 @Override
-                public void onChanged(@Nullable Pair<List<DailyStress>, List<SimpleRegressionSummary>> listListPair) {
-                    if (listListPair != null && listListPair.first != null && listListPair.second != null) {
-                        if (listListPair.first.size() > 0) {
-                            Handler handler = new Handler();
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    double total = 0;
-                                    final List<String> entryDatesList = new ArrayList<>();
-                                    final List<BarEntry> barEntries = new ArrayList<>();
-                                    Map<String, Double> dataByDayMap = new LinkedHashMap<>();
-                                    Map<String, Long> countByDayMap = new LinkedHashMap<>();
-                                    String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
-                                    for (int i = 1; i <= numOfDays; i++) {
-                                        String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
-                                        Log.i(TAG, date);
-                                        dataByDayMap.put(date, 0d);
-                                        countByDayMap.put(date, 0L);
-                                    }
-                                    Log.i(TAG, dataByDayMap.toString());
-                                    Log.i(TAG, countByDayMap.toString());
-
-                                    for (DailyStress dailyEnergy : listListPair.first) {
-                                        // find matching record
-                                        total += dailyEnergy.getAverageStress();
-                                        String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailyEnergy.getDate());
-                                        Long oldCount = countByDayMap.get(formattedDate);
-                                        countByDayMap.put(formattedDate, oldCount + 1L);
-                                        Double oldData = dataByDayMap.get(formattedDate);
-                                        dataByDayMap.put(formattedDate, oldData + dailyEnergy.getAverageStress());
-                                    }
-                                    int i = 0;
-                                    float bestValue = 0;
-                                    for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
-                                        float entryValue = 0;
-                                        if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
-                                            entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
-                                        }
-                                        if (entryValue > bestValue) {
-                                            bestValue = entryValue;
-                                        }
-                                        barEntries.add(new BarEntry(i, entryValue));
-                                        entryDatesList.add(entry.getKey());
-                                        i++;
-                                    }
-
-                                    Log.i(TAG, barEntries.toString());
-                                    Log.i(TAG, dataByDayMap.toString());
-                                    Log.i(TAG, countByDayMap.toString());
-                                    double average = total / listListPair.first.size();
-                                    final float finalValueToPass = bestValue;
-                                    //displayAllInsights(itemType);
-                                    Log.i(TAG, "Average is " + average);
-                                    final List<SimpleRegressionSummary> simpleRegressionSummaries = new ArrayList<>();
-                                    final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
-                                    if (listListPair.second.size() > 0) {
-                                        simpleRegressionSummaries.addAll(listListPair.second);
-                                        Collections.sort(simpleRegressionSummaries, new SimpleRegressionSummary.BestFitComparator());
-                                        for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
-                                            if (simpleRegressionSummary.getDepVar().equals(getString(R.string.stress_camel_case))) {
-                                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    }
-                                                } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.timer_camel_case))) {
-                                                    if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                    }
-                                                } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
-                                                    if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                    }
-                                                } else {
-                                                    sortedList.add(simpleRegressionSummary);
-                                                }
-                                                Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
-                                            }
-                                        }
-                                    }
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            averageItemItemAdapter.clear();
-                                            bestAndAverageItemItemAdapter.clear();
-                                            topThreeItemItemAdapter.clear();
-                                            recommendationItemItemAdapter.clear();
-                                            InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.stress_camel_case), average);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.stress_camel_case), barEntries, entryDatesList, average, finalValueToPass);
-                                            averageItemItemAdapter.add(moodAverageItem);
-                                            bestAndAverageItemItemAdapter.add(bestAndWorstItem);
-                                            if (sortedList.size() > 0) {
-                                                if (getActivity() != null) {
-                                                    topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightMindFragment.this, getString(R.string.stress_camel_case), sortedList));
-                                                }
-                                            }
-                                        }
-                                    });
-                                }
-                            }).start();
+                public void run() {
+                    List<DailyStress> dailyEntries =
+                            stressRepository.getDailyStresssNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(),
+                                            numOfDays - 1),
+                                    formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                    List<SimpleRegressionSummary> regressionSummaries =
+                            predictionsRepository.getAllMindSummariesNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(),
+                                            numOfDays - 1), now, numOfDays);
+                    if (dailyEntries != null & dailyEntries.size() > 0) {
+                        double total = 0;
+                        final List<String> entryDatesList = new ArrayList<>();
+                        final List<BarEntry> barEntries = new ArrayList<>();
+                        Map<String, Double> dataByDayMap = new LinkedHashMap<>();
+                        Map<String, Long> countByDayMap = new LinkedHashMap<>();
+                        String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                        for (int i = 1; i <= numOfDays; i++) {
+                            String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
+                            Log.i(TAG, date);
+                            dataByDayMap.put(date, 0d);
+                            countByDayMap.put(date, 0L);
                         }
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+
+                        for (DailyStress dailyEntry : dailyEntries) {
+                            // find matching record
+                            total += dailyEntry.getAverageStress();
+                            String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailyEntry.getDate());
+                            Long oldCount = countByDayMap.get(formattedDate);
+                            countByDayMap.put(formattedDate, oldCount + 1L);
+                            Double oldData = dataByDayMap.get(formattedDate);
+                            dataByDayMap.put(formattedDate, oldData + dailyEntry.getAverageStress());
+                        }
+                        int i = 0;
+                        float bestValue = 0;
+                        for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
+                            float entryValue = 0;
+                            if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
+                                entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
+                            }
+                            if (entryValue > bestValue) {
+                                bestValue = entryValue;
+                            }
+                            barEntries.add(new BarEntry(i, entryValue));
+                            entryDatesList.add(entry.getKey());
+                            i++;
+                        }
+
+                        Log.i(TAG, barEntries.toString());
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+                        double average = total / dailyEntries.size();
+                        final float finalValueToPass = bestValue;
+                        //displayAllInsights(itemType);
+                        Log.i(TAG, "Average is " + average);
+
+                        final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
+                        if (regressionSummaries != null && regressionSummaries.size() > 0) {
+                            Collections.sort(regressionSummaries, new SimpleRegressionSummary.BestFitComparator());
+                            for (SimpleRegressionSummary simpleRegressionSummary : regressionSummaries) {
+                                if (simpleRegressionSummary.getDepVar().equals(getString(R.string.stress_camel_case))) {
+                                    if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
+                                        if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
+                                            sortedList.add(simpleRegressionSummary);
+                                            //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                        } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
+                                            sortedList.add(simpleRegressionSummary);
+                                            //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                        }
+                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.timer_camel_case))) {
+                                        if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
+                                            sortedList.add(simpleRegressionSummary);
+                                        }
+                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
+                                        if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
+                                            sortedList.add(simpleRegressionSummary);
+                                        }
+                                    } else {
+                                        sortedList.add(simpleRegressionSummary);
+                                    }
+                                    Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
+                                }
+                            }
+                        }
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.stress_camel_case), average);
+                                InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.stress_camel_case), barEntries, entryDatesList, average, finalValueToPass);
+                                averageItemItemAdapter.add(moodAverageItem);
+                                bestAndAverageItemItemAdapter.add(bestAndWorstItem);
+                                if (sortedList.size() > 0) {
+                                    if (getActivity() != null) {
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightMindFragment.this, getActivity(), getString(R.string.stress_camel_case), sortedList));
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                emptyViewItemAdapter.clear();
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightEmptyViewItem emptyViewItem = new InsightEmptyViewItem(getString(R.string.survey_camel_case));
+                                emptyViewItemAdapter.add(emptyViewItem);
+                            }
+                        });
                     }
                 }
-            });
+            }).start();
         } else if (itemType == DAILYREVIEW) {
-            InsightSummaryDailyReviewMediatorLiveData insightSummaryDailyReviewMediatorLiveData =
-                    new InsightSummaryDailyReviewMediatorLiveData(dailyReviewViewModel.getDailyDailyReviews(
-                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())),
-                            regressionSummaryViewModel.getAllMindSummaries(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                                    now, numOfDays));
-            insightSummaryDailyReviewMediatorLiveData.observe(getViewLifecycleOwner(), new Observer<Pair<List<DailyDailyReview>, List<SimpleRegressionSummary>>>() {
+            Handler handler = new Handler();
+            new Thread(new Runnable() {
                 @Override
-                public void onChanged(@Nullable Pair<List<DailyDailyReview>, List<SimpleRegressionSummary>> listListPair) {
-                    if (listListPair != null && listListPair.first != null && listListPair.second != null) {
-                        if (listListPair.first.size() > 0) {
-                            Handler handler = new Handler();
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    double total = 0;
-                                    final List<String> entryDatesList = new ArrayList<>();
-                                    final List<BarEntry> barEntries = new ArrayList<>();
-                                    Map<String, Double> dataByDayMap = new LinkedHashMap<>();
-                                    Map<String, Long> countByDayMap = new LinkedHashMap<>();
-                                    String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
-                                    for (int i = 1; i <= numOfDays; i++) {
-                                        String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
-                                        Log.i(TAG, date);
-                                        dataByDayMap.put(date, 0d);
-                                        countByDayMap.put(date, 0L);
-                                    }
-                                    Log.i(TAG, dataByDayMap.toString());
-                                    Log.i(TAG, countByDayMap.toString());
-
-                                    for (DailyDailyReview dailyEnergy : listListPair.first) {
-                                        // find matching record
-                                        total += dailyEnergy.getAverageDailyReview();
-                                        String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailyEnergy.getDate());
-                                        Long oldCount = countByDayMap.get(formattedDate);
-                                        countByDayMap.put(formattedDate, oldCount + 1L);
-                                        Double oldData = dataByDayMap.get(formattedDate);
-                                        dataByDayMap.put(formattedDate, oldData + dailyEnergy.getAverageDailyReview());
-                                    }
-                                    int i = 0;
-                                    float bestValue = 0;
-                                    for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
-                                        float entryValue = 0;
-                                        if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
-                                            entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
-                                        }
-                                        if (entryValue > bestValue) {
-                                            bestValue = entryValue;
-                                        }
-                                        barEntries.add(new BarEntry(i, entryValue));
-                                        entryDatesList.add(entry.getKey());
-                                        i++;
-                                    }
-
-                                    Log.i(TAG, barEntries.toString());
-                                    Log.i(TAG, dataByDayMap.toString());
-                                    Log.i(TAG, countByDayMap.toString());
-                                    double average = total / listListPair.first.size();
-                                    final float finalValueToPass = bestValue;
-                                    //displayAllInsights(itemType);
-                                    Log.i(TAG, "Average is " + average);
-                                    final List<SimpleRegressionSummary> simpleRegressionSummaries = new ArrayList<>();
-                                    final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
-                                    if (listListPair.second.size() > 0) {
-                                        simpleRegressionSummaries.addAll(listListPair.second);
-                                        Collections.sort(simpleRegressionSummaries, new SimpleRegressionSummary.BestFitComparator());
-                                        for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
-                                            if (simpleRegressionSummary.getDepVar().equals(getString(R.string.daily_review_camel_case))) {
-                                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    }
-                                                } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.timer_camel_case))) {
-                                                    if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                    }
-                                                } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
-                                                    if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                    }
-                                                } else {
-                                                    sortedList.add(simpleRegressionSummary);
-                                                }
-                                                Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
-                                            }
-                                        }
-                                    }
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            averageItemItemAdapter.clear();
-                                            bestAndAverageItemItemAdapter.clear();
-                                            topThreeItemItemAdapter.clear();
-                                            recommendationItemItemAdapter.clear();
-                                            InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.daily_review_camel_case), average);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.daily_review_camel_case), barEntries, entryDatesList, average, finalValueToPass);
-                                            averageItemItemAdapter.add(moodAverageItem);
-                                            bestAndAverageItemItemAdapter.add(bestAndWorstItem);
-                                            if (sortedList.size() > 0) {
-                                                if (getActivity() != null) {
-                                                    topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightMindFragment.this, getString(R.string.daily_review_camel_case), sortedList));
-                                                }
-                                            }
-                                        }
-                                    });
-                                }
-                            }).start();
+                public void run() {
+                    List<DailyDailyReview> dailyEntries =
+                            dailyReviewRepository.getDailyDailyReviewsNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(),
+                                            numOfDays - 1),
+                                    formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                    List<SimpleRegressionSummary> regressionSummaries =
+                            predictionsRepository.getAllMindSummariesNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(),
+                                            numOfDays - 1), now, numOfDays);
+                    if (dailyEntries != null & dailyEntries.size() > 0) {
+                        double total = 0;
+                        final List<String> entryDatesList = new ArrayList<>();
+                        final List<BarEntry> barEntries = new ArrayList<>();
+                        Map<String, Double> dataByDayMap = new LinkedHashMap<>();
+                        Map<String, Long> countByDayMap = new LinkedHashMap<>();
+                        String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                        for (int i = 1; i <= numOfDays; i++) {
+                            String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
+                            Log.i(TAG, date);
+                            dataByDayMap.put(date, 0d);
+                            countByDayMap.put(date, 0L);
                         }
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+
+                        for (DailyDailyReview dailyEntry : dailyEntries) {
+                            // find matching record
+                            total += dailyEntry.getAverageDailyReview();
+                            String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailyEntry.getDate());
+                            Long oldCount = countByDayMap.get(formattedDate);
+                            countByDayMap.put(formattedDate, oldCount + 1L);
+                            Double oldData = dataByDayMap.get(formattedDate);
+                            dataByDayMap.put(formattedDate, oldData + dailyEntry.getAverageDailyReview());
+                        }
+                        int i = 0;
+                        float bestValue = 0;
+                        for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
+                            float entryValue = 0;
+                            if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
+                                entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
+                            }
+                            if (entryValue > bestValue) {
+                                bestValue = entryValue;
+                            }
+                            barEntries.add(new BarEntry(i, entryValue));
+                            entryDatesList.add(entry.getKey());
+                            i++;
+                        }
+
+                        Log.i(TAG, barEntries.toString());
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+                        double average = total / dailyEntries.size();
+                        final float finalValueToPass = bestValue;
+                        //displayAllInsights(itemType);
+                        Log.i(TAG, "Average is " + average);
+
+                        final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
+                        if (regressionSummaries != null && regressionSummaries.size() > 0) {
+                            Collections.sort(regressionSummaries, new SimpleRegressionSummary.BestFitComparator());
+                            for (SimpleRegressionSummary simpleRegressionSummary : regressionSummaries) {
+                                if (simpleRegressionSummary.getDepVar().equals(getString(R.string.daily_review_camel_case))) {
+                                    if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
+                                        if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
+                                            sortedList.add(simpleRegressionSummary);
+                                            //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                        } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
+                                            sortedList.add(simpleRegressionSummary);
+                                            //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                        }
+                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.timer_camel_case))) {
+                                        if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
+                                            sortedList.add(simpleRegressionSummary);
+                                        }
+                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
+                                        if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
+                                            sortedList.add(simpleRegressionSummary);
+                                        }
+                                    } else {
+                                        sortedList.add(simpleRegressionSummary);
+                                    }
+                                    Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
+                                }
+                            }
+                        }
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.daily_review_camel_case), average);
+                                InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.daily_review_camel_case), barEntries, entryDatesList, average, finalValueToPass);
+                                averageItemItemAdapter.add(moodAverageItem);
+                                bestAndAverageItemItemAdapter.add(bestAndWorstItem);
+                                if (sortedList.size() > 0) {
+                                    if (getActivity() != null) {
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightMindFragment.this, getActivity(), getString(R.string.daily_review_camel_case), sortedList));
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                emptyViewItemAdapter.clear();
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightEmptyViewItem emptyViewItem = new InsightEmptyViewItem(getString(R.string.survey_camel_case));
+                                emptyViewItemAdapter.add(emptyViewItem);
+                            }
+                        });
                     }
                 }
-            });
+            }).start();
         } else if (itemType == DEPRESSION) {
-            InsightSummaryDepressionMediatorLiveData insightDepressionMediatorLiveData =
-                    new InsightSummaryDepressionMediatorLiveData(depressionViewModel.getDailyPhq9s(
-                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())),
-                            regressionSummaryViewModel.getAllMindSummaries(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                                    now, numOfDays));
-            insightDepressionMediatorLiveData.observe(getViewLifecycleOwner(), new Observer<Pair<List<DailyPhq9>, List<SimpleRegressionSummary>>>() {
+            Handler handler = new Handler();
+            new Thread(new Runnable() {
                 @Override
-                public void onChanged(@Nullable Pair<List<DailyPhq9>, List<SimpleRegressionSummary>> listListPair) {
-                    if (listListPair != null && listListPair.first != null && listListPair.second != null) {
-                        if (listListPair.first.size() > 0) {
-                            Handler handler = new Handler();
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    double total = 0;
-                                    final List<String> entryDatesList = new ArrayList<>();
-                                    final List<BarEntry> barEntries = new ArrayList<>();
-                                    Map<String, Double> dataByDayMap = new LinkedHashMap<>();
-                                    Map<String, Long> countByDayMap = new LinkedHashMap<>();
-                                    String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
-                                    for (int i = 1; i <= numOfDays; i++) {
-                                        String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
-                                        Log.i(TAG, date);
-                                        dataByDayMap.put(date, 0d);
-                                        countByDayMap.put(date, 0L);
-                                    }
-                                    Log.i(TAG, dataByDayMap.toString());
-                                    Log.i(TAG, countByDayMap.toString());
-
-                                    for (DailyPhq9 dailyEntry : listListPair.first) {
-                                        // find matching record
-                                        total += dailyEntry.getAverageScore();
-                                        String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailyEntry.getDate());
-                                        Long oldCount = countByDayMap.get(formattedDate);
-                                        countByDayMap.put(formattedDate, oldCount + 1L);
-                                        Double oldData = dataByDayMap.get(formattedDate);
-                                        dataByDayMap.put(formattedDate, oldData + dailyEntry.getAverageScore());
-                                    }
-                                    int i = 0;
-                                    float bestValue = 0;
-                                    for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
-                                        float entryValue = 0;
-                                        if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
-                                            entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
-                                        }
-                                        if (entryValue > bestValue) {
-                                            bestValue = entryValue;
-                                        }
-                                        barEntries.add(new BarEntry(i, entryValue));
-                                        entryDatesList.add(entry.getKey());
-                                        i++;
-                                    }
-
-                                    Log.i(TAG, barEntries.toString());
-                                    Log.i(TAG, dataByDayMap.toString());
-                                    Log.i(TAG, countByDayMap.toString());
-                                    double average = total / listListPair.first.size();
-                                    final float finalValueToPass = bestValue;
-                                    //displayAllInsights(itemType);
-                                    Log.i(TAG, "Average is " + average);
-                                    final List<SimpleRegressionSummary> simpleRegressionSummaries = new ArrayList<>();
-                                    final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
-                                    if (listListPair.second.size() > 0) {
-                                        simpleRegressionSummaries.addAll(listListPair.second);
-                                        Collections.sort(simpleRegressionSummaries, new SimpleRegressionSummary.BestFitComparator());
-                                        for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
-                                            if (simpleRegressionSummary.getDepVar().equals(getString(R.string.depression_phq9_camel_case))) {
-                                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    }
-                                                } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.timer_camel_case))) {
-                                                    if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                    }
-                                                } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
-                                                    if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                    }
-                                                } else {
-                                                    sortedList.add(simpleRegressionSummary);
-                                                }
-                                                Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
-                                            }
-                                        }
-                                    }
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            averageItemItemAdapter.clear();
-                                            bestAndAverageItemItemAdapter.clear();
-                                            topThreeItemItemAdapter.clear();
-                                            recommendationItemItemAdapter.clear();
-                                            InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.depression_phq9_camel_case), average);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.depression_phq9_camel_case), barEntries, entryDatesList, average, finalValueToPass);
-                                            averageItemItemAdapter.add(moodAverageItem);
-                                            bestAndAverageItemItemAdapter.add(bestAndWorstItem);
-                                            if (sortedList.size() > 0) {
-                                                if (getActivity() != null) {
-                                                    topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightMindFragment.this, getString(R.string.depression_phq9_camel_case), sortedList));
-                                                }
-                                            }
-                                        }
-                                    });
-                                }
-                            }).start();
+                public void run() {
+                    List<DailyPhq9> dailyEntries =
+                            depressionRepository.getDailyPhq9sNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(),
+                                            numOfDays - 1),
+                                    formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                    List<SimpleRegressionSummary> regressionSummaries =
+                            predictionsRepository.getAllMindSummariesNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(),
+                                            numOfDays - 1), now, numOfDays);
+                    if (dailyEntries != null & dailyEntries.size() > 0) {
+                        double total = 0;
+                        final List<String> entryDatesList = new ArrayList<>();
+                        final List<BarEntry> barEntries = new ArrayList<>();
+                        Map<String, Double> dataByDayMap = new LinkedHashMap<>();
+                        Map<String, Long> countByDayMap = new LinkedHashMap<>();
+                        String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                        for (int i = 1; i <= numOfDays; i++) {
+                            String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
+                            Log.i(TAG, date);
+                            dataByDayMap.put(date, 0d);
+                            countByDayMap.put(date, 0L);
                         }
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+
+                        for (DailyPhq9 dailyEntry : dailyEntries) {
+                            // find matching record
+                            total += dailyEntry.getAverageScore();
+                            String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailyEntry.getDate());
+                            Long oldCount = countByDayMap.get(formattedDate);
+                            countByDayMap.put(formattedDate, oldCount + 1L);
+                            Double oldData = dataByDayMap.get(formattedDate);
+                            dataByDayMap.put(formattedDate, oldData + dailyEntry.getAverageScore());
+                        }
+                        int i = 0;
+                        float bestValue = 0;
+                        for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
+                            float entryValue = 0;
+                            if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
+                                entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
+                            }
+                            if (entryValue > bestValue) {
+                                bestValue = entryValue;
+                            }
+                            barEntries.add(new BarEntry(i, entryValue));
+                            entryDatesList.add(entry.getKey());
+                            i++;
+                        }
+
+                        Log.i(TAG, barEntries.toString());
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+                        double average = total / dailyEntries.size();
+                        final float finalValueToPass = bestValue;
+                        //displayAllInsights(itemType);
+                        Log.i(TAG, "Average is " + average);
+
+                        final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
+                        if (regressionSummaries != null && regressionSummaries.size() > 0) {
+                            Collections.sort(regressionSummaries, new SimpleRegressionSummary.BestFitComparator());
+                            for (SimpleRegressionSummary simpleRegressionSummary : regressionSummaries) {
+                                if (simpleRegressionSummary.getDepVar().equals(getString(R.string.depression_phq9_camel_case))) {
+                                    if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
+                                        if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
+                                            sortedList.add(simpleRegressionSummary);
+                                            //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                        } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
+                                            sortedList.add(simpleRegressionSummary);
+                                            //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                        }
+                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.timer_camel_case))) {
+                                        if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
+                                            sortedList.add(simpleRegressionSummary);
+                                        }
+                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
+                                        if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
+                                            sortedList.add(simpleRegressionSummary);
+                                        }
+                                    } else {
+                                        sortedList.add(simpleRegressionSummary);
+                                    }
+                                    Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
+                                }
+                            }
+                        }
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.depression_phq9_camel_case), average);
+                                InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.depression_phq9_camel_case), barEntries, entryDatesList, average, finalValueToPass);
+                                averageItemItemAdapter.add(moodAverageItem);
+                                bestAndAverageItemItemAdapter.add(bestAndWorstItem);
+                                if (sortedList.size() > 0) {
+                                    if (getActivity() != null) {
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightMindFragment.this, getActivity(), getString(R.string.depression_phq9_camel_case), sortedList));
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                emptyViewItemAdapter.clear();
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightEmptyViewItem emptyViewItem = new InsightEmptyViewItem(getString(R.string.survey_camel_case));
+                                emptyViewItemAdapter.add(emptyViewItem);
+                            }
+                        });
                     }
                 }
-            });
+            }).start();
         } else if (itemType == ANXIETY) {
-            InsightSummaryAnxietyMediatorLiveData insightAnxietyMediatorLiveData =
-                    new InsightSummaryAnxietyMediatorLiveData(anxietyViewModel.getDailyGad7s(
-                            formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                            formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD())),
-                            regressionSummaryViewModel.getAllMindSummaries(formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(formattedTime.getCurrentDateAsYYYYMMDD(), numOfDays - 1),
-                                    now, numOfDays));
-            insightAnxietyMediatorLiveData.observe(getViewLifecycleOwner(), new Observer<Pair<List<DailyGad7>, List<SimpleRegressionSummary>>>() {
+            Handler handler = new Handler();
+            new Thread(new Runnable() {
                 @Override
-                public void onChanged(@Nullable Pair<List<DailyGad7>, List<SimpleRegressionSummary>> listListPair) {
-                    if (listListPair != null && listListPair.first != null && listListPair.second != null) {
-                        if (listListPair.first.size() > 0) {
-                            Handler handler = new Handler();
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    double total = 0;
-                                    final List<String> entryDatesList = new ArrayList<>();
-                                    final List<BarEntry> barEntries = new ArrayList<>();
-                                    Map<String, Double> dataByDayMap = new LinkedHashMap<>();
-                                    Map<String, Long> countByDayMap = new LinkedHashMap<>();
-                                    String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
-                                    for (int i = 1; i <= numOfDays; i++) {
-                                        String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
-                                        Log.i(TAG, date);
-                                        dataByDayMap.put(date, 0d);
-                                        countByDayMap.put(date, 0L);
-                                    }
-                                    Log.i(TAG, dataByDayMap.toString());
-                                    Log.i(TAG, countByDayMap.toString());
-
-                                    for (DailyGad7 dailyEntry : listListPair.first) {
-                                        // find matching record
-                                        total += dailyEntry.getAverageScore();
-                                        String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailyEntry.getDate());
-                                        Long oldCount = countByDayMap.get(formattedDate);
-                                        countByDayMap.put(formattedDate, oldCount + 1L);
-                                        Double oldData = dataByDayMap.get(formattedDate);
-                                        dataByDayMap.put(formattedDate, oldData + dailyEntry.getAverageScore());
-                                    }
-                                    int i = 0;
-                                    float bestValue = 0;
-                                    for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
-                                        float entryValue = 0;
-                                        if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
-                                            entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
-                                        }
-                                        if (entryValue > bestValue) {
-                                            bestValue = entryValue;
-                                        }
-                                        barEntries.add(new BarEntry(i, entryValue));
-                                        entryDatesList.add(entry.getKey());
-                                        i++;
-                                    }
-
-                                    Log.i(TAG, barEntries.toString());
-                                    Log.i(TAG, dataByDayMap.toString());
-                                    Log.i(TAG, countByDayMap.toString());
-                                    double average = total / listListPair.first.size();
-                                    final float finalValueToPass = bestValue;
-                                    //displayAllInsights(itemType);
-                                    Log.i(TAG, "Average is " + average);
-                                    final List<SimpleRegressionSummary> simpleRegressionSummaries = new ArrayList<>();
-                                    final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
-                                    if (listListPair.second.size() > 0) {
-                                        simpleRegressionSummaries.addAll(listListPair.second);
-                                        Collections.sort(simpleRegressionSummaries, new SimpleRegressionSummary.BestFitComparator());
-                                        for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
-                                            if (simpleRegressionSummary.getDepVar().equals(getString(R.string.anxiety_gad7_camel_case))) {
-                                                if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
-                                                    if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                        //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
-                                                    }
-                                                } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.timer_camel_case))) {
-                                                    if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                    }
-                                                } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
-                                                    if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
-                                                        sortedList.add(simpleRegressionSummary);
-                                                    }
-                                                } else {
-                                                    sortedList.add(simpleRegressionSummary);
-                                                }
-                                                Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
-                                            }
-                                        }
-                                    }
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            averageItemItemAdapter.clear();
-                                            bestAndAverageItemItemAdapter.clear();
-                                            topThreeItemItemAdapter.clear();
-                                            recommendationItemItemAdapter.clear();
-                                            InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.anxiety_gad7_camel_case), average);
-                                            InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.anxiety_gad7_camel_case), barEntries, entryDatesList, average, finalValueToPass);
-                                            averageItemItemAdapter.add(moodAverageItem);
-                                            bestAndAverageItemItemAdapter.add(bestAndWorstItem);
-                                            if (sortedList.size() > 0) {
-                                                if (getActivity() != null) {
-                                                    topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightMindFragment.this, getString(R.string.anxiety_gad7_camel_case), sortedList));
-                                                }
-                                            }
-                                        }
-                                    });
-                                }
-                            }).start();
+                public void run() {
+                    List<DailyGad7> dailyEntries =
+                            anxietyRepository.getDailyGad7sNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(),
+                                            numOfDays - 1),
+                                    formattedTime.getEndOfDay(formattedTime.getCurrentDateAsYYYYMMDD()));
+                    List<SimpleRegressionSummary> regressionSummaries =
+                            predictionsRepository.getAllMindSummariesNow(
+                                    formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(
+                                            formattedTime.getCurrentDateAsYYYYMMDD(),
+                                            numOfDays - 1), now, numOfDays);
+                    if (dailyEntries != null & dailyEntries.size() > 0) {
+                        double total = 0;
+                        final List<String> entryDatesList = new ArrayList<>();
+                        final List<BarEntry> barEntries = new ArrayList<>();
+                        Map<String, Double> dataByDayMap = new LinkedHashMap<>();
+                        Map<String, Long> countByDayMap = new LinkedHashMap<>();
+                        String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
+                        for (int i = 1; i <= numOfDays; i++) {
+                            String date = formattedTime.getDateBeforeSpecifiedNumberOfDaysAsEEE(lastEntryDate, numOfDays - i);
+                            Log.i(TAG, date);
+                            dataByDayMap.put(date, 0d);
+                            countByDayMap.put(date, 0L);
                         }
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+
+                        for (DailyGad7 dailyEntry : dailyEntries) {
+                            // find matching record
+                            total += dailyEntry.getAverageScore();
+                            String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailyEntry.getDate());
+                            Long oldCount = countByDayMap.get(formattedDate);
+                            countByDayMap.put(formattedDate, oldCount + 1L);
+                            Double oldData = dataByDayMap.get(formattedDate);
+                            dataByDayMap.put(formattedDate, oldData + dailyEntry.getAverageScore());
+                        }
+                        int i = 0;
+                        float bestValue = 0;
+                        for (Map.Entry<String, Double> entry : dataByDayMap.entrySet()) {
+                            float entryValue = 0;
+                            if (countByDayMap.get(entry.getKey()) != null && countByDayMap.get(entry.getKey()) != 0L) {
+                                entryValue = entry.getValue().floatValue() / countByDayMap.get(entry.getKey());
+                            }
+                            if (entryValue > bestValue) {
+                                bestValue = entryValue;
+                            }
+                            barEntries.add(new BarEntry(i, entryValue));
+                            entryDatesList.add(entry.getKey());
+                            i++;
+                        }
+
+                        Log.i(TAG, barEntries.toString());
+                        Log.i(TAG, dataByDayMap.toString());
+                        Log.i(TAG, countByDayMap.toString());
+                        double average = total / dailyEntries.size();
+                        final float finalValueToPass = bestValue;
+                        //displayAllInsights(itemType);
+                        Log.i(TAG, "Average is " + average);
+
+                        final List<SimpleRegressionSummary> sortedList = new ArrayList<>();
+                        if (regressionSummaries != null && regressionSummaries.size() > 0) {
+                            Collections.sort(regressionSummaries, new SimpleRegressionSummary.BestFitComparator());
+                            for (SimpleRegressionSummary simpleRegressionSummary : regressionSummaries) {
+                                if (simpleRegressionSummary.getDepVar().equals(getString(R.string.anxiety_gad7_camel_case))) {
+                                    if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.phone_usage_camel_case))) {
+                                        if (simpleRegressionSummary.getIndepVar().equals(getString(R.string.phone_usage_total_title))) {
+                                            sortedList.add(simpleRegressionSummary);
+                                            //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                        } else if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
+                                            sortedList.add(simpleRegressionSummary);
+                                            //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()));
+                                        }
+                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.timer_camel_case))) {
+                                        if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
+                                            sortedList.add(simpleRegressionSummary);
+                                        }
+                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
+                                        if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
+                                            sortedList.add(simpleRegressionSummary);
+                                        }
+                                    } else {
+                                        sortedList.add(simpleRegressionSummary);
+                                    }
+                                    Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
+                                }
+                            }
+                        }
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightMindAverageItem moodAverageItem = new InsightMindAverageItem(getString(R.string.anxiety_gad7_camel_case), average);
+                                InsightBestAndWorstItem bestAndWorstItem = new InsightBestAndWorstItem(getString(R.string.anxiety_gad7_camel_case), barEntries, entryDatesList, average, finalValueToPass);
+                                averageItemItemAdapter.add(moodAverageItem);
+                                bestAndAverageItemItemAdapter.add(bestAndWorstItem);
+                                if (sortedList.size() > 0) {
+                                    if (getActivity() != null) {
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightMindFragment.this, getActivity(), getString(R.string.anxiety_gad7_camel_case), sortedList));
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                emptyViewItemAdapter.clear();
+                                averageItemItemAdapter.clear();
+                                bestAndAverageItemItemAdapter.clear();
+                                topThreeItemItemAdapter.clear();
+                                recommendationItemItemAdapter.clear();
+                                InsightEmptyViewItem emptyViewItem = new InsightEmptyViewItem(getString(R.string.survey_camel_case));
+                                emptyViewItemAdapter.add(emptyViewItem);
+                            }
+                        });
                     }
                 }
-            });
+            }).start();
         }
     }
 
@@ -1059,12 +1135,13 @@ public class InsightMindFragment extends Fragment {
                 now, numOfDays).observe(getViewLifecycleOwner(), new Observer<List<SimpleRegressionSummary>>() {
             @Override
             public void onChanged(@Nullable List<SimpleRegressionSummary> simpleRegressionSummaries) {
+                Handler handler = new Handler();
                 if (simpleRegressionSummaries != null && simpleRegressionSummaries.size() > 0) {
+                    emptyViewItemAdapter.clear();
                     averageItemItemAdapter.clear();
                     bestAndAverageItemItemAdapter.clear();
                     topThreeItemItemAdapter.clear();
                     recommendationItemItemAdapter.clear();
-                    Handler handler = new Handler();
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -1147,14 +1224,18 @@ public class InsightMindFragment extends Fragment {
                         }
                     }).start();
                 } else {
-                    averageItemItemAdapter.clear();
-                    bestAndAverageItemItemAdapter.clear();
-                    topThreeItemItemAdapter.clear();
-                    recommendationItemItemAdapter.clear();
-                    if (getActivity() != null) {
-                        InsightRecommendationItem insightRecommendationItem = new InsightRecommendationItem(null, InsightMindFragment.this);
-                        recommendationItemItemAdapter.add(insightRecommendationItem);
-                    }
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            emptyViewItemAdapter.clear();
+                            averageItemItemAdapter.clear();
+                            bestAndAverageItemItemAdapter.clear();
+                            topThreeItemItemAdapter.clear();
+                            recommendationItemItemAdapter.clear();
+                            InsightEmptyViewItem emptyViewItem = new InsightEmptyViewItem(getString(R.string.recommendation_camel_case));
+                            emptyViewItemAdapter.add(emptyViewItem);
+                        }
+                    });
                 }
             }
         });
