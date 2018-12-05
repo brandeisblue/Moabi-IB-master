@@ -108,11 +108,7 @@ public class BAActivityRepository {
 
     public boolean deleteActivityEntry(String timeOfEntry, String name) {
         AsyncTask.Status status = new deleteActivityEntryAsyncTask(entryDao, timeOfEntry, name).execute().getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class deleteActivityEntryAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -137,11 +133,7 @@ public class BAActivityRepository {
 
     public boolean deleteAllFavoritedActivities() {
         AsyncTask.Status status = new deleteAllFavoritedActivitiesAsyncTask(favoritedDao).execute().getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class deleteAllFavoritedActivitiesAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -161,11 +153,7 @@ public class BAActivityRepository {
 
     public boolean deleteAllActivitiesInLibrary() {
         AsyncTask.Status status = new deleteAllActivitiesInLibraryAsyncTask(libraryDao).execute().getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class deleteAllActivitiesInLibraryAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -185,11 +173,7 @@ public class BAActivityRepository {
 
     public boolean deleteFavoritedActivity(String name) {
         AsyncTask.Status status = new deleteFavoritedActivityAsyncTask(favoritedDao).execute(name).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class deleteFavoritedActivityAsyncTask extends AsyncTask<String, Void, Void> {
@@ -215,11 +199,7 @@ public class BAActivityRepository {
         inputHistory.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
         inputHistoryRepository.insert(inputHistory);
         AsyncTask.Status status = new insertActivityEntryAsyncTask(entryDao).execute(entry).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertActivityEntryAsyncTask extends AsyncTask<BAActivityEntry, Void, Void> {
@@ -240,11 +220,7 @@ public class BAActivityRepository {
 
     public boolean insertFavoritedActivity(BAActivityFavorited activityInUse) {
         AsyncTask.Status status = new insertFavoritedActivityAsyncTask(favoritedDao).execute(activityInUse).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertFavoritedActivityAsyncTask extends AsyncTask<BAActivityFavorited, Void, Void> {
@@ -263,11 +239,7 @@ public class BAActivityRepository {
 
     public boolean insertActivityToLibrary(BAActivityInLibrary activityInDB) {
         AsyncTask.Status status = new insertActivityToLibraryAsyncTask(libraryDao).execute(activityInDB).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertActivityToLibraryAsyncTask extends AsyncTask<BAActivityInLibrary, Void, Void> {

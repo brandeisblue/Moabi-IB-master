@@ -86,7 +86,7 @@ public class DailyReviewRepository {
                             if (timeSnap.getKey() != null) {
                                 String dateTimeToConvert = date + " " + timeSnap.getKey();
                                 long dateInLong = formattedTime.convertStringYYYYMMDDhhmmToLong(dateTimeToConvert);
-                                if ((Long) timeSnap.getValue() != null) {
+                                if (timeSnap.getValue() != null) {
                                     DailyReview entry = new DailyReview();
                                     entry.setDailyReview((Long) timeSnap.getValue());
                                     entry.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
@@ -115,20 +115,12 @@ public class DailyReviewRepository {
         inputHistory.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
         inputHistory.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
         inputHistoryRepository.insert(inputHistory);
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     public boolean processDailyReview(List<DailyReview> dailyReviewList) {
         AsyncTask.Status status = new processDailyReviewAsyncTask(this, dailyReviewList).execute().getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class processDailyReviewAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -296,11 +288,7 @@ public class DailyReviewRepository {
 
     private boolean insertDailyDailyReview(DailyDailyReview dailyDailyReview) {
         AsyncTask.Status status = new insertDailyDailyReviewAsyncTask(mDao).execute(dailyDailyReview).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertDailyDailyReviewAsyncTask extends AsyncTask<DailyDailyReview, Void, Void> {
@@ -320,11 +308,7 @@ public class DailyReviewRepository {
 
     private boolean insertWeeklyDailyReview(WeeklyDailyReview weeklyDailyReview) {
         AsyncTask.Status status = new insertWeeklyDailyReviewAsyncTask(mDao).execute(weeklyDailyReview).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertWeeklyDailyReviewAsyncTask extends AsyncTask<WeeklyDailyReview, Void, Void> {
@@ -344,11 +328,7 @@ public class DailyReviewRepository {
 
     private boolean insertMonthlyDailyReview(MonthlyDailyReview monthlyDailyReview) {
         AsyncTask.Status status = new insertMonthlyDailyReviewAsyncTask(mDao).execute(monthlyDailyReview).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertMonthlyDailyReviewAsyncTask extends AsyncTask<MonthlyDailyReview, Void, Void> {

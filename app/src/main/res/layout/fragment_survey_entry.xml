@@ -1,30 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:seekarc="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
 
     <TextView
         android:id="@+id/fragment_survey_entry_question_prompt_textview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_weight="2.5"
         android:gravity="center"
-        android:text="Over the last 2 weeks, \n how often have you been bothered \n by any of the following problems?"
+        android:text="@string/gad7_phq9_main_question"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold" />
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/fragment_survey_entry_question_progress_indicator"
+            style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="6"
+            android:gravity="center"
+            android:progress="80"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/fragment_survey_entry_question_progress_textview"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="1 / 10"
+            android:gravity="center"/>
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/fragment_survey_entry_question_recyclerview"
         android:layout_width="match_parent"
-        android:layout_gravity="center"
         android:layout_height="0dp"
-        android:layout_weight="6">
-    </androidx.recyclerview.widget.RecyclerView>
+        android:layout_gravity="center"
+        android:layout_weight="5"></androidx.recyclerview.widget.RecyclerView>
 
     <LinearLayout
         android:id="@+id/fragment_survey_entry_navigation_layout"
@@ -40,10 +70,10 @@
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginTop="-6dp"
             android:layout_marginBottom="-22dp"
             android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:layout_marginTop="-6dp"
             android:paddingStart="-16dp"
             android:paddingEnd="-16dp"
             android:text="Back"
@@ -74,9 +104,9 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:paddingStart="-16dp"
             android:paddingEnd="-16dp"
-            android:visibility="gone"
             android:text="Submit"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:visibility="gone" />
     </LinearLayout>
 
 </LinearLayout>

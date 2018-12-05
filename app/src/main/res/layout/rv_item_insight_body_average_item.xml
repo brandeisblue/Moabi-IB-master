@@ -23,7 +23,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_alignParentEnd="true"
-            android:visibility="visible"
+            android:visibility="gone"
             android:scaleType="fitXY"
             android:tint="@color/darker_gray"
             android:layout_centerVertical="true"

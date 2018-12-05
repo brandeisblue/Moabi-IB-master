@@ -99,6 +99,8 @@ public class MotionSensorService extends Service implements SensorEventListener 
     @Override
     public void onCreate() {
         super.onCreate();
+        builder = new NotificationCompat.Builder(this,
+                getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID));
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         formattedTime = new FormattedTime();
@@ -131,11 +133,13 @@ public class MotionSensorService extends Service implements SensorEventListener 
                             if (profile.getAge() != null) {
                                 bmr = bmr - 5 * profile.getAge() + 5;
                             }
-                        } else {
+                        } else if (profile.getGender().equals(getString(R.string.profile_sex_female))){
                             bmr = profile.getWeight() * 10 + 6.25 * profile.getHeight();
                             if (profile.getAge() != null) {
                                 bmr = bmr - 5 * profile.getAge() - 161;
                             }
+                        } else {
+                            bmr = 1577.5;
                         }
                     }
                 } else {
@@ -232,8 +236,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
             } else if (mainMeasure.equals(getString(R.string.activity_calories_title))) {
                 measure = getString(R.string.activity_calories_title) + ": " + String.format(Locale.US, "%.0f", calories) + " " + getString(R.string.unit_calories);
             }
-            builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
-                    .setSmallIcon(R.drawable.ic_monogram_white)
+            builder.setSmallIcon(R.drawable.ic_monogram_white)
                     .setContentTitle(measure)
                     //.setContentText("Today: " + String.format(Locale.US, "%.2f", distance / 1000) + " km, " + TimeUnit.MILLISECONDS.toMinutes(activeMins) + " mins, " + TimeUnit.MILLISECONDS.toMinutes(sedentaryMins) + " mins, " + calories + " Cal")
                     .setColor(getColor(R.color.colorPrimary))
@@ -302,8 +305,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
-                                        .setSmallIcon(R.drawable.ic_monogram_white)
+                                builder.setSmallIcon(R.drawable.ic_monogram_white)
                                         .setContentTitle(s)
                                         .setShowWhen(false)
                                         .setContentText(getString(R.string.tracker_google_fit_last_sync_prompt) + " " + lastSyncTime)
@@ -343,8 +345,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
-                                        .setSmallIcon(R.drawable.ic_monogram_white)
+                                builder.setSmallIcon(R.drawable.ic_monogram_white)
                                         .setContentTitle(s)
                                         .setShowWhen(false)
                                         .setContentText(getString(R.string.tracker_google_fit_last_sync_prompt) + " " + formattedTime.getCurrentTimeAsHMMA())
@@ -417,8 +418,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
                                     handler.post(new Runnable() {
                                         @Override
                                         public void run() {
-                                            builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
-                                                    .setSmallIcon(R.drawable.ic_monogram_white)
+                                            builder.setSmallIcon(R.drawable.ic_monogram_white)
                                                     .setContentTitle(s)
                                                     .setShowWhen(false)
                                                     .setContentText(getString(R.string.tracker_fitbit_last_sync_prompt) + " " + timeOnly)
@@ -440,8 +440,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
                                     });
                                 } catch (ParseException e) {
                                     e.printStackTrace();
-                                    builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
-                                            .setSmallIcon(R.drawable.ic_monogram_white)
+                                    builder.setSmallIcon(R.drawable.ic_monogram_white)
                                             .setContentTitle(s)
                                             .setShowWhen(false)
                                             .setContentText(getString(R.string.tracker_fitbit_last_sync_prompt) + " " + lastSyncTimeHHMM)
@@ -465,8 +464,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
-                                            .setSmallIcon(R.drawable.ic_monogram_white)
+                                    builder.setSmallIcon(R.drawable.ic_monogram_white)
                                             .setContentTitle(s)
                                             .setShowWhen(false)
                                             .setContentText(getString(R.string.tracker_fitbit_last_sync_prompt) + " " + formattedTime.getCurrentTimeAsHMMA())
@@ -512,8 +510,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                builder = new NotificationCompat.Builder(MotionSensorService.this, getApplicationContext().getString(R.string.MOTION_SENSOR_NOTIF_CHANNEL_ID))
-                                        .setSmallIcon(R.drawable.ic_monogram_white)
+                                builder.setSmallIcon(R.drawable.ic_monogram_white)
                                         .setContentTitle(s)
                                         .setShowWhen(false)
                                         .setContentText(getString(R.string.tracker_fitbit_last_sync_prompt) + " " + formattedTime.getCurrentTimeAsHMMA())
@@ -595,8 +592,10 @@ public class MotionSensorService extends Service implements SensorEventListener 
                             distance = steps * (profile.getHeight() * 0.414) / 100;
                         } else if (profile.getGender().equals(getString(R.string.profile_sex_male))) {
                             distance = steps * profile.getHeight() * 0.415 / 100;
-                        } else {
+                        } else if (profile.getGender().equals(getString(R.string.profile_sex_female))){
                             distance = steps * profile.getHeight() * 0.413 / 100;
+                        } else {
+                            distance = steps * (profile.getHeight() * 0.414) / 100;
                         }
                     } else {
                         distance = steps * 0.762;
@@ -623,7 +622,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
                     gravity[2] = smoothed[2];
                     if (ignore) {
                         countdown--;
-                        ignore = (countdown < 0) ? false : ignore;
+                        ignore = (countdown >= 0) && ignore;
                     } else
                         countdown = 22;
                     if ((Math.abs(prevY - gravity[1]) > threshold) && !ignore) {
@@ -631,11 +630,13 @@ public class MotionSensorService extends Service implements SensorEventListener 
                         ignore = true;
                         if (profile.getHeight() != null) {
                             if (profile.getGender() == null) {
-                                distance = steps * profile.getHeight() * 0.414 / 100;
+                                distance = steps * (profile.getHeight() * 0.414) / 100;
                             } else if (profile.getGender().equals(getString(R.string.profile_sex_male))) {
                                 distance = steps * profile.getHeight() * 0.415 / 100;
-                            } else {
+                            } else if (profile.getGender().equals(getString(R.string.profile_sex_female))){
                                 distance = steps * profile.getHeight() * 0.413 / 100;
+                            } else {
+                                distance = steps * (profile.getHeight() * 0.414) / 100;
                             }
                         } else {
                             distance = steps * 0.762;

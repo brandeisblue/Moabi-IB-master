@@ -127,7 +127,7 @@ public class StressEntryFragment extends Fragment {
                                 || inUse.getName().equals(getString(R.string.stress_camel_case)) || inUse.getName().equals(getString(R.string.pain_camel_case)) ||
                                 inUse.getName().equals(getString(R.string.daily_review_camel_case)) || inUse.getName().equals(getString(R.string.depression_phq9_camel_case))
                                 || inUse.getName().equals(getString(R.string.anxiety_gad7_camel_case))) {
-                            Boolean isChecked = (Boolean) inUse.isInUse();
+                            Boolean isChecked = inUse.isInUse();
                             if (isChecked != null) {
                                 if (isChecked) {
                                     userInputsInUseList.add(inUse.getName());
@@ -164,7 +164,7 @@ public class StressEntryFragment extends Fragment {
                                 });
                             }
                             //TODO - if getActivities for today (start of day till now) isn't null, update daysWithData
-                            ViewPager viewPager = (ViewPager) getActivity().findViewById(R.id.activity_make_entry_viewpager);
+                            ViewPager viewPager = getActivity().findViewById(R.id.activity_make_entry_viewpager);
                             int currentItem = viewPager.getCurrentItem();
                             Log.i(TAG, "# of fragments: " + userInputsInUseList.size() + ", " + "current position: " + currentItem);
                             if (userInputsInUseList.size() == 1 || currentItem == userInputsInUseList.size() - 1) {

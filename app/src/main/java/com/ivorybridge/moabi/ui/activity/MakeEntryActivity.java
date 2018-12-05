@@ -83,7 +83,7 @@ public class MakeEntryActivity extends AppCompatActivity {
                                 || inUse.getName().equals(getString(R.string.daily_review_camel_case))
                                 || inUse.getName().equals(getString(R.string.depression_phq9_camel_case))
                                 || inUse.getName().equals(getString(R.string.anxiety_gad7_camel_case))) {
-                            Boolean isChecked = (Boolean) inUse.isInUse();
+                            Boolean isChecked = inUse.isInUse();
                             if (isChecked != null) {
                                 if (isChecked) {
                                     userInputsInUseList.add(inUse.getName());

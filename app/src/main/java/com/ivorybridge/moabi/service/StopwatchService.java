@@ -36,9 +36,9 @@ import androidx.core.content.ContextCompat;
  * Service for Timer.
  * It is implemented as a foreground service so that it will be rarely killed even if resources are scarce.
  */
-public class TimerService extends Service implements PropertyChangeListener {
+public class StopwatchService extends Service implements PropertyChangeListener {
 
-    private static final String TAG = TimerService.class.getSimpleName();
+    private static final String TAG = StopwatchService.class.getSimpleName();
     private static final String ACTION_CHANGESTATE = "com.ivorybridge.moabi.service.timerservice.action_changestate";
     private static final String ACTION_RESET = "com.ivorybridge.moabi.service.timerservice.action_reset";
     private static final String ACTION_EXIT = "com.ivorybridge.moabi.service.timerservice.action_exit";
@@ -156,7 +156,7 @@ public class TimerService extends Service implements PropertyChangeListener {
                 timedActivitySummary.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
                 timedActivitySummary.setDuration(TimeContainer.getInstance().getElapsedTime());
                 timedActivityRepository.insert(timedActivitySummary, formattedTime.getCurrentDateAsYYYYMMDD());
-                TimerService.TimeContainer.getInstance().stopAndReset();
+                StopwatchService.TimeContainer.getInstance().stopAndReset();
                 firebaseManager.getUserInputsRef().child(getString(R.string.timer_camel_case))
                         .child(formattedTime.getCurrentDateAsYYYYMMDD())
                         .child(formattedTime.convertLongToHHMM(timedActivitySummary.getDateInLong()))
@@ -260,7 +260,7 @@ public class TimerService extends Service implements PropertyChangeListener {
                     .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                             .setShowCancelButton(true)
                             .setCancelButtonIntent(exitPendingIntent)
-                            .setShowActionsInCompactView(1, 2, 3))
+                            .setShowActionsInCompactView(1, 2, 5))
                     .build();
         }
         //this.startForeground(NOTIFICATION_ID, customNotification);

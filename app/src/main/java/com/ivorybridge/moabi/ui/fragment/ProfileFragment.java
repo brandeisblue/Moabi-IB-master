@@ -196,6 +196,7 @@ public class ProfileFragment extends Fragment {
                             if (dob == null || dob.isEmpty()) {
                                 dob = "";
                             }
+                            dobLayout.setVisibility(View.GONE);
                             dobTextView.setText(dob);
                             dobLayout.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -271,18 +272,19 @@ public class ProfileFragment extends Fragment {
                                 });
                             }
                             String age = "";
-                            long ageLong = 0;
+                            long ageLong = 30;
                             if (profile.getAge() != null) {
                                 age = profile.getAge() + "";
                                 ageLong = profile.getAge();
                             }
-                            final int numFirstNumPicker = (int) ageLong / 10;
-                            final int numSecondNumPicker = (int) ageLong % 10;
+                            final int numFirstNumPicker = (int) ageLong;
+                            //final int numSecondNumPicker = (int) ageLong % 10;
                             ageTextView.setText(age);
                             ageLayout.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    configureDoubleNumPicksLayout("Age", unit, numFirstNumPicker, numSecondNumPicker);
+                                    //configureDoubleNumPicksLayout("Age", unit, numFirstNumPicker, numSecondNumPicker);
+                                    configureSingleNumPickLayout(numFirstNumPicker);
                                 }
                             });
                         }
@@ -291,6 +293,66 @@ public class ProfileFragment extends Fragment {
             }
         }
         return mView;
+    }
+
+    private void configureSingleNumPickLayout(int firstNum) {
+        LinearLayout LL = new LinearLayout(getContext());
+        LL.setOrientation(LinearLayout.HORIZONTAL);
+
+        NumberPicker numPicker1 = new NumberPicker(getContext());
+        final TextView firstUnit = new TextView(getContext());
+        final String[] ages = new String[150];
+        for (int i = 0; i < 150; i++) {
+            ages[i] = Integer.toString(i);
+        }
+        numPicker1.setMaxValue(ages.length - 1);
+        numPicker1.setMinValue(0);
+        numPicker1.setDisplayedValues(ages);
+        firstUnit.setText("");
+        firstUnit.setGravity(Gravity.CENTER);
+        numPicker1.setValue(firstNum);
+        final TextView emptyView = new TextView(getContext());
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(50, 50);
+        params.setMargins(24, 24, 16, 16);
+        params.gravity = Gravity.CENTER;
+
+        LinearLayout.LayoutParams numPicker1Params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT);
+        numPicker1Params.weight = 2;
+
+        LinearLayout.LayoutParams firstUnitParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT);
+        firstUnitParams.weight = 1;
+
+        LinearLayout.LayoutParams emptyViewParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT);
+        emptyViewParams.weight = 1;
+
+        LL.setLayoutParams(params);
+        LL.addView(emptyView, emptyViewParams);
+        LL.addView(numPicker1, numPicker1Params);
+        LL.addView(firstUnit, firstUnitParams);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(getString(R.string.profile_age_title))
+                .setView(LL)
+                .setPositiveButton(getString(R.string.survey_okay_prompt), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.i(TAG, " " + numPicker1.getValue());
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (getActivity() != null) {
+                                    builtInFitnessRepository = new BuiltInFitnessRepository(getActivity().getApplication());
+                                    List<BuiltInProfile> builtInProfiles = builtInFitnessRepository.getUserProfileNow();
+                                    BuiltInProfile profile = builtInProfiles.get(0);
+                                    profile.setAge((long) (numPicker1.getValue()));
+                                    builtInFitnessRepository.insert(profile);
+                                }
+                            }
+                        }).start();
+                    }
+                });
+        builder.create().show();
     }
 
     private void configureDoubleNumPicksLayout(String type, String unit, int firstNum, int secondNum) {

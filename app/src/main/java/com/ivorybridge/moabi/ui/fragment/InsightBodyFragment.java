@@ -44,13 +44,8 @@ import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightEmptyViewItem;
 import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightRecommendationItem;
 import com.ivorybridge.moabi.ui.recyclerviewitem.insight.InsightTopThreeItem;
 import com.ivorybridge.moabi.util.FormattedTime;
-import com.ivorybridge.moabi.viewmodel.AppUsageViewModel;
 import com.ivorybridge.moabi.viewmodel.BAActivityViewModel;
-import com.ivorybridge.moabi.viewmodel.BuiltInFitnessViewModel;
 import com.ivorybridge.moabi.viewmodel.DataInUseViewModel;
-import com.ivorybridge.moabi.viewmodel.FitbitViewModel;
-import com.ivorybridge.moabi.viewmodel.GoogleFitViewModel;
-import com.ivorybridge.moabi.viewmodel.RegressionSummaryViewModel;
 import com.ivorybridge.moabi.viewmodel.TimedActivityViewModel;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IItem;
@@ -100,16 +95,11 @@ public class InsightBodyFragment extends Fragment {
     ScrollView chipGroupContainer;
     @BindView(R.id.fragment_insight_body_chipgroup)
     ChipGroup chipGroup;
-    private GoogleFitViewModel googleFitViewModel;
     private GoogleFitRepository googleFitRepository;
-    private RegressionSummaryViewModel regressionSummaryViewModel;
     private PredictionsRepository predictionsRepository;
     private DataInUseViewModel dataInUseViewModel;
-    private BuiltInFitnessViewModel builtInFitnessViewModel;
     private BuiltInFitnessRepository builtInFitnessRepository;
-    private FitbitViewModel fitbitViewModel;
     private FitbitRepository fitbitRepository;
-    private AppUsageViewModel appUsageViewModel;
     private AppUsageRepository appUsageRepository;
     private BAActivityViewModel activityViewModel;
     private BAActivityRepository activityRepository;
@@ -156,16 +146,11 @@ public class InsightBodyFragment extends Fragment {
         unitSharedPreferences = getContext().getSharedPreferences(
                 getString(R.string.com_ivorybridge_moabi_UNIT_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
         yesterday = formattedTime.convertStringYYYYMMDDToLong(formattedTime.getYesterdaysDateAsYYYYMMDD());
-        googleFitViewModel = ViewModelProviders.of(this).get(GoogleFitViewModel.class);
         googleFitRepository = new GoogleFitRepository(getActivity().getApplication());
-        appUsageViewModel = ViewModelProviders.of(this).get(AppUsageViewModel.class);
         appUsageRepository = new AppUsageRepository(getActivity().getApplication());
         dataInUseViewModel = ViewModelProviders.of(this).get(DataInUseViewModel.class);
-        regressionSummaryViewModel = ViewModelProviders.of(this).get(RegressionSummaryViewModel.class);
         predictionsRepository = new PredictionsRepository(getActivity().getApplication());
-        fitbitViewModel = ViewModelProviders.of(this).get(FitbitViewModel.class);
         fitbitRepository = new FitbitRepository(getActivity().getApplication());
-        builtInFitnessViewModel = ViewModelProviders.of(this).get(BuiltInFitnessViewModel.class);
         builtInFitnessRepository = new BuiltInFitnessRepository(getActivity().getApplication());
         activityViewModel = ViewModelProviders.of(this).get(BAActivityViewModel.class);
         activityRepository = new BAActivityRepository(getActivity().getApplication());
@@ -188,7 +173,7 @@ public class InsightBodyFragment extends Fragment {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 // This will get the radiobutton that has changed in its check state
-                RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                RadioButton checkedRadioButton = group.findViewById(checkedId);
                 // This puts the value (true/false) into the variable
                 boolean isChecked = checkedRadioButton.isChecked();
                 // If the radiobutton that has changed in check state is now checked...

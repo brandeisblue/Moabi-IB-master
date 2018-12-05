@@ -30,7 +30,10 @@
         android:theme="@style/WhiteBlackAndBlueAppTheme">
 
         <service
-            android:name=".service.TimerService"
+            android:name=".service.CheckInService"
+            android:exported="false" />
+        <service
+            android:name=".service.StopwatchService"
             android:exported="false" />
         <service
             android:name=".service.UserGoalService"

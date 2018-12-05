@@ -183,7 +183,7 @@ public class InsightMindFragment extends Fragment {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 // This will get the radiobutton that has changed in its check state
-                RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                RadioButton checkedRadioButton = group.findViewById(checkedId);
                 // This puts the value (true/false) into the variable
                 boolean isChecked = checkedRadioButton.isChecked();
                 // If the radiobutton that has changed in check state is now checked...
@@ -1200,13 +1200,14 @@ public class InsightMindFragment extends Fragment {
                                     //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
                                 }
                             }
+
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
                                     if (simpleRegressionSummaryList.size() == 0) {
                                         if (getActivity() != null) {
-                                            InsightRecommendationItem insightRecommendationItem = new InsightRecommendationItem(null, InsightMindFragment.this);
-                                            recommendationItemItemAdapter.add(insightRecommendationItem);
+                                            InsightEmptyViewItem emptyViewItem = new InsightEmptyViewItem(getString(R.string.recommendation_camel_case));
+                                            emptyViewItemAdapter.add(emptyViewItem);
                                         }
                                     } else {
                                         for (int i = 0; i < simpleRegressionSummaryList.size(); i++) {

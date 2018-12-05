@@ -24,8 +24,8 @@ public class CategorizedChartMarkerView extends MarkerView {
         super(context, layoutResource);
         this.context = context;
         // this markerview only displays a textview
-        topText = (TextView) findViewById(R.id.mpchart_chartvalueselectedview_top_textview);
-        bottomText = (TextView) findViewById(R.id.mpchart_chartvalueselectedview_bottom_textview);
+        topText = findViewById(R.id.mpchart_chartvalueselectedview_top_textview);
+        bottomText = findViewById(R.id.mpchart_chartvalueselectedview_bottom_textview);
     }
 
     // callbacks everytime the MarkerView is redrawn, can be used to update the

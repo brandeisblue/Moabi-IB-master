@@ -6,7 +6,6 @@ import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -191,7 +190,7 @@ public class FitbitAuthTokenHandler {
                 return params;
             }
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 Map<String, String> params = new HashMap<>();
                 params.put("Authorization", "Basic " + encodedCodeString);
                 params.put("Content-Type", "application/x-www-form-urlencoded");

@@ -111,20 +111,20 @@ public class MoodEntryFragment extends Fragment {
         formattedTime = new FormattedTime();
         userInputsInUseList = new ArrayList<>();
         mContainerView = mView.findViewById(R.id.fragment_mood_entry_container);
-        mExpandedLL = (LinearLayout) mView.findViewById(R.id.fragment_mood_entry_expanded_linearlayout);
-        mExpandedImageView = (ImageView) mView.findViewById(R.id.fragment_mood_entry_expanded_imageview);
-        mExpandedTextView = (TextView) mView.findViewById(R.id.fragment_mood_entry_expanded_textview);
+        mExpandedLL = mView.findViewById(R.id.fragment_mood_entry_expanded_linearlayout);
+        mExpandedImageView = mView.findViewById(R.id.fragment_mood_entry_expanded_imageview);
+        mExpandedTextView = mView.findViewById(R.id.fragment_mood_entry_expanded_textview);
         final RelativeLayout emojiViewGroup = mView.findViewById(R.id.fragment_mood_entry_emoji_relativelayout);
-        TextView promptTextView = (TextView) mView.findViewById(R.id.fragment_mood_entry_prompt_textview);
-        LinearLayout alertLL = (LinearLayout) mView.findViewById(R.id.fragment_mood_entry_alert_linearlayout);
-        LinearLayout excitedLL = (LinearLayout) mView.findViewById(R.id.fragment_mood_entry_excited_linearlayout);
-        LinearLayout okayLL = (LinearLayout) mView.findViewById(R.id.fragment_mood_entry_okay_linearlayout);
-        LinearLayout happyLL = (LinearLayout) mView.findViewById(R.id.fragment_mood_entry_happy_linearlayout);
-        LinearLayout calmLL = (LinearLayout) mView.findViewById(R.id.fragment_mood_entry_calm_linearlayout);
-        LinearLayout tiredLL = (LinearLayout) mView.findViewById(R.id.fragment_mood_entry_tired_linearlayout);
-        LinearLayout boredLL = (LinearLayout) mView.findViewById(R.id.fragment_mood_entry_bored_linearlayout);
-        LinearLayout unhappyLL = (LinearLayout) mView.findViewById(R.id.fragment_mood_entry_unhappy_linearlayout);
-        LinearLayout tenseLL = (LinearLayout) mView.findViewById(R.id.fragment_mood_entry_tense_linearlayout);
+        TextView promptTextView = mView.findViewById(R.id.fragment_mood_entry_prompt_textview);
+        LinearLayout alertLL = mView.findViewById(R.id.fragment_mood_entry_alert_linearlayout);
+        LinearLayout excitedLL = mView.findViewById(R.id.fragment_mood_entry_excited_linearlayout);
+        LinearLayout okayLL = mView.findViewById(R.id.fragment_mood_entry_okay_linearlayout);
+        LinearLayout happyLL = mView.findViewById(R.id.fragment_mood_entry_happy_linearlayout);
+        LinearLayout calmLL = mView.findViewById(R.id.fragment_mood_entry_calm_linearlayout);
+        LinearLayout tiredLL = mView.findViewById(R.id.fragment_mood_entry_tired_linearlayout);
+        LinearLayout boredLL = mView.findViewById(R.id.fragment_mood_entry_bored_linearlayout);
+        LinearLayout unhappyLL = mView.findViewById(R.id.fragment_mood_entry_unhappy_linearlayout);
+        LinearLayout tenseLL = mView.findViewById(R.id.fragment_mood_entry_tense_linearlayout);
         /*
         ImageView alertIV = (ImageView) mView.findViewById(R.id.fragment_mood_entry_alert_imageview);
         ImageView excitedIV = (ImageView) mView.findViewById(R.id.fragment_mood_entry_excited_imageview);
@@ -382,7 +382,7 @@ public class MoodEntryFragment extends Fragment {
                                 || inUse.getName().equals(getString(R.string.daily_review_camel_case))
                                 || inUse.getName().equals(getString(R.string.depression_phq9_camel_case))
                                 || inUse.getName().equals(getString(R.string.anxiety_gad7_camel_case))) {
-                            Boolean isChecked = (Boolean) inUse.isInUse();
+                            Boolean isChecked = inUse.isInUse();
                             if (isChecked != null) {
                                 if (isChecked) {
                                     userInputsInUseList.add(inUse.getName());
@@ -419,7 +419,7 @@ public class MoodEntryFragment extends Fragment {
                                     }
                                 }
                             });
-                            ViewPager viewPager = (ViewPager) getActivity().findViewById(R.id.activity_make_entry_viewpager);
+                            ViewPager viewPager = getActivity().findViewById(R.id.activity_make_entry_viewpager);
                             int currentItem = viewPager.getCurrentItem();
                             Log.i(TAG, "# of fragments: " + userInputsInUseList.size() + ", " + "current position: " + currentItem);
                             if (userInputsInUseList.size() == 1 || currentItem == userInputsInUseList.size() - 1) {

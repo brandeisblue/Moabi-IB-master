@@ -67,20 +67,12 @@ public class GoogleFitRepository {
         inputHistory.setInputType(application.getString(R.string.googlefit_camel_case));
         inputHistoryRepository.insert(inputHistory);
         AsyncTask.Status status = new GoogleFitRepository.insertAsyncTask(mGoogleFitDao).execute(dailySummary).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private boolean update(GoogleFitSummary dailySummary) {
         AsyncTask.Status status = new updateAsyncTask(mGoogleFitDao).execute(dailySummary).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertAsyncTask extends AsyncTask<GoogleFitSummary, Void, Void> {

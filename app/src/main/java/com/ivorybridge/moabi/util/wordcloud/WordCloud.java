@@ -58,7 +58,8 @@ public class WordCloud extends AutoResizeTextView {
         Random rand = new Random();
         for (int i = 0; i < data.size(); i++) {
 
-            int r = rand.nextInt(3) + 1;
+            //int r = rand.nextInt(3) + 1;
+            int r = 2;
             String newString = data.get(i).getEntryName();
             for (int j = 0; j < r; j++) {
                 newString = newString + " ";

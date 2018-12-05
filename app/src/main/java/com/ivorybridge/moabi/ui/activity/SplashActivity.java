@@ -19,13 +19,14 @@ import com.ivorybridge.moabi.service.AnxietyInsightCalculatorJob;
 import com.ivorybridge.moabi.service.AsyncCallsForTodayJob;
 import com.ivorybridge.moabi.service.AsyncCallsForYesterdayJob;
 import com.ivorybridge.moabi.service.BodyInsightCalculatorDailyJob;
+import com.ivorybridge.moabi.service.CheckInDailyJob;
+import com.ivorybridge.moabi.service.DailyReviewInsightCalculatorDailyJob;
+import com.ivorybridge.moabi.service.DailyReviewInsightCalculatorJob;
 import com.ivorybridge.moabi.service.DepressionInsightCalculatorJob;
 import com.ivorybridge.moabi.service.MoodAndEnergyInsightCalculatorDailyJob;
 import com.ivorybridge.moabi.service.MoodAndEnergyInsightCalculatorJob;
 import com.ivorybridge.moabi.service.MotionSensorEndofDayDailyJob;
 import com.ivorybridge.moabi.service.MotionSensorResetDailyJob;
-import com.ivorybridge.moabi.service.DailyReviewInsightCalculatorDailyJob;
-import com.ivorybridge.moabi.service.DailyReviewInsightCalculatorJob;
 import com.ivorybridge.moabi.service.StressInsightCalculatorDailyJob;
 import com.ivorybridge.moabi.service.StressInsightCalculatorJob;
 import com.ivorybridge.moabi.util.FormattedTime;
@@ -68,6 +69,7 @@ public class SplashActivity extends AppCompatActivity {
     private SharedPreferences appUsageSharedPreferences;
     private SharedPreferences moodAndEnergyUsageSharedPreferences;
     private SharedPreferences unitSharedPreferences;
+    private SharedPreferences notificationSharedPreferences;
     private FormattedTime formattedTime;
     private BuiltInFitnessRepository builtInFitnessRepository;
 
@@ -103,9 +105,28 @@ public class SplashActivity extends AppCompatActivity {
                 getString(R.string.com_ivorybridge_moabi_APP_USAGE_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
         moodAndEnergyUsageSharedPreferences = this.getSharedPreferences(
                 getString(R.string.com_ivorybridge_moabi_MOOD_AND_ENERGY_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
+        notificationSharedPreferences = getSharedPreferences(
+                getString(R.string.com_ivorybridge_mobai_NOTIFICATION_SHARED_PREFERENCE),
+                Context.MODE_PRIVATE);
         formattedTime = new FormattedTime();
         asyncCallsMasterRepository = new AsyncCallsMasterRepository(this, formattedTime.getCurrentDateAsYYYYMMDD());
         unitSharedPreferences = this.getSharedPreferences(getString(R.string.com_ivorybridge_moabi_UNIT_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
+        SharedPreferences.Editor unitSPEditor = unitSharedPreferences.edit();
+        if (!unitSharedPreferences.contains(getString(R.string.preference_daily_check_in_notification))) {
+            unitSPEditor.putBoolean(getString(R.string.preference_daily_check_in_notification), true);
+            unitSPEditor.apply();
+        }
+        if (!unitSharedPreferences.contains(getString(R.string.preference_timer_notification))) {
+            unitSPEditor.putBoolean(getString(R.string.preference_timer_notification), true);
+            unitSPEditor.apply();
+        }
+        if (!unitSharedPreferences.contains(getString(R.string.preference_personal_goal_notification))) {
+            unitSPEditor.putBoolean(getString(R.string.preference_personal_goal_notification), true);
+            unitSPEditor.apply();
+        }
+        int hour = notificationSharedPreferences.getInt(getString(R.string.preference_daily_check_in_hour), 20);
+        int minute = notificationSharedPreferences.getInt(getString(R.string.preference_daily_check_in_minute), 0);
+        CheckInDailyJob.scheduleJob(hour, minute);
         configureSharedPreferences();
 
 

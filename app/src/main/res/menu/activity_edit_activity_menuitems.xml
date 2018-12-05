@@ -5,16 +5,18 @@
     <item
         android:id="@+id/activity_edit_activity_menuitem_clearselection"
         android:icon="@drawable/ic_clear"
-        android:title="Clear Selected"
+        android:title="@string/edit_activity_menu_clear_selection_title"
         app:showAsAction="collapseActionView" />
     <item
         android:id="@+id/activity_edit_activity_menuitem_restore"
         android:icon="@drawable/ic_reset"
-        android:title="Restore"
+        android:title="@string/edit_activity_menu_restore_default_title"
         app:showAsAction="collapseActionView" />
+
     <item
         android:id="@+id/activity_edit_activity_menuitem_clear"
         android:icon="@drawable/ic_reset"
+        android:visible="false"
         android:title="Clear"
         app:showAsAction="collapseActionView" />
 

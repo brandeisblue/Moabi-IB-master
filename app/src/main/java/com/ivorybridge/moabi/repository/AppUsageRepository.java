@@ -145,11 +145,7 @@ public class AppUsageRepository {
         inputHistory.setDate(date);
         inputHistoryRepository.insert(inputHistory);
         AsyncTask.Status status = new insertAppUsageAsyncTask(mUsageDao).execute(appUsageSummary).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private void queryAppUsage(String date) {
@@ -369,11 +365,7 @@ public class AppUsageRepository {
 
     private boolean insertSuccess(AsyncTaskBoolean asyncTaskSuccess) {
         AsyncTask.Status status = new insertSuccessAsyncTask(mTaskBooleanDao).execute(asyncTaskSuccess).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertSuccessAsyncTask extends AsyncTask<AsyncTaskBoolean, Void, Void> {

@@ -186,6 +186,7 @@
     <string name="CHRONOMETER_NOTIF_CHANNEL_ID">CHRONOMETER_NOTIF_CHANNEL_ID</string>
     <string name="USER_GOAL_NOTIF_CHANNEL_ID">USER_GOAL_NOTIF_CHANNEL_ID</string>
     <string name="MOTION_SENSOR_NOTIF_CHANNEL_ID">MOTION_SENSOR_NOTIF_CHANNEL_ID</string>
+    <string name="CHECK_IN_NOTIF_CHANNEL_ID">CHECK_IN_NOTIF_CHANNEL_ID</string>
 
     <!-- Preference -->
     <string name="preference_unit_title">Unit</string>
@@ -230,6 +231,8 @@
     <string name="preference_timer_notification">pref_timer_notification</string>
     <string name="preference_personal_goal_notification">pref_personal_goal_notification</string>
     <string name="preference_daily_check_in_notification">pref_daily_check_in_notification</string>
+    <string name="preference_daily_check_in_hour">check_in_hour</string>
+    <string name="preference_daily_check_in_minute">check_in_minute</string>
     <string name="preference_daily_cheers_notification">pref_daily_cheers_notification</string>
     <string name="preference_sign_in">pref_sign_in</string>
     <string name="preference_sign_out">pref_sign_out</string>
@@ -288,6 +291,8 @@
     <string name="activity_mind_body_spirit_title">Mind/Body/Spirituality</string>
     <string name="activity_daily_responsibility_title">Daily Responsibilities</string>
     <string name="activity_unknown_title">Unknown</string>
+    <string name="edit_activity_menu_clear_selection_title">Clear Selection</string>
+    <string name="edit_activity_menu_restore_default_title">Restore Default</string>
 
     <!-- Weather -->
     <string name="humidity_title">Humidity</string>
@@ -375,6 +380,7 @@
     <string name="survey_phq9_level_mild">mild.</string>
     <string name="survey_phq9_level_moderate">moderate.</string>
     <string name="survey_phq9_level_moderately_severe">moderately severe.</string>
+    <string name="survey_phq9_level_moderately_severe_markerview">moderately\nsevere.</string>
     <string name="survey_phq9_level_severe">severe.</string>
     <string name="survey_phq9_minimal_suggestion">You may not need any treatment.</string>
     <string name="survey_phq9_mild_suggestion">Continue to watch your symptoms. If symptoms worsen, consult with a health professional.</string>
@@ -405,11 +411,11 @@
     <string name="chart_label_none">None</string>
     <string name="chart_label_excellent">Excellent</string>
     <string name="chart_label_terrible">Terrible</string>
-    <string name="chart_mild_abbr">Mld</string>
-    <string name="chart_min_abbr">Min</string>
-    <string name="chart_moderate_abbr">Mod</string>
-    <string name="chart_moderately_severe_abbr">M.Sv</string>
-    <string name="chart_severe_abbr">Sev</string>
+    <string name="chart_mild_abbr">Mild</string>
+    <string name="chart_min_abbr">Minimal</string>
+    <string name="chart_moderate_abbr">Moderate</string>
+    <string name="chart_moderately_severe_abbr">Mod. Severe</string>
+    <string name="chart_severe_abbr">Severe</string>
 
     <!-- Tracker Texts -->
     <string name="tracker_choose_four_activities_prompt">Choose four activities</string>
@@ -417,7 +423,11 @@
     <string name="tracker_loading_status_prompt">Loading...</string>
     <string name="timer_edit_text_prompt">What are you up to?</string>
 
+    <!-- Survey -->
+    <string name="survey_question_requires_answer_prompt">This question requires an answer.</string>
+
     <!-- GAD7 Questions -->
+    <string name="gad7_phq9_main_question">Over the last 2 weeks, \n how often have you been bothered \n by any of the following problems?</string>
     <string name="gad7_question_1">1. Feeling nervous, anxious, or on edge</string>
     <string name="gad7_question_2">2. Not being able to stop or control worrying</string>
     <string name="gad7_question_3">3. Worrying too much about different things</string>
@@ -457,4 +467,8 @@
     <!-- Tracker Notification -->
     <string name="tracker_google_fit_last_sync_prompt">Google Fit last updated:</string>
     <string name="tracker_fitbit_last_sync_prompt">Fitbit last updated:</string>
+
+    <!-- Check-in Notification -->
+    <string name="notif_check_in_title">How are you?</string>
+    <string name="notif_check_in_description">Check-in to record your day.</string>
 </resources>

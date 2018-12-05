@@ -137,6 +137,7 @@
     <string-array name="sex_array">
         <item>Male</item>
         <item>Female</item>
+        <item>Intersex</item>
     </string-array>
 
 

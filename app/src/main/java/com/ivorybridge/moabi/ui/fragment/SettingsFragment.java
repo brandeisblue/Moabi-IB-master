@@ -252,6 +252,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         findPreference("preference_apps_and_services").setOnPreferenceClickListener(this);
         findPreference("preference_surveys").setOnPreferenceClickListener(this);
         findPreference("preference_edit_activities").setOnPreferenceClickListener(this);
+        findPreference("preference_edit_activities").setVisible(false);
         findPreference("preference_sync").setOnPreferenceClickListener(this);
 
         final SwitchPreference switchPreference = (SwitchPreference) findPreference("preference_phone_usage_permission");

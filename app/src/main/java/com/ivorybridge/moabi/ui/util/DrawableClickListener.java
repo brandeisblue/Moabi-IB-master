@@ -176,10 +176,7 @@ public abstract class DrawableClickListener implements OnTouchListener
                 {
                     if ( y >= ( view.getPaddingTop() - fuzz ) )
                     {
-                        if ( y <= ( view.getHeight() - view.getPaddingBottom() + fuzz ) )
-                        {
-                            return true;
-                        }
+                        return y <= (view.getHeight() - view.getPaddingBottom() + fuzz);
                     }
                 }
             }
@@ -234,10 +231,7 @@ public abstract class DrawableClickListener implements OnTouchListener
                 {
                     if ( y >= ( view.getPaddingTop() - fuzz ) )
                     {
-                        if ( y <= ( view.getPaddingTop() + drawableBounds.height() + fuzz ) )
-                        {
-                            return true;
-                        }
+                        return y <= (view.getPaddingTop() + drawableBounds.height() + fuzz);
                     }
                 }
             }
@@ -292,10 +286,7 @@ public abstract class DrawableClickListener implements OnTouchListener
                 {
                     if ( y >= ( view.getPaddingTop() - fuzz ) )
                     {
-                        if ( y <= ( view.getHeight() - view.getPaddingBottom() + fuzz ) )
-                        {
-                            return true;
-                        }
+                        return y <= (view.getHeight() - view.getPaddingBottom() + fuzz);
                     }
                 }
             }
@@ -350,10 +341,7 @@ public abstract class DrawableClickListener implements OnTouchListener
                 {
                     if ( y >= ( view.getHeight() - view.getPaddingBottom() - drawableBounds.height() - fuzz ) )
                     {
-                        if ( y <= ( view.getHeight() - view.getPaddingBottom() + fuzz ) )
-                        {
-                            return true;
-                        }
+                        return y <= (view.getHeight() - view.getPaddingBottom() + fuzz);
                     }
                 }
             }

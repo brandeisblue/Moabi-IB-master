@@ -144,20 +144,12 @@ public class MoodAndEnergyRepository {
         inputHistory.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
         inputHistory.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
         inputHistoryRepository.insert(inputHistory);
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     public boolean processMood(List<MoodAndEnergy> moodAndEnergyList) {
         AsyncTask.Status status = new processMoodAsyncTask(this, moodAndEnergyList).execute().getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class processMoodAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -400,11 +392,7 @@ public class MoodAndEnergyRepository {
 
     private boolean insertDailyMood(DailyMood dailyMood) {
         AsyncTask.Status status = new insertDailyMoodAsyncTask(moodDao).execute(dailyMood).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertDailyMoodAsyncTask extends AsyncTask<DailyMood, Void, Void> {
@@ -424,11 +412,7 @@ public class MoodAndEnergyRepository {
 
     private boolean insertDailyEnergy(DailyEnergy dailyEnergy) {
         AsyncTask.Status status = new insertDailyEnergyAsyncTask(energyDao).execute(dailyEnergy).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertDailyEnergyAsyncTask extends AsyncTask<DailyEnergy, Void, Void> {
@@ -448,11 +432,7 @@ public class MoodAndEnergyRepository {
 
     private boolean insertWeeklyMood(WeeklyMood weeklyMood) {
         AsyncTask.Status status = new insertWeeklyMoodAsyncTask(moodDao).execute(weeklyMood).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertWeeklyMoodAsyncTask extends AsyncTask<WeeklyMood, Void, Void> {
@@ -472,11 +452,7 @@ public class MoodAndEnergyRepository {
 
     private boolean insertWeeklyEnergy(WeeklyEnergy weeklyEnergy) {
         AsyncTask.Status status = new insertWeeklyEnergyAsyncTask(energyDao).execute(weeklyEnergy).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertWeeklyEnergyAsyncTask extends AsyncTask<WeeklyEnergy, Void, Void> {
@@ -496,11 +472,7 @@ public class MoodAndEnergyRepository {
 
     private boolean insertMonthlyMood(MonthlyMood monthlyMood) {
         AsyncTask.Status status = new insertMonthlyMoodAsyncTask(moodDao).execute(monthlyMood).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertMonthlyMoodAsyncTask extends AsyncTask<MonthlyMood, Void, Void> {
@@ -520,11 +492,7 @@ public class MoodAndEnergyRepository {
 
     private boolean insertMonthlyEnergy(MonthlyEnergy monthlyEnergy) {
         AsyncTask.Status status = new insertMonthlyEnergyAsyncTask(energyDao).execute(monthlyEnergy).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertMonthlyEnergyAsyncTask extends AsyncTask<MonthlyEnergy, Void, Void> {

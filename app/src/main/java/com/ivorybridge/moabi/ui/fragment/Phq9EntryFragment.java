@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,6 +60,10 @@ public class Phq9EntryFragment extends Fragment {
     TextView questionPromptTextView;
     @BindView(R.id.fragment_survey_entry_question_recyclerview)
     RecyclerView recyclerView;
+    @BindView(R.id.fragment_survey_entry_question_progress_indicator)
+    ProgressBar progressBar;
+    @BindView(R.id.fragment_survey_entry_question_progress_textview)
+    TextView progressTextView;
     @BindView(R.id.fragment_survey_entry_submitbutton)
     Button submitButton;
     @BindView(R.id.fragment_survey_entry_next_button)
@@ -74,6 +79,7 @@ public class Phq9EntryFragment extends Fragment {
     private SharedPreferences.OnSharedPreferenceChangeListener phq9SPChangeListener;
     private LinearLayoutManager layoutManager;
     private DepressionViewModel depressionViewModel;
+    private boolean isScroolEnabled = false;
 
 
     @Override
@@ -118,7 +124,13 @@ public class Phq9EntryFragment extends Fragment {
         phq9SPEditor = phq9SharedPreference.edit();
         depressionViewModel = ViewModelProviders.of(this).get(DepressionViewModel.class);
 
-        layoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
+        layoutManager = new LinearLayoutManager(getContext()) {
+            @Override
+            public boolean canScrollHorizontally() {
+                return isScroolEnabled && super.canScrollHorizontally();
+            }
+        };
+        layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         recyclerView.setLayoutManager(layoutManager);
         SnapHelper snapHelper = new LinearSnapHelper();
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -135,10 +147,12 @@ public class Phq9EntryFragment extends Fragment {
         phq9QuestionItemItemAdapter.add(new Phq9QuestionItem(8));
         phq9QuestionItemItemAdapter.add(new Phq9QuestionItem(9));
 
+        progressBar.setProgress(1);
+        progressTextView.setText(1 + " / " + 9);
+        progressBar.setMax(9);
         backButton.setVisibility(View.GONE);
         submitButton.setVisibility(View.GONE);
         enableBackButton();
-        //disableNextButton();
         enableNextButton();
         setSubmitButton();
 
@@ -150,7 +164,13 @@ public class Phq9EntryFragment extends Fragment {
                     nextButton.setVisibility(View.GONE);
                     backButton.setVisibility(View.GONE);
                     submitButton.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.GONE);
+                    progressTextView.setVisibility(View.GONE);
+                    isScroolEnabled = false;
                 } else if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    isScroolEnabled = false;
+                    progressBar.setVisibility(View.VISIBLE);
+                    progressTextView.setVisibility(View.VISIBLE);
                     Log.i(TAG, "RecyclerView position: " + layoutManager.findFirstVisibleItemPosition());
                     int position = layoutManager.findFirstVisibleItemPosition();
                     if (layoutManager.getItemCount() > 1) {
@@ -194,9 +214,24 @@ public class Phq9EntryFragment extends Fragment {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isScroolEnabled = true;
                 Log.i(TAG, "@ " + layoutManager.findLastVisibleItemPosition() + "/" + layoutManager.getItemCount());
+                Set<Integer> completeChoiceSet = new LinkedHashSet<>();
+                for (int i = 1; i <= layoutManager.findLastVisibleItemPosition() + 1; i++) {
+                    Long choice = phq9SharedPreference.getLong("question_" + i + "_choice", 0);
+                    if (choice != 0) {
+                        completeChoiceSet.add(i);
+                    }
+                }
                 //nextButton.setVisibility(View.INVISIBLE);
-                recyclerView.smoothScrollToPosition(layoutManager.findLastVisibleItemPosition() + 1);
+                progressBar.setProgress(completeChoiceSet.size() + 1);
+                progressTextView.setText(completeChoiceSet.size()  + 1 + " / " + 9);
+                Log.i(TAG, "Number of complete question: " + completeChoiceSet.size());
+                if (completeChoiceSet.size() > layoutManager.findLastVisibleItemPosition()) {
+                    recyclerView.smoothScrollToPosition(layoutManager.findLastVisibleItemPosition() + 1);
+                } else {
+                    Toast.makeText(getContext(), getString(R.string.survey_question_requires_answer_prompt), Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -205,11 +240,17 @@ public class Phq9EntryFragment extends Fragment {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isScroolEnabled = true;
                 Log.i(TAG, "@ " + layoutManager.findFirstVisibleItemPosition() + "/" + layoutManager.getItemCount());
                 if (layoutManager.findFirstVisibleItemPosition() > 0) {
                     recyclerView.smoothScrollToPosition(layoutManager.findFirstVisibleItemPosition() - 1);
+                    //nextButton.setVisibility(View.INVISIBLE);
+                    progressBar.setProgress(layoutManager.findFirstVisibleItemPosition());
+                    progressTextView.setText(layoutManager.findFirstVisibleItemPosition() + " / " + 9);
                 } else {
                     recyclerView.smoothScrollToPosition(0);
+                    progressBar.setProgress(1);
+                    progressTextView.setText(1 + " / " + 9);
                     //backButton.setVisibility(View.INVISIBLE);
                 }
             }
@@ -220,6 +261,7 @@ public class Phq9EntryFragment extends Fragment {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isScroolEnabled = true;
                 Set<Integer> missingChoiceSet = new LinkedHashSet<>();
                 Long score = 0L;
                 Long suicidality = 0L;
@@ -263,7 +305,7 @@ public class Phq9EntryFragment extends Fragment {
                                         || inUse.getName().equals(getString(R.string.stress_camel_case)) || inUse.getName().equals(getString(R.string.pain_camel_case)) ||
                                         inUse.getName().equals(getString(R.string.daily_review_camel_case)) || inUse.getName().equals(getString(R.string.depression_phq9_camel_case))
                                         || inUse.getName().equals(getString(R.string.anxiety_gad7_camel_case))) {
-                                    Boolean isChecked = (Boolean) inUse.isInUse();
+                                    Boolean isChecked = inUse.isInUse();
                                     if (isChecked != null) {
                                         if (isChecked) {
                                             userInputsInUseList.add(inUse.getName());
@@ -288,7 +330,7 @@ public class Phq9EntryFragment extends Fragment {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 dialog.dismiss();
-                                                ViewPager viewPager = (ViewPager) getActivity().findViewById(R.id.activity_make_entry_viewpager);
+                                                ViewPager viewPager = getActivity().findViewById(R.id.activity_make_entry_viewpager);
                                                 int currentItem = viewPager.getCurrentItem();
                                                 Log.i(TAG, "# of fragments: " + userInputsInUseList.size() + ", " + "current position: " + currentItem);
                                                 if (userInputsInUseList.size() == 1 || currentItem == userInputsInUseList.size() - 1) {
@@ -412,8 +454,10 @@ public class Phq9EntryFragment extends Fragment {
                                             }
                                         });
                                         resetSelections();
+                                        progressBar.setProgress(1);
+                                        progressTextView.setText(1 + " / " + 9);
                                         recyclerView.smoothScrollToPosition(0);
-                                        ViewPager viewPager = (ViewPager) getActivity().findViewById(R.id.activity_make_entry_viewpager);
+                                        ViewPager viewPager = getActivity().findViewById(R.id.activity_make_entry_viewpager);
                                         int currentItem = viewPager.getCurrentItem();
                                         Log.i(TAG, "# of fragments: " + userInputsInUseList.size() + ", " + "current position: " + currentItem);
                                         if (userInputsInUseList.size() == 1 || currentItem == userInputsInUseList.size() - 1) {

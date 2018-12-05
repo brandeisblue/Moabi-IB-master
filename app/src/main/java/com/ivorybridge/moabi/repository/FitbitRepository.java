@@ -99,11 +99,7 @@ public class FitbitRepository {
         inputHistory.setInputType(mApplication.getString(R.string.fitbit_camel_case));
         inputHistoryRepository.insert(inputHistory);
         AsyncTask.Status status = new insertAsyncTask(mFitbitDao).execute(dailySummary).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     public void downloadData(String date) {
@@ -270,7 +266,7 @@ public class FitbitRepository {
 
     private void getAccessTokenWithRefreshToken(String date) {
 
-        Toast.makeText(mApplication, "Refreshing token", Toast.LENGTH_LONG).show();
+        //Toast.makeText(mApplication, "Refreshing token", Toast.LENGTH_LONG).show();
         String CLIENT_ID = "22D6TC";
         String CLIENT_SECRET = "05f59d5f32a14ecba00cd6c2a58fa7a5";
         String clientCredentials = CLIENT_ID + ":" + CLIENT_SECRET;
@@ -309,7 +305,7 @@ public class FitbitRepository {
                             inputInUse.setName(mApplication.getString(R.string.fitbit_camel_case));
                             inputInUse.setInUse(true);
                             dataInUseRepository.insert(inputInUse);
-                            Toast.makeText(mApplication, "Refreshing token successful.", Toast.LENGTH_LONG).show();
+                            //Toast.makeText(mApplication, "Refreshing token successful.", Toast.LENGTH_LONG).show();
                         } else {
                             InputInUse inputInUse = new InputInUse();
                             inputInUse.setType("tracker");
@@ -323,7 +319,7 @@ public class FitbitRepository {
                             dataInUseRepository.insert(connectedService);
                             fitbitTaskSuccess.setResult(true);
                             insertSuccess(fitbitTaskSuccess);
-                            Toast.makeText(mApplication, "Refreshing token unsuccessful.", Toast.LENGTH_LONG).show();
+                            //Toast.makeText(mApplication, "Refreshing token unsuccessful.", Toast.LENGTH_LONG).show();
                             //TODO - when this happens, show a notification to let the user know something is wrong
                         }
                     }
@@ -355,11 +351,7 @@ public class FitbitRepository {
 
     private boolean insertSuccess(AsyncTaskBoolean asyncTaskSuccess) {
         AsyncTask.Status status = new insertSuccessAsyncTask(mTaskSuccessDao).execute(asyncTaskSuccess).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertSuccessAsyncTask extends AsyncTask<AsyncTaskBoolean, Void, Void> {

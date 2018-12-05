@@ -85,7 +85,7 @@ public class DepressionRepository {
                             if (timeSnap.getKey() != null) {
                                 String dateTimeToConvert = date + " " + timeSnap.getKey();
                                 long dateInLong = formattedTime.convertStringYYYYMMDDhhmmToLong(dateTimeToConvert);
-                                if ((Long) timeSnap.getValue() != null){
+                                if (timeSnap.getValue() != null){
                                     Phq9 entry = new Phq9();
                                     entry.setScore((Long) timeSnap.getValue());
                                     entry.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
@@ -114,20 +114,12 @@ public class DepressionRepository {
         inputHistory.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
         inputHistory.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
         inputHistoryRepository.insert(inputHistory);
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     public boolean processPhq9(List<Phq9> phq9List) {
         AsyncTask.Status status = new processPhq9AsyncTask(this, phq9List).execute().getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class processPhq9AsyncTask extends AsyncTask<Void, Void, Void> {
@@ -295,11 +287,7 @@ public class DepressionRepository {
 
     private boolean insertDailyPhq9(DailyPhq9 dailyPhq9) {
         AsyncTask.Status status = new insertDailyPhq9AsyncTask(phq9Dao).execute(dailyPhq9).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertDailyPhq9AsyncTask extends AsyncTask<DailyPhq9, Void, Void> {
@@ -319,11 +307,7 @@ public class DepressionRepository {
 
     private boolean insertWeeklyPhq9(WeeklyPhq9 weeklyPhq9) {
         AsyncTask.Status status = new insertWeeklyPhq9AsyncTask(phq9Dao).execute(weeklyPhq9).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertWeeklyPhq9AsyncTask extends AsyncTask<WeeklyPhq9, Void, Void> {
@@ -343,11 +327,7 @@ public class DepressionRepository {
 
     private boolean insertMonthlyPhq9(MonthlyPhq9 monthlyPhq9) {
         AsyncTask.Status status = new insertMonthlyPhq9AsyncTask(phq9Dao).execute(monthlyPhq9).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertMonthlyPhq9AsyncTask extends AsyncTask<MonthlyPhq9, Void, Void> {

@@ -132,7 +132,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     // This will get the radiobutton that has changed in its check state
-                    RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                    RadioButton checkedRadioButton = group.findViewById(checkedId);
                     // This puts the value (true/false) into the variable
                     boolean isChecked = checkedRadioButton.isChecked();
                     // If the radiobutton that has changed in check state is now checked...
@@ -241,7 +241,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
                         xAxis.setDrawGridLines(false);
                         xAxis.setAxisMaximum(6.5f);
                         xAxis.setAxisMinimum(-0.5f);
-                        xAxis.setTextSize(10f);
+                        xAxis.setTextSize(12f);
                         xAxis.setTypeface(tf);
                         //xAxis.setLabelCount(6, true);
                         xAxis.setDrawAxisLine(false);
@@ -280,7 +280,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
                                 return convertToTimeString(value);
                             }
                         });
-                        int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.fui_transparent);
+                        int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white20);
                         int startColor2 = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
                         List<GradientColor> gradientColors = new ArrayList<>();
                         gradientColors.add(new GradientColor(startColor1, startColor2));
@@ -381,7 +381,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
                         xAxis.setDrawGridLines(false);
                         xAxis.setAxisMaximum(6.5f);
                         xAxis.setAxisMinimum(-0.5f);
-                        xAxis.setTextSize(10f);
+                        xAxis.setTextSize(12f);
                         xAxis.setTypeface(tf);
                         xAxis.setTextColor(Color.DKGRAY);
                         //xAxis.setLabelCount(6, true);
@@ -425,7 +425,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
                                 return convertToTimeString(value);
                             }
                         });
-                        int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.fui_transparent);
+                        int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white20);
                         int startColor2 = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
                         List<GradientColor> gradientColors = new ArrayList<>();
                         gradientColors.add(new GradientColor(startColor1, startColor2));
@@ -477,7 +477,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
             leftAxis.setDrawGridLines(false);
             //leftAxis.setAxisMaximum(3);
             leftAxis.setAxisMinimum(0);
-            leftAxis.setTextSize(10f);
+            leftAxis.setTextSize(12f);
             //leftAxis.setGranularity(1f);
             //leftAxis.setGranularityEnabled(true);
             leftAxis.setLabelCount(3, true);
@@ -520,9 +520,9 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
             long hour = Math.round((timeInMiliSecs / (1000 * 60 * 60)));
             //Log.i(TAG, timeInMiliSecs + " converted to " + hour);
             if (hour < 1) {
-                return minute + itemView.getContext().getString(R.string.unit_time_sing);
+                return minute + " " + itemView.getContext().getString(R.string.unit_time_sing);
             } else {
-                return hour + itemView.getContext().getString(R.string.unit_hour_sing);
+                return hour + " " + itemView.getContext().getString(R.string.unit_hour_sing);
             }
         }
     }

@@ -115,15 +115,13 @@ public class DailyReviewItem extends AbstractItem<DailyReviewItem, DailyReviewIt
                     Context.MODE_PRIVATE);
             itemSPEditor = itemSharedPreferences.edit();
             formattedTime = new FormattedTime();
-            if (item.mFragment != null) {
-                itemViewModel = ViewModelProviders.of(item.mFragment).get(DailyReviewViewModel.class);
-            }
             titleTextView.setText(itemView.getContext().getString(R.string.daily_review_title));
             titleImageView.setImageResource(R.drawable.ic_review_black);
             tf = ResourcesCompat.getFont(itemView.getContext(), R.font.source_sans_pro);
             styleLineChart();
             radioGroup.setTintColor(ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary), Color.WHITE);
             radioGroup.setUnCheckedTintColor(Color.WHITE, Color.BLACK);
+            itemViewModel = ViewModelProviders.of(item.mFragment).get(DailyReviewViewModel.class);
             String checked = itemSharedPreferences.getString(itemView.getContext()
                     .getString(R.string.com_ivorybridge_mobai_TIME_RANGE_KEY), itemView.getContext().getString(R.string.today));
             if (checked.equals(itemView.getContext().getString(R.string.today))) {
@@ -141,7 +139,7 @@ public class DailyReviewItem extends AbstractItem<DailyReviewItem, DailyReviewIt
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     // This will get the radiobutton that has changed in its check state
-                    RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                    RadioButton checkedRadioButton = group.findViewById(checkedId);
                     // This puts the value (true/false) into the variable
                     boolean isChecked = checkedRadioButton.isChecked();
                     // If the radiobutton that has changed in check state is now checked...
@@ -205,10 +203,14 @@ public class DailyReviewItem extends AbstractItem<DailyReviewItem, DailyReviewIt
                                     List<Entry> itemLineEntries = new ArrayList<>();
                                     List<String> entryDatesList = new ArrayList<>();
                                     Double total = 0d;
+                                    double max = 0;
                                     for (DailyReview item : itemList) {
                                         Long timeOfEntry = item.getDateInLong();
                                         Long entry = item.getDailyReview();
                                         total += entry;
+                                        if (item.getDailyReview() > max) {
+                                            max = item.getDailyReview();
+                                        }
                                         String timeOfEntryInString = formattedTime.convertLongToHHMM(timeOfEntry);
                                         Log.i(TAG, timeOfEntryInString);
                                         String[] times = timeOfEntryInString.split(":");
@@ -223,11 +225,12 @@ public class DailyReviewItem extends AbstractItem<DailyReviewItem, DailyReviewIt
                                     }
                                     float average = total.floatValue() / itemList.size();
                                     Log.i(TAG, "Average is " + average);
+                                    final double maxValue = max;
                                     Collections.sort(itemLineEntries, new EntryXComparator());
                                     handler.post(new Runnable() {
                                         @Override
                                         public void run() {
-                                            drawLineChart(itemLineEntries, entryDatesList, 1, average);
+                                            drawLineChart(itemLineEntries, entryDatesList, 1, average, maxValue);
                                         }
                                     });
                                 }
@@ -266,10 +269,14 @@ public class DailyReviewItem extends AbstractItem<DailyReviewItem, DailyReviewIt
                                     entryDatesList.add(formattedTime.getDateBeforeSpecifiedNumberOfDaysAsYYYYMMDD(lastEntryDate, numOfDays - i));
                                     entries.put(formattedTime.getDateBeforeSpecifiedNumberOfDaysAsYYYYMMDD(lastEntryDate, numOfDays - i), -200f);
                                 }
+                                double max = 0;
                                 for (int j = 0; j < dailyEntries.size(); j++) {
                                     for (String date : entryDatesList) {
                                         if (dailyEntries.get(j).getDate().equals(date)) {
                                             entries.put(date, dailyEntries.get(j).getAverageDailyReview().floatValue());
+                                            if (dailyEntries.get(j).getAverageDailyReview() > max) {
+                                                max = dailyEntries.get(j).getAverageDailyReview();
+                                            }
                                         }
                                     }
                                 }
@@ -288,16 +295,18 @@ public class DailyReviewItem extends AbstractItem<DailyReviewItem, DailyReviewIt
                                     }
                                 }
 
+                                final double maxValue = max;
+                                Collections.sort(lineEntries, new EntryXComparator());
                                 if (validEntryCounter != 0) {
                                     final float average = total / validEntryCounter;
                                     handler.post(new Runnable() {
                                         @Override
                                         public void run() {
-                                            drawLineChart(lineEntries, entryDatesList, numOfDays, average);
+                                            drawLineChart(lineEntries, entryDatesList, numOfDays, average, maxValue);
                                         }
                                     });
                                 }
-                                Collections.sort(lineEntries, new EntryXComparator());
+
                                 Log.i(TAG, dailyEntries.toString());
                                 Log.i(TAG, entryDatesList.toString());
                                 Log.i(TAG, entries.toString());
@@ -339,7 +348,7 @@ public class DailyReviewItem extends AbstractItem<DailyReviewItem, DailyReviewIt
             lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         }
 
-        private void drawLineChart(List<Entry> lineEntries, List<String> entryDatesList, int numOfDays, float average) {
+        private void drawLineChart(List<Entry> lineEntries, List<String> entryDatesList, int numOfDays, float average, double maxValue) {
 
             lineChart.clear();
 
@@ -351,7 +360,7 @@ public class DailyReviewItem extends AbstractItem<DailyReviewItem, DailyReviewIt
                     formattedEntryDatesList.add(newDate.substring(0, 1));
                 }
             }
-            if (numOfDays == 31) {
+            else if (numOfDays == 31) {
                 for (int i = 0; i < entryDatesList.size(); i++) {
                     String newDate = formattedTime.convertStringYYYYMMDDToMD(entryDatesList.get(i));
                     formattedEntryDatesList.add(newDate);
@@ -432,17 +441,18 @@ public class DailyReviewItem extends AbstractItem<DailyReviewItem, DailyReviewIt
             // set up y-axis
             leftAxis.setDrawGridLines(false);
             leftAxis.setDrawAxisLine(false);
-            leftAxis.setAxisMaximum(6f);
+            leftAxis.setAxisMaximum(5.5f);
             leftAxis.setAxisMinimum(1f);
             leftAxis.setTypeface(tf);
             leftAxis.setTextSize(12);
-            leftAxis.setGranularity(1f);
+            leftAxis.setGranularity(0.5f);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
+            leftAxis.setLabelCount(10, true);
             leftAxis.setValueFormatter(new IAxisValueFormatter() {
                 @Override
                 public String getFormattedValue(float value, AxisBase axis) {
-                    //Log.i(TAG, "Y-axis value is: " + value);
+                    Log.i(TAG, "Y-axis value is: " + value);
                     if (value == 5f) {
                         return itemView.getContext().getString(R.string.chart_label_excellent);
                     } else if (value == 1f) {
@@ -497,9 +507,13 @@ public class DailyReviewItem extends AbstractItem<DailyReviewItem, DailyReviewIt
             set.setCircleHoleColor(ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary));
             set.setCircleHoleRadius(2f);
             set.setCircleRadius(2f);
-            set.setDrawFilled(true);
-            Drawable drawable = ContextCompat.getDrawable(itemView.getContext(), R.drawable.bg_white_to_primary);
-            set.setFillDrawable(drawable);
+            if (maxValue > 1) {
+                set.setDrawFilled(true);
+                Drawable drawable = ContextCompat.getDrawable(itemView.getContext(), R.drawable.bg_white_to_primary);
+                set.setFillDrawable(drawable);
+            } else {
+                set.setDrawFilled(false);
+            }
             set.setDrawHorizontalHighlightIndicator(false);
             set.setDrawVerticalHighlightIndicator(false);
             List<ILineDataSet> lineDataSets = new ArrayList<>();

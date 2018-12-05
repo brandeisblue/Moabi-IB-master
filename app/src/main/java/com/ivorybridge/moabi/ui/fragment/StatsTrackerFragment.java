@@ -4,9 +4,7 @@ package com.ivorybridge.moabi.ui.fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,6 +30,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.model.GradientColor;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.entity.appusage.AppUsage;
 import com.ivorybridge.moabi.database.entity.appusage.AppUsageSummary;
@@ -190,7 +189,7 @@ public class StatsTrackerFragment extends Fragment {
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     unit = unitSharedPreferences.getString(getString(R.string.com_ivorybridge_mobai_UNIT_KEY), getString(R.string.preference_unit_si_title));
                     // This will get the radiobutton that has changed in its check state
-                    RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                    RadioButton checkedRadioButton = group.findViewById(checkedId);
                     // This puts the value (true/false) into the variable
                     boolean isChecked = checkedRadioButton.isChecked();
                     // If the radiobutton that has changed in check state is now checked...
@@ -772,10 +771,10 @@ public class StatsTrackerFragment extends Fragment {
                                         }
                                     } else {
                                         if (unit.equals(getString(R.string.preference_unit_si_title))) {
-                                            double value = (Double) dailySummary.getAvgTempC();
+                                            double value = dailySummary.getAvgTempC();
                                             activitySummaryMap.put(getString(R.string.temperature_title), value);
                                         } else {
-                                            double value = (Double) dailySummary.getAvgTempF();
+                                            double value = dailySummary.getAvgTempF();
                                             activitySummaryMap.put(getString(R.string.temperature_title), value);
                                         }
                                     }
@@ -783,7 +782,7 @@ public class StatsTrackerFragment extends Fragment {
                                         double old = (Double) activitySummaryMap.get(getString(R.string.humidity_title));
                                         activitySummaryMap.put(getString(R.string.humidity_title), old + dailySummary.getAvgHumidity());
                                     } else {
-                                        double value = (Double) dailySummary.getAvgHumidity();
+                                        double value = dailySummary.getAvgHumidity();
                                         activitySummaryMap.put(getString(R.string.humidity_title), value);
                                     }
                                 }
@@ -1270,10 +1269,10 @@ public class StatsTrackerFragment extends Fragment {
                                                     } else if (activity.equals(getString(R.string.activity_distance_title))) {
                                                         if (unit.equals(getString(R.string.preference_unit_si_title))) {
                                                             barEntries.add(new BarEntry(i, summary.getValue().floatValue() / 1000));
-                                                            total += summary.getValue().floatValue();
+                                                            total += summary.getValue().floatValue() / 1000;
                                                         } else {
                                                             barEntries.add(new BarEntry(i, summary.getValue().floatValue() / 1000 * 0.621371f));
-                                                            total += summary.getValue().floatValue();
+                                                            total += summary.getValue().floatValue() / 1000 * 0.621371f;
                                                         }
                                                         validEntryCounter++;
                                                     } else {
@@ -2901,9 +2900,7 @@ public class StatsTrackerFragment extends Fragment {
                 String newDate = formattedTime.convertStringYYYYMMDDToMD(entryDatesList.get(i));
                 formattedEntryDatesList.add(newDate);
             }
-        }
-
-        if (numOfDays == 180) {
+        } else if (numOfDays == 180) {
             for (int i = 0; i < entryDatesList.size(); i++) {
                 String date = entryDatesList.get(i);
                 int year = Integer.parseInt(date.substring(0, 4));
@@ -2912,8 +2909,7 @@ public class StatsTrackerFragment extends Fragment {
                 String newDate = formattedTime.convertLongToMD(endTime);
                 formattedEntryDatesList.add(newDate);
             }
-        }
-        if (numOfDays == 395) {
+        } else if (numOfDays == 395) {
             for (int i = 0; i < entryDatesList.size(); i++) {
                 String newDate = formattedTime.convertStringYYYYMMToMMM(entryDatesList.get(i));
                 formattedEntryDatesList.add(newDate);
@@ -3034,20 +3030,30 @@ public class StatsTrackerFragment extends Fragment {
         YAxis rightAxis = barChart.getAxisRight();
         leftAxis.setEnabled(true);
         leftAxis.setDrawGridLines(false);
-        leftAxis.setAxisMinimum(0);
-        leftAxis.setTextSize(12);
+        leftAxis.setDrawAxisLine(false);
+        leftAxis.setAxisMinimum(0f);
+        leftAxis.setTextSize(12f);
         leftAxis.setTypeface(tf);
         leftAxis.setSpaceMax(1f);
         leftAxis.setTextColor(Color.DKGRAY);
-        leftAxis.setDrawAxisLine(false);
         leftAxis.setLabelCount(3, true);
-        /*
-        leftAxis.setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return convertToTimeString(value);
-            }
-        });*/
+        if (inputType.equals(getContext().getString(R.string.phone_usage_camel_case)) ||
+                activity.equals(getContext().getString(R.string.activity_active_minutes_title)) ||
+                activity.equals(getContext().getString(R.string.activity_sedentary_minutes_title)) ||
+                activity.equals(getContext().getString(R.string.activity_sleep_title)) ||
+                inputType.equals(getContext().getString(R.string.timer_camel_case))) {
+            leftAxis.setTypeface(tf);
+            leftAxis.setTextColor(Color.DKGRAY);
+            leftAxis.setSpaceMax(40f);
+            leftAxis.setValueFormatter(new IAxisValueFormatter() {
+                @Override
+                public String getFormattedValue(float value, AxisBase axis) {
+                    return convertToTimeString(value);
+                }
+            });
+        } else {
+            leftAxis.setValueFormatter(null);
+        }
 
         rightAxis.setAxisMinimum(0);
         rightAxis.setEnabled(false);
@@ -3075,7 +3081,11 @@ public class StatsTrackerFragment extends Fragment {
         BarDataSet set = new BarDataSet(barEntries, "");
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
 
-        //set.setColor(ContextCompat.getColor(context, R.color.colorPrimary));
+        int startColor1 = ContextCompat.getColor(getContext(), R.color.white20);
+        int startColor2 = ContextCompat.getColor(getContext(), R.color.colorPrimary);
+        List<GradientColor> gradientColors = new ArrayList<>();
+        gradientColors.add(new GradientColor(startColor1, startColor2));
+        set.setGradientColors(gradientColors);
 
         //set.setLineWidth(1f);
         //Log.i(TAG, set.toString());
@@ -3083,19 +3093,20 @@ public class StatsTrackerFragment extends Fragment {
         barData.setDrawValues(false);
         //barData.setValueTextSize(12f);
 
+        /*
         int height = barChart.getHeight();
         Paint paint = barChart.getRenderer().getPaintRender();
         int[] colors = new int[]{ContextCompat.getColor(context, R.color.colorPrimaryDark), ContextCompat.getColor(context, R.color.colorPrimary),
                 ContextCompat.getColor(context, R.color.white)};
         float[] positions = new float[]{0, 0.5f, 1};
-        /*
+
         LinearGradient linearGradient = new LinearGradient(0, 0, 0, height,
                 ContextCompat.getColor(context, R.color.colorPrimary), ContextCompat.getColor(context, R.color.white),
-                Shader.TileMode.REPEAT);*/
+                Shader.TileMode.REPEAT);
         LinearGradient linearGradient = new LinearGradient(0, 0, 0, height,
                 colors, positions,
                 Shader.TileMode.REPEAT);
-        paint.setShader(linearGradient);
+        paint.setShader(linearGradient);*/
         barChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
@@ -3247,20 +3258,12 @@ public class StatsTrackerFragment extends Fragment {
     }
 
     private String convertToTimeString(float timeInFloat) {
-        long timeInMiliSecs = (long) timeInFloat;
-        long minute = (timeInMiliSecs / (1000 * 60)) % 60;
-        long hour = (timeInMiliSecs / (1000 * 60 * 60));
-        //Log.i(TAG, timeInMiliSecs + " converted to " + hour);
+        long minute = (long) timeInFloat % 60;
+        long hour = (long) timeInFloat / 60;
         if (hour < 1) {
-            if (minute < 1) {
-                return minute + " m";
-            } else {
-                return minute + " m";
-            }
-        } else if (hour == 1) {
-            return hour + " h";
+            return minute + " " + getContext().getString(R.string.unit_time_sing);
         } else {
-            return hour + " h";
+            return hour + " " + getContext().getString(R.string.unit_hour_sing);
         }
     }
 

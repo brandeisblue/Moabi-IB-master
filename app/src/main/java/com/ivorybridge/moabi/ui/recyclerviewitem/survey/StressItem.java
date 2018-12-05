@@ -114,15 +114,13 @@ public class StressItem extends AbstractItem<StressItem, StressItem.ViewHolder> 
                     itemView.getContext().getString(R.string.com_ivorybridge_moabi_STRESS_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
             itemSPEditor = itemSharedPreferences.edit();
             formattedTime = new FormattedTime();
-            if (item.mFragment != null) {
-                itemViewModel = ViewModelProviders.of(item.mFragment).get(StressViewModel.class);
-            }
             titleTextView.setText(itemView.getContext().getString(R.string.stress_title));
             titleImageView.setImageResource(R.drawable.ic_stress);
             tf = ResourcesCompat.getFont(itemView.getContext(), R.font.source_sans_pro);
             styleLineChart();
             radioGroup.setTintColor(ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary), Color.WHITE);
             radioGroup.setUnCheckedTintColor(Color.WHITE, Color.BLACK);
+            itemViewModel = ViewModelProviders.of(item.mFragment).get(StressViewModel.class);
             String checked = itemSharedPreferences.getString(itemView.getContext()
                     .getString(R.string.com_ivorybridge_mobai_TIME_RANGE_KEY), itemView.getContext().getString(R.string.today));
             if (checked.equals(itemView.getContext().getString(R.string.today))) {
@@ -140,7 +138,7 @@ public class StressItem extends AbstractItem<StressItem, StressItem.ViewHolder> 
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     // This will get the radiobutton that has changed in its check state
-                    RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                    RadioButton checkedRadioButton = group.findViewById(checkedId);
                     // This puts the value (true/false) into the variable
                     boolean isChecked = checkedRadioButton.isChecked();
                     // If the radiobutton that has changed in check state is now checked...
@@ -202,12 +200,16 @@ public class StressItem extends AbstractItem<StressItem, StressItem.ViewHolder> 
                                     List<Entry> itemLineEntries = new ArrayList<>();
                                     List<String> entryDatesList = new ArrayList<>();
                                     Double total = 0d;
+                                    double max = 0;
                                     for (Stress item : itemList) {
                                         Long timeOfEntry = item.getDateInLong();
                                         Double entry = item.getStress();
                                         total += entry;
                                         String timeOfEntryInString = formattedTime.convertLongToHHMM(timeOfEntry);
                                         Log.i(TAG, timeOfEntryInString);
+                                        if (item.getStress() > max) {
+                                            max = item.getStress();
+                                        }
                                         String[] times = timeOfEntryInString.split(":");
                                         int hour = Integer.parseInt(times[0].trim());
                                         int minute = Integer.parseInt(times[1].trim());
@@ -220,11 +222,12 @@ public class StressItem extends AbstractItem<StressItem, StressItem.ViewHolder> 
                                     }
                                     float average = total.floatValue() / itemList.size();
                                     Log.i(TAG, "Average is " + average);
+                                    final double maxValue = max;
                                     Collections.sort(itemLineEntries, new EntryXComparator());
                                     handler.post(new Runnable() {
                                         @Override
                                         public void run() {
-                                            drawLineChart(itemLineEntries, entryDatesList, 1, average);
+                                            drawLineChart(itemLineEntries, entryDatesList, 1, average, maxValue);
                                         }
                                     });
                                 }
@@ -257,7 +260,7 @@ public class StressItem extends AbstractItem<StressItem, StressItem.ViewHolder> 
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-
+                                double max = 0;
                                 String lastEntryDate = formattedTime.getCurrentDateAsYYYYMMDD();
                                 for (int i = 1; i <= numOfDays; i++) {
                                     entryDatesList.add(formattedTime.getDateBeforeSpecifiedNumberOfDaysAsYYYYMMDD(lastEntryDate, numOfDays - i));
@@ -267,9 +270,13 @@ public class StressItem extends AbstractItem<StressItem, StressItem.ViewHolder> 
                                     for (String date : entryDatesList) {
                                         if (dailyEntries.get(j).getDate().equals(date)) {
                                             entries.put(date, dailyEntries.get(j).getAverageStress().floatValue());
+                                            if (dailyEntries.get(j).getAverageStress() > max) {
+                                                max = dailyEntries.get(j).getAverageStress();
+                                            }
                                         }
                                     }
                                 }
+
                                 float total = 0;
                                 float validEntryCounter = 0;
                                 int j = 0;
@@ -285,16 +292,18 @@ public class StressItem extends AbstractItem<StressItem, StressItem.ViewHolder> 
                                     }
                                 }
 
+                                Collections.sort(lineEntries, new EntryXComparator());
+                                final double maxValue = max;
                                 if (validEntryCounter != 0) {
                                     final float average = total / validEntryCounter;
                                     handler.post(new Runnable() {
                                         @Override
                                         public void run() {
-                                            drawLineChart(lineEntries, entryDatesList, numOfDays, average);
+                                            drawLineChart(lineEntries, entryDatesList, numOfDays, average, maxValue);
                                         }
                                     });
                                 }
-                                Collections.sort(lineEntries, new EntryXComparator());
+
                                 Log.i(TAG, dailyEntries.toString());
                                 Log.i(TAG, entryDatesList.toString());
                                 Log.i(TAG, entries.toString());
@@ -336,7 +345,7 @@ public class StressItem extends AbstractItem<StressItem, StressItem.ViewHolder> 
             lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         }
 
-        private void drawLineChart(List<Entry> lineEntries, List<String> entryDatesList, int numOfDays, float average) {
+        private void drawLineChart(List<Entry> lineEntries, List<String> entryDatesList, int numOfDays, float average, double maxValue) {
 
             lineChart.clear();
 
@@ -348,7 +357,7 @@ public class StressItem extends AbstractItem<StressItem, StressItem.ViewHolder> 
                     formattedEntryDatesList.add(newDate.substring(0, 1));
                 }
             }
-            if (numOfDays == 31) {
+            else if (numOfDays == 31) {
                 for (int i = 0; i < entryDatesList.size(); i++) {
                     String newDate = formattedTime.convertStringYYYYMMDDToMD(entryDatesList.get(i));
                     formattedEntryDatesList.add(newDate);
@@ -432,7 +441,8 @@ public class StressItem extends AbstractItem<StressItem, StressItem.ViewHolder> 
             leftAxis.setAxisMinimum(0f);
             leftAxis.setTypeface(tf);
             leftAxis.setTextSize(12);
-            leftAxis.setGranularity(5f);
+            leftAxis.setGranularity(1f);
+            leftAxis.setLabelCount(12, true);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
             leftAxis.setValueFormatter(new IAxisValueFormatter() {
@@ -493,9 +503,13 @@ public class StressItem extends AbstractItem<StressItem, StressItem.ViewHolder> 
             set.setCircleHoleColor(ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary));
             set.setCircleHoleRadius(2f);
             set.setCircleRadius(2f);
-            set.setDrawFilled(true);
-            Drawable drawable = ContextCompat.getDrawable(itemView.getContext(), R.drawable.bg_white_to_primary);
-            set.setFillDrawable(drawable);
+            if (maxValue > 0) {
+                set.setDrawFilled(true);
+                Drawable drawable = ContextCompat.getDrawable(itemView.getContext(), R.drawable.bg_white_to_primary);
+                set.setFillDrawable(drawable);
+            } else {
+                set.setDrawFilled(false);
+            }
             set.setDrawHorizontalHighlightIndicator(false);
             set.setDrawVerticalHighlightIndicator(false);
             List<ILineDataSet> lineDataSets = new ArrayList<>();

@@ -33,8 +33,8 @@ public class FitnessTrackerBarChartMarkerView extends MarkerView {
     public FitnessTrackerBarChartMarkerView(Context context, int layoutResource, List<String> entryDatesList, String activity, int numOfDays,  Chart chart) {
         super(context, layoutResource);
         this.context = context;
-        topText = (TextView) findViewById(R.id.mpchart_chartvalueselectedview_top_textview);
-        bottomText = (TextView) findViewById(R.id.mpchart_chartvalueselectedview_bottom_textview);
+        topText = findViewById(R.id.mpchart_chartvalueselectedview_top_textview);
+        bottomText = findViewById(R.id.mpchart_chartvalueselectedview_bottom_textview);
         this.formattedTime = new FormattedTime();
         this.entryDatesList = entryDatesList;
         this.numOfDays = numOfDays;

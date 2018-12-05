@@ -420,11 +420,7 @@ public class WeatherRepository {
 
     public boolean insert(WeatherDailySummary weatherDailySummary) {
         AsyncTask.Status status = new insertAsyncTask(weatherDao).execute(weatherDailySummary).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertAsyncTask extends AsyncTask<WeatherDailySummary, Void, Void> {
@@ -446,11 +442,7 @@ public class WeatherRepository {
 
     private boolean insertSuccess(AsyncTaskBoolean asyncTaskSuccess) {
         AsyncTask.Status status = new insertSuccessAsyncTask(mTaskSuccessDao).execute(asyncTaskSuccess).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertSuccessAsyncTask extends AsyncTask<AsyncTaskBoolean, Void, Void> {

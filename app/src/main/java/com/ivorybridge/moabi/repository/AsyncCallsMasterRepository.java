@@ -190,11 +190,7 @@ public class AsyncCallsMasterRepository {
 
     private boolean insertSuccess(AsyncTaskBoolean asyncTaskSuccess) {
         AsyncTask.Status status = new insertSuccessAsyncTask(mTaskSuccessDao).execute(asyncTaskSuccess).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertSuccessAsyncTask extends AsyncTask<AsyncTaskBoolean, Void, Void> {

@@ -114,9 +114,6 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
                     itemView.getContext().getString(R.string.com_ivorybridge_moabi_ENERGY_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
             moodAndEnergySPEditor = moodAndEnergySharedPreferences.edit();
             formattedTime = new FormattedTime();
-            if (item.mFragment != null) {
-                moodAndEnergyViewModel = ViewModelProviders.of(item.mFragment).get(MoodAndEnergyViewModel.class);
-            }
             titleTextView.setText(itemView.getContext().getString(R.string.energy_title));
             titleImageView.setImageResource(R.drawable.ic_emotion);
             tf = ResourcesCompat.getFont(itemView.getContext(), R.font.source_sans_pro);
@@ -125,6 +122,7 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
             radioGroup.setUnCheckedTintColor(Color.WHITE, Color.BLACK);
             String checked = moodAndEnergySharedPreferences.getString(itemView.getContext()
                     .getString(R.string.com_ivorybridge_mobai_TIME_RANGE_KEY), itemView.getContext().getString(R.string.today));
+            moodAndEnergyViewModel = ViewModelProviders.of(item.mFragment).get(MoodAndEnergyViewModel.class);
             if (checked.equals(itemView.getContext().getString(R.string.today))) {
                 todayButton.setChecked(true);
                 configureData(item, 1);
@@ -140,7 +138,7 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     // This will get the radiobutton that has changed in its check state
-                    RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                    RadioButton checkedRadioButton = group.findViewById(checkedId);
                     // This puts the value (true/false) into the variable
                     boolean isChecked = checkedRadioButton.isChecked();
                     // If the radiobutton that has changed in check state is now checked...
@@ -202,9 +200,13 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
                                     List<Entry> energyLineEntries = new ArrayList<>();
                                     List<String> entryDatesList = new ArrayList<>();
                                     Long total = 0L;
+                                    double max = 0;
                                     for (MoodAndEnergy moodAndEnergy : moodAndEnergyList) {
                                         Long timeOfEntry = moodAndEnergy.getDateInLong();
                                         Long energy = moodAndEnergy.getEnergyLevel();
+                                        if (moodAndEnergy.getEnergyLevel() > max) {
+                                            max = moodAndEnergy.getEnergyLevel();
+                                        }
                                         total += energy;
                                         String timeOfEntryInString = formattedTime.convertLongToHHMM(timeOfEntry);
                                         Log.i(TAG, timeOfEntryInString);
@@ -220,11 +222,12 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
                                     }
                                     float average = total.floatValue() / moodAndEnergyList.size();
                                     Log.i(TAG, "Average is " + average);
+                                    final double maxValue = max;
                                     Collections.sort(energyLineEntries, new EntryXComparator());
                                     handler.post(new Runnable() {
                                         @Override
                                         public void run() {
-                                            drawLineChart(energyLineEntries, entryDatesList, 1, average);
+                                            drawLineChart(energyLineEntries, entryDatesList, 1, average, maxValue);
                                         }
                                     });
                                 }
@@ -263,10 +266,14 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
                                     entryDatesList.add(formattedTime.getDateBeforeSpecifiedNumberOfDaysAsYYYYMMDD(lastEntryDate, numOfDays - i));
                                     entries.put(formattedTime.getDateBeforeSpecifiedNumberOfDaysAsYYYYMMDD(lastEntryDate, numOfDays - i), -200f);
                                 }
+                                double max = 0;
                                 for (int j = 0; j < dailyEntries.size(); j++) {
                                     for (String date : entryDatesList) {
                                         if (dailyEntries.get(j).getDate().equals(date)) {
                                             entries.put(date, dailyEntries.get(j).getAverageEnergy().floatValue());
+                                            if (dailyEntries.get(j).getAverageEnergy() > max) {
+                                                max = dailyEntries.get(j).getAverageEnergy();
+                                            }
                                         }
                                     }
                                 }
@@ -285,16 +292,18 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
                                     }
                                 }
 
+                                final double maxValue = max;
+                                Collections.sort(lineEntries, new EntryXComparator());
                                 if (validEntryCounter != 0) {
                                     final float average = total / validEntryCounter;
                                     handler.post(new Runnable() {
                                         @Override
                                         public void run() {
-                                            drawLineChart(lineEntries, entryDatesList, numOfDays, average);
+                                            drawLineChart(lineEntries, entryDatesList, numOfDays, average, maxValue);
                                         }
                                     });
                                 }
-                                Collections.sort(lineEntries, new EntryXComparator());
+
                                 Log.i(TAG, dailyEntries.toString());
                                 Log.i(TAG, entryDatesList.toString());
                                 Log.i(TAG, entries.toString());
@@ -336,7 +345,7 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
             lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         }
 
-        private void drawLineChart(List<Entry> lineEntries, List<String> entryDatesList, int numOfDays, float average) {
+        private void drawLineChart(List<Entry> lineEntries, List<String> entryDatesList, int numOfDays, float average, double maxValue) {
 
             lineChart.clear();
 
@@ -348,7 +357,7 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
                     formattedEntryDatesList.add(newDate.substring(0, 1));
                 }
             }
-            if (numOfDays == 31) {
+            else if (numOfDays == 31) {
                 for (int i = 0; i < entryDatesList.size(); i++) {
                     String newDate = formattedTime.convertStringYYYYMMDDToMD(entryDatesList.get(i));
                     formattedEntryDatesList.add(newDate);
@@ -484,7 +493,6 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
                     entryDatesList, numOfDays, lineChart,
                     itemView.getContext().getString(R.string.energy_camel_case));
             lineChart.setMarker(numeralChartMarker);
-
             LineDataSet set = new LineDataSet(lineEntries, "");
             set.setAxisDependency(YAxis.AxisDependency.LEFT);
             set.setColor(ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary));
@@ -494,9 +502,13 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
             set.setCircleHoleColor(ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary));
             set.setCircleHoleRadius(2f);
             set.setCircleRadius(2f);
-            set.setDrawFilled(true);
-            Drawable drawable = ContextCompat.getDrawable(itemView.getContext(), R.drawable.bg_white_to_primary);
-            set.setFillDrawable(drawable);
+            if (maxValue > 1) {
+                set.setDrawFilled(true);
+                Drawable drawable = ContextCompat.getDrawable(itemView.getContext(), R.drawable.bg_white_to_primary);
+                set.setFillDrawable(drawable);
+            } else {
+                set.setDrawFilled(false);
+            }
             set.setDrawHorizontalHighlightIndicator(false);
             set.setDrawVerticalHighlightIndicator(false);
             List<ILineDataSet> lineDataSets = new ArrayList<>();

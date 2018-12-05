@@ -58,11 +58,7 @@ public class UserGoalRepository {
 
     public boolean insert(UserGoal userGoal) {
         AsyncTask.Status status = new insertAsyncTask(userGoalDao).execute(userGoal).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertAsyncTask extends AsyncTask<UserGoal, Void, Void> {
@@ -84,11 +80,7 @@ public class UserGoalRepository {
 
     private boolean insertSuccess(AsyncTaskBoolean asyncTaskSuccess) {
         AsyncTask.Status status = new insertSuccessAsyncTask(mTaskSuccessDao).execute(asyncTaskSuccess).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertSuccessAsyncTask extends AsyncTask<AsyncTaskBoolean, Void, Void> {

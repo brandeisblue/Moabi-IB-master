@@ -8,7 +8,7 @@
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/rv_item_timedactivity_barchart"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="156dp"
         android:layout_below="@id/rv_item_timedactivity_radiogroup"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"></com.github.mikephil.charting.charts.BarChart>

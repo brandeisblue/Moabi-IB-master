@@ -86,7 +86,7 @@ public class AnxietyRepository {
                             if (timeSnap.getKey() != null) {
                                 String dateTimeToConvert = date + " " + timeSnap.getKey();
                                 long dateInLong = formattedTime.convertStringYYYYMMDDhhmmToLong(dateTimeToConvert);
-                                if ((Long) timeSnap.getValue() != null) {
+                                if (timeSnap.getValue() != null) {
                                     Gad7 entry = new Gad7();
                                     entry.setScore((Long) timeSnap.getValue());
                                     entry.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
@@ -114,20 +114,12 @@ public class AnxietyRepository {
         inputHistory.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
         inputHistory.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
         inputHistoryRepository.insert(inputHistory);
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     public boolean processGad7(List<Gad7> gad7List) {
         AsyncTask.Status status = new processGad7AsyncTask(this, gad7List).execute().getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class processGad7AsyncTask extends AsyncTask<Void, Void, Void> {
@@ -295,11 +287,7 @@ public class AnxietyRepository {
 
     private boolean insertDailyGad7(DailyGad7 dailyGad7) {
         AsyncTask.Status status = new insertDailyGad7AsyncTask(gad7Dao).execute(dailyGad7).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertDailyGad7AsyncTask extends AsyncTask<DailyGad7, Void, Void> {
@@ -319,11 +307,7 @@ public class AnxietyRepository {
 
     private boolean insertWeeklyGad7(WeeklyGad7 weeklyGad7) {
         AsyncTask.Status status = new insertWeeklyGad7AsyncTask(gad7Dao).execute(weeklyGad7).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertWeeklyGad7AsyncTask extends AsyncTask<WeeklyGad7, Void, Void> {
@@ -343,11 +327,7 @@ public class AnxietyRepository {
 
     private boolean insertMonthlyGad7(MonthlyGad7 monthlyGad7) {
         AsyncTask.Status status = new insertMonthlyGad7AsyncTask(gad7Dao).execute(monthlyGad7).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertMonthlyGad7AsyncTask extends AsyncTask<MonthlyGad7, Void, Void> {

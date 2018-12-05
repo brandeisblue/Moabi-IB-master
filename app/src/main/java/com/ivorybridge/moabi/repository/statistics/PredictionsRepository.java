@@ -800,7 +800,6 @@ public class PredictionsRepository {
                     regression4[i][0] = indepVarList.get(i).getAvgHumidity();
                     regression5[i][0] = indepVarList.get(i).getAvgHumidity();
                     total += indepVarList.get(i).getAvgHumidity();
-                    ;
                 } else if (activityName.equals(application.getString(R.string.temperature_camel_case))) {
                     regression1[i][0] = indepVarList.get(i).getAvgTempC();
                     regression2[i][0] = indepVarList.get(i).getAvgTempC();
@@ -7907,11 +7906,7 @@ public class PredictionsRepository {
 
     public boolean insert(RegressionSummary regressionSummary) {
         AsyncTask.Status status = new insertAsyncTask(regressionSummaryDao).execute(regressionSummary).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertAsyncTask extends AsyncTask<RegressionSummary, Void, Void> {
@@ -7931,11 +7926,7 @@ public class PredictionsRepository {
 
     public boolean insert(SimpleRegressionSummary simpleRegressionSummary) {
         AsyncTask.Status status = new insertSimpleRegressionAsyncTask(regressionSummaryDao).execute(simpleRegressionSummary).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertSimpleRegressionAsyncTask extends AsyncTask<SimpleRegressionSummary, Void, Void> {

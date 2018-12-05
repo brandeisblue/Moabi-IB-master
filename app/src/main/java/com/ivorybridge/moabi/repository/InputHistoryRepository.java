@@ -43,11 +43,7 @@ public class InputHistoryRepository {
         inputDate.setDate(inputHistory.getDate());
         inputDate.setHasData(true);
         insert(inputDate);
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     public LiveData<List<InputDate>> getInputDates() {
@@ -75,11 +71,7 @@ public class InputHistoryRepository {
 
     public boolean insert(InputDate inputDate) {
         AsyncTask.Status status = new insertInputDateAsyncTask(inputHistoryDao).execute(inputDate).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertInputDateAsyncTask extends AsyncTask<InputDate, Void, Void> {

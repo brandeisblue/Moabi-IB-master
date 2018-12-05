@@ -67,11 +67,7 @@ public class TimedActivityRepository {
         inputHistory.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
         inputHistory.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
         inputHistoryRepository.insert(inputHistory);
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     public void sync() {
@@ -87,7 +83,7 @@ public class TimedActivityRepository {
                                     if (activitySnap.getKey() != null && activitySnap.hasChildren()) {
                                         String dateTimeToConvert = date + " " + timeSnap.getKey();
                                         long dateInLong = formattedTime.convertStringYYYYMMDDhhmmToLong(dateTimeToConvert);
-                                        if ((Long) activitySnap.getValue() != null) {
+                                        if (activitySnap.getValue() != null) {
                                             TimedActivitySummary timedActivitySummary = new TimedActivitySummary();
                                             timedActivitySummary.setInputName(activitySnap.getKey());
                                             timedActivitySummary.setDateInLong(dateInLong);

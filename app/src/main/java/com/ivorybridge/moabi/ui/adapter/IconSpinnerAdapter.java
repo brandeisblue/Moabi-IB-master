@@ -45,8 +45,8 @@ public class IconSpinnerAdapter extends ArrayAdapter<String> {
             LayoutInflater mInflater = (LayoutInflater) mContext.
                     getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = mInflater.inflate(R.layout.spinner_item_with_icon, parent, false);
-            mViewHolder.icon = (ImageView) convertView.findViewById(R.id.spinner_item_with_icon_imageview);
-            mViewHolder.name = (TextView) convertView.findViewById(R.id.spinner_item_with_icon_textview);
+            mViewHolder.icon = convertView.findViewById(R.id.spinner_item_with_icon_imageview);
+            mViewHolder.name = convertView.findViewById(R.id.spinner_item_with_icon_textview);
             convertView.setTag(mViewHolder);
         } else {
             mViewHolder = (ViewHolder) convertView.getTag();

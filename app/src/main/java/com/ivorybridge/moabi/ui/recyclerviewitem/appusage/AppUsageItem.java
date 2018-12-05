@@ -132,7 +132,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     // This will get the radiobutton that has changed in its check state
-                    RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                    RadioButton checkedRadioButton = group.findViewById(checkedId);
                     // This puts the value (true/false) into the variable
                     boolean isChecked = checkedRadioButton.isChecked();
                     // If the radiobutton that has changed in check state is now checked...
@@ -237,7 +237,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             xAxis.setDrawGridLines(false);
             xAxis.setAxisMaximum(6.5f);
             xAxis.setAxisMinimum(0.5f);
-            xAxis.setTextSize(10f);
+            xAxis.setTextSize(12f);
             xAxis.setTypeface(tf);
             //xAxis.setLabelCount(5, true);
             xAxis.setDrawAxisLine(false);
@@ -277,7 +277,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
                     return convertToTimeString(value);
                 }
             });
-            int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.fui_transparent);
+            int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white20);
             int startColor2 = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
             List<GradientColor> gradientColors = new ArrayList<>();
             gradientColors.add(new GradientColor(startColor1, startColor2));
@@ -393,7 +393,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             BarDataSet AppUsageDataSet = new BarDataSet(AppUsageBarEntries, "Digital BAActivityFavorited");
             AppUsageDataSet.setDrawValues(false);
             AppUsageDataSet.setColor(itemView.getContext().getColor(R.color.colorPrimary));
-            int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.fui_transparent);
+            int startColor1 = ContextCompat.getColor(itemView.getContext(), R.color.white20);
             int startColor2 = ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary);
             List<GradientColor> gradientColors = new ArrayList<>();
             gradientColors.add(new GradientColor(startColor1, startColor2));
@@ -435,7 +435,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             leftAxis.setDrawGridLines(false);
             //leftAxis.setAxisMaximum(3);
             leftAxis.setAxisMinimum(0);
-            leftAxis.setTextSize(10f);
+            leftAxis.setTextSize(12f);
             //leftAxis.setGranularity(1f);
             //leftAxis.setGranularityEnabled(true);
             leftAxis.setLabelCount(3, true);
@@ -475,9 +475,9 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             long minute = Math.round((timeInMiliSecs / (1000 * 60)) % 60);
             long hour = Math.round((timeInMiliSecs / (1000 * 60 * 60)));
             if (hour < 1) {
-                return minute + itemView.getContext().getString(R.string.unit_time_sing);
+                return minute + " " + itemView.getContext().getString(R.string.unit_time_sing);
             } else {
-                return hour + itemView.getContext().getString(R.string.unit_hour_sing);
+                return hour + " " + itemView.getContext().getString(R.string.unit_hour_sing);
             }
         }
     }

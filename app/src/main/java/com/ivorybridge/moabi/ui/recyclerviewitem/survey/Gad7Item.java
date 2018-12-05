@@ -141,7 +141,7 @@ public class Gad7Item extends AbstractItem<Gad7Item, Gad7Item.ViewHolder> {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     // This will get the radiobutton that has changed in its check state
-                    RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                    RadioButton checkedRadioButton = group.findViewById(checkedId);
                     // This puts the value (true/false) into the variable
                     boolean isChecked = checkedRadioButton.isChecked();
                     // If the radiobutton that has changed in check state is now checked...
@@ -203,10 +203,14 @@ public class Gad7Item extends AbstractItem<Gad7Item, Gad7Item.ViewHolder> {
                                     List<Entry> itemLineEntries = new ArrayList<>();
                                     List<String> entryDatesList = new ArrayList<>();
                                     Long total = 0L;
+                                    double max = 0;
                                     for (Gad7 item : itemList) {
                                         Long timeOfEntry = item.getDateInLong();
                                         Long entry = item.getScore();
                                         total += entry;
+                                        if (item.getScore() > max) {
+                                            max = item.getScore();
+                                        }
                                         String timeOfEntryInString = formattedTime.convertLongToHHMM(timeOfEntry);
                                         Log.i(TAG, timeOfEntryInString);
                                         String[] times = timeOfEntryInString.split(":");
@@ -221,11 +225,12 @@ public class Gad7Item extends AbstractItem<Gad7Item, Gad7Item.ViewHolder> {
                                     }
                                     float average = total.floatValue() / itemList.size();
                                     Log.i(TAG, "Average is " + average);
+                                    final double maxValue = max;
                                     Collections.sort(itemLineEntries, new EntryXComparator());
                                     handler.post(new Runnable() {
                                         @Override
                                         public void run() {
-                                            drawLineChart(itemLineEntries, entryDatesList, 1, average);
+                                            drawLineChart(itemLineEntries, entryDatesList, 1, average, maxValue);
                                         }
                                     });
                                 }
@@ -267,10 +272,14 @@ public class Gad7Item extends AbstractItem<Gad7Item, Gad7Item.ViewHolder> {
                                     entryDatesList.add(formattedTime.getDateBeforeSpecifiedNumberOfDaysAsYYYYMMDD(lastEntryDate, numOfDays - i));
                                     entries.put(formattedTime.getDateBeforeSpecifiedNumberOfDaysAsYYYYMMDD(lastEntryDate, numOfDays - i), -200f);
                                 }
+                                double max = 0;
                                 for (int j = 0; j < dailyEntries.size(); j++) {
                                     for (String date : entryDatesList) {
                                         if (dailyEntries.get(j).getDate().equals(date)) {
                                             entries.put(date, dailyEntries.get(j).getAverageScore().floatValue());
+                                            if (dailyEntries.get(j).getAverageScore() > max) {
+                                                max = dailyEntries.get(j).getAverageScore();
+                                            }
                                         }
                                     }
                                 }
@@ -288,17 +297,18 @@ public class Gad7Item extends AbstractItem<Gad7Item, Gad7Item.ViewHolder> {
                                         j++;
                                     }
                                 }
-
+                                final double maxValue = max;
+                                Collections.sort(lineEntries, new EntryXComparator());
                                 if (validEntryCounter != 0) {
                                     final float average = total / validEntryCounter;
                                     handler.post(new Runnable() {
                                         @Override
                                         public void run() {
-                                            drawLineChart(lineEntries, entryDatesList, numOfDays, average);
+                                            drawLineChart(lineEntries, entryDatesList, numOfDays, average, maxValue);
                                         }
                                     });
                                 }
-                                Collections.sort(lineEntries, new EntryXComparator());
+
                                 Log.i(TAG, dailyEntries.toString());
                                 Log.i(TAG, entryDatesList.toString());
                                 Log.i(TAG, entries.toString());
@@ -340,7 +350,7 @@ public class Gad7Item extends AbstractItem<Gad7Item, Gad7Item.ViewHolder> {
             lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         }
 
-        private void drawLineChart(List<Entry> lineEntries, List<String> entryDatesList, int numOfDays, float average) {
+        private void drawLineChart(List<Entry> lineEntries, List<String> entryDatesList, int numOfDays, float average, double maxValue) {
 
             lineChart.clear();
 
@@ -352,7 +362,7 @@ public class Gad7Item extends AbstractItem<Gad7Item, Gad7Item.ViewHolder> {
                     formattedEntryDatesList.add(newDate.substring(0, 1));
                 }
             }
-            if (numOfDays == 31) {
+            else if (numOfDays == 31) {
                 for (int i = 0; i < entryDatesList.size(); i++) {
                     String newDate = formattedTime.convertStringYYYYMMDDToMD(entryDatesList.get(i));
                     formattedEntryDatesList.add(newDate);
@@ -432,26 +442,26 @@ public class Gad7Item extends AbstractItem<Gad7Item, Gad7Item.ViewHolder> {
 
             leftAxis.setDrawGridLines(false);
             leftAxis.setDrawAxisLine(false);
-            leftAxis.setAxisMaximum(22f);
+            leftAxis.setAxisMaximum(24f);
             leftAxis.setAxisMinimum(0f);
             leftAxis.setTypeface(tf);
             leftAxis.setTextSize(12);
             leftAxis.setGranularity(1.0f);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
-            leftAxis.setLabelCount(23, true);
+            leftAxis.setLabelCount(9, true);
             leftAxis.setValueFormatter(new IAxisValueFormatter() {
                 @Override
                 public String getFormattedValue(float value, AxisBase axis) {
                     Log.i(TAG, "Y-axis value is: " + value);
                     /*if (value == 4f) {
-                        return "Min";
+                        return "Min"
                     }*/
                     if (value == 9f) {
                         return itemView.getContext().getString(R.string.chart_mild_abbr);
-                    } else if (value == 14f) {
+                    } /*else if (value == 14f) {
                         return itemView.getContext().getString(R.string.chart_moderate_abbr);
-                    } else if (value == 21f) {
+                    } */else if (value == 21f) {
                         return itemView.getContext().getString(R.string.chart_severe_abbr);
                     } else {
                         return "";
@@ -503,9 +513,13 @@ public class Gad7Item extends AbstractItem<Gad7Item, Gad7Item.ViewHolder> {
             set.setCircleHoleColor(ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary));
             set.setCircleHoleRadius(2f);
             set.setCircleRadius(2f);
-            set.setDrawFilled(true);
-            Drawable drawable = ContextCompat.getDrawable(itemView.getContext(), R.drawable.bg_white_to_primary);
-            set.setFillDrawable(drawable);
+            if (maxValue > 0) {
+                set.setDrawFilled(true);
+                Drawable drawable = ContextCompat.getDrawable(itemView.getContext(), R.drawable.bg_white_to_primary);
+                set.setFillDrawable(drawable);
+            } else {
+                set.setDrawFilled(false);
+            }
             set.setDrawHorizontalHighlightIndicator(false);
             set.setDrawVerticalHighlightIndicator(false);
             List<ILineDataSet> lineDataSets = new ArrayList<>();

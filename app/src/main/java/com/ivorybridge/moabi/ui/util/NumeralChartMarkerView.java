@@ -35,8 +35,8 @@ public class NumeralChartMarkerView extends MarkerView {
                                   int numOfDays, Chart chart, String inputType) {
         super(context, layoutResource);
         // this markerview only displays a textview
-        topText = (TextView) findViewById(R.id.mpchart_chartvalueselectedview_top_textview);
-        bottomText = (TextView) findViewById(R.id.mpchart_chartvalueselectedview_bottom_textview);
+        topText = findViewById(R.id.mpchart_chartvalueselectedview_top_textview);
+        bottomText = findViewById(R.id.mpchart_chartvalueselectedview_bottom_textview);
         formattedTime = new FormattedTime();
         this.entryDatesList = entryDatesList;
         this.numOfDays = numOfDays;
@@ -73,18 +73,40 @@ public class NumeralChartMarkerView extends MarkerView {
         }  else if (inputType.equals(getContext().getString(R.string.daily_review_camel_case))) {
             score = String.format(Locale.US, "%.0f",((e.getY() - 1f) / 4f) * 100) + "%";
         } else if (inputType.equals(getContext().getString(R.string.depression_phq9_camel_case))) {
-            score = String.format(Locale.US, "%.0f",(e.getY() / 27f) * 100) + "%";
+            if (e.getY() < 5) {
+                score = getContext().getString(R.string.chart_min_abbr);
+            } else if (e.getY() < 10) {
+                score = getContext().getString(R.string.chart_mild_abbr);
+            } else if (e.getY() < 15) {
+                score = getContext().getString(R.string.chart_moderate_abbr);
+            } else if (e.getY() < 20) {
+                score = getContext().getString(R.string.chart_moderately_severe_abbr);
+            } else {
+                score = getContext().getString(R.string.chart_severe_abbr);
+            }
+            //score = String.format(Locale.US, "%.0f",(e.getY() / 27f) * 100) + "%";
         } else if (inputType.equals(getContext().getString(R.string.anxiety_gad7_camel_case))) {
-            score = String.format(Locale.US, "%.0f",(e.getY() / 21f) * 100) + "%";
+            if (e.getY() < 5) {
+                score = getContext().getString(R.string.chart_min_abbr);
+            } else if (e.getY() < 10) {
+                score = getContext().getString(R.string.chart_mild_abbr);
+            } else if (e.getY() < 15) {
+                score = getContext().getString(R.string.chart_moderate_abbr);
+            } else {
+                score = getContext().getString(R.string.chart_severe_abbr);
+            }
         } else if (inputType.equals(getContext().getString(R.string.activity_steps_title))) {
             if (e.getY() > 1) {
                 score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_step_plur);
             } else {
                 score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_step_sing);
             }
-        } else if (inputType.contains("Minutes") || inputType.equals(getContext().getString(R.string.activity_sleep_title)) ||
+        } else if (inputType.equals(getContext().getString(R.string.activity_active_minutes_title)) ||
+                inputType.equals(getContext().getString(R.string.activity_sedentary_minutes_title)) ||
+                inputType.equals(getContext().getString(R.string.activity_sleep_title)) ||
                 inputType.contains(getContext().getString(R.string.phone_usage_camel_case))) {
-            score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_time_sing);
+            //score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_time_sing);
+            score = convertToTimeString(e.getY());
         } else if (inputType.equals(getContext().getString(R.string.activity_distance_title))) {
             if (unit.equals(getContext().getString(R.string.preference_unit_si_title))) {
                 score = String.format(Locale.US, "%.2f", (e.getY())) + " " + getContext().getString(R.string.unit_distance_si);
@@ -100,7 +122,8 @@ public class NumeralChartMarkerView extends MarkerView {
                 score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_floor_sing);
             }
         } else if (inputType.equals(getContext().getString(R.string.timer_camel_case))) {
-            score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_time_sing);
+            //score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_time_sing);
+            score = convertToTimeString(e.getY());
         } else if (inputType.equals(getContext().getString(R.string.baactivity_camel_case))) {
             if (e.getY() > 1) {
                 score = String.format(Locale.US, "%.0f", (e.getY())) + " " + getContext().getString(R.string.unit_activity_plur);
@@ -170,5 +193,35 @@ public class NumeralChartMarkerView extends MarkerView {
     public void draw(Canvas canvas, float posX, float posY) {
         super.draw(canvas, posX, posY);
         getOffsetForDrawingAtPoint(posX, posY);
+    }
+
+    private String convertToTimeString(float timeInFloat) {
+        long minute = (long) timeInFloat % 60;
+        long hour = (long) timeInFloat / 60;
+        String timeElapsed = "";
+        if (hour == 0) {
+            if (minute < 2) {
+                timeElapsed = minute + " " + getContext().getString(R.string.unit_time_sing);
+            } else {
+                timeElapsed = minute + " " + getContext().getString(R.string.unit_time_plur);
+            }
+        } else if (hour == 1) {
+            if (minute < 2) {
+                timeElapsed = hour + getContext().getString(R.string.unit_hour_sing) + " " +
+                        + minute + getContext().getString(R.string.unit_time_sing);
+            } else {
+                timeElapsed = hour + getContext().getString(R.string.unit_hour_sing) + " " +
+                        + minute + getContext().getString(R.string.unit_time_plur);
+            }
+        } else {
+            if (minute < 2) {
+                timeElapsed = hour + getContext().getString(R.string.unit_hour_plur) + " " +
+                        + minute + getContext().getString(R.string.unit_time_sing);
+            } else {
+                timeElapsed = hour + getContext().getString(R.string.unit_hour_plur) + " " +
+                        + minute + getContext().getString(R.string.unit_time_plur);
+            }
+        }
+        return timeElapsed;
     }
 }

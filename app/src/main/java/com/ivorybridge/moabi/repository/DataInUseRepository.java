@@ -32,11 +32,7 @@ public class DataInUseRepository {
 
     public boolean insert(InputInUse InputInUse) {
         AsyncTask.Status status = new insertAsyncTask(mTaskDao).execute(InputInUse).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     public void deleteAllInputsInUse() {
@@ -72,11 +68,7 @@ public class DataInUseRepository {
 
     public boolean insert(ConnectedService connectedService) {
         AsyncTask.Status status = new insertConnectedServiceAsyncTask(mTaskDao).execute(connectedService).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertConnectedServiceAsyncTask extends AsyncTask<ConnectedService, Void, Void> {

@@ -43,11 +43,7 @@ public class CredentialRepository {
 
     public boolean insert(Credential Credential) {
         AsyncTask.Status status = new insertAsyncTask(mTaskDao).execute(Credential).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertAsyncTask extends AsyncTask<Credential, Void, Void> {

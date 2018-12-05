@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -13,13 +14,17 @@ import com.ivorybridge.moabi.database.entity.util.ConnectedService;
 import com.ivorybridge.moabi.database.entity.util.DataInUseMediatorLiveData;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.database.entity.util.UserGoal;
+import com.ivorybridge.moabi.service.CheckInDailyJob;
 import com.ivorybridge.moabi.service.MotionSensorService;
-import com.ivorybridge.moabi.service.TimerService;
+import com.ivorybridge.moabi.service.StopwatchService;
 import com.ivorybridge.moabi.service.UserGoalJob;
 import com.ivorybridge.moabi.service.UserGoalPeriodicJob;
+import com.ivorybridge.moabi.util.FormattedTime;
 import com.ivorybridge.moabi.viewmodel.DataInUseViewModel;
 import com.ivorybridge.moabi.viewmodel.UserGoalViewModel;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -57,6 +62,7 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
     private SwitchPreference personalGoalSwitchPref;
     private SwitchPreference dailyCheckInSwitchPref;
     private SwitchPreference dailyCheersSwitchPref;
+    private FormattedTime formattedTime;
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
@@ -66,6 +72,7 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
                 getString(R.string.com_ivorybridge_mobai_NOTIFICATION_SHARED_PREFERENCE),
                 Context.MODE_PRIVATE);
         notificationSPEditor = notificationSharedPreferences.edit();
+        formattedTime = new FormattedTime();
         dataInUseViewModel = ViewModelProviders.of(this).get(DataInUseViewModel.class);
         userGoalViewModel = ViewModelProviders.of(this).get(UserGoalViewModel.class);
         timerSwitchPref = (SwitchPreference)
@@ -78,6 +85,7 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
                 findPreference("daily_check_in_preference");
         dailyCheersSwitchPref = (SwitchPreference)
                 findPreference("cheers_preference");
+        dailyCheersSwitchPref.setVisible(false);
         trackerSourcePref = (ListPreference)
         findPreference("fitness_tracker_source_preference");
         measureListPref = (ListPreference)
@@ -92,11 +100,11 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
                 notificationSPEditor.putBoolean(getString(R.string.preference_timer_notification), isChecked);
                 notificationSPEditor.commit();
                 if (isChecked) {
-                    if (TimerService.TimeContainer.getInstance().isServiceRunning.get()) {
-                        getContext().startService(new Intent(getActivity(), TimerService.class));
+                    if (StopwatchService.TimeContainer.getInstance().isServiceRunning.get()) {
+                        getContext().startService(new Intent(getActivity(), StopwatchService.class));
                     } else {
                         if (getActivity() != null) {
-                            getContext().stopService(new Intent(getActivity(), TimerService.class));
+                            getContext().stopService(new Intent(getActivity(), StopwatchService.class));
                         }
                     }
                 }
@@ -182,6 +190,7 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
                 return false;
             }
         });
+
         userGoalViewModel.getGoal(0).observe(this, new Observer<UserGoal>() {
             @Override
             public void onChanged(UserGoal userGoal) {
@@ -204,9 +213,41 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
                 notificationSPEditor.commit();
                 if (isChecked) {
                     checkInTimePref.setEnabled(true);
+                    int hour = notificationSharedPreferences.getInt(getString(R.string.preference_daily_check_in_hour), 20);
+                    int minute = notificationSharedPreferences.getInt(getString(R.string.preference_daily_check_in_minute), 0);
+                    CheckInDailyJob.scheduleJob(hour, minute);
                 } else {
                     checkInTimePref.setEnabled(false);
                 }
+                return false;
+            }
+        });
+
+        int hour = notificationSharedPreferences.getInt(getString(R.string.preference_daily_check_in_hour), 20);
+        int minute = notificationSharedPreferences.getInt(getString(R.string.preference_daily_check_in_minute), 0);
+        String time = hour + ":" + minute;
+        checkInTimePref.setSummary(formattedTime.convertStringHMToHMMAA(time));
+
+        checkInTimePref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Calendar now = Calendar.getInstance();
+                TimePickerDialog tpd = TimePickerDialog.newInstance(
+                        new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
+                                Log.i(TAG, hourOfDay + ":" + minute);
+                                notificationSPEditor.putInt(getString(R.string.preference_daily_check_in_hour), hourOfDay);
+                                notificationSPEditor.putInt(getString(R.string.preference_daily_check_in_minute), minute);
+                                notificationSPEditor.commit();
+                                String time = hourOfDay + ":" + minute;
+                                checkInTimePref.setSummary(formattedTime.convertStringHMToHMMAA(time));
+                                CheckInDailyJob.scheduleJob(hourOfDay, minute);
+                            }
+                        },
+                        now.get(Calendar.HOUR_OF_DAY),
+                        now.get(Calendar.MINUTE), false);
+                tpd.show(getChildFragmentManager(), "Timepickerdialog");
                 return false;
             }
         });
@@ -216,16 +257,17 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
     public void onResume() {
         super.onResume();
         isTimerNotifEnabled = notificationSharedPreferences.getBoolean(
-                getString(R.string.preference_timer_notification), false);
+                getString(R.string.preference_timer_notification), true);
         isPersonalGoalNotifEnabled = notificationSharedPreferences.getBoolean(
-                getString(R.string.preference_personal_goal_notification), false);
+                getString(R.string.preference_personal_goal_notification), true);
         isCheckInNotifEnabled = notificationSharedPreferences.getBoolean(
-                getString(R.string.preference_daily_check_in_notification), false);
+                getString(R.string.preference_daily_check_in_notification), true);
         isDailyCheersNotifEnabled = notificationSharedPreferences.getBoolean(
                 getString(R.string.preference_daily_cheers_notification), false);
         String tracker = notificationSharedPreferences.getString(getString(R.string.preference_fitness_tracker_source_notification), null);
         String measure = notificationSharedPreferences.getString(getString(R.string.preference_fitness_tracker_activity_type_notification),
                 null);
+
         if (tracker != null && measure != null) {
             trackerSourcePref.setSummary(tracker);
             trackerSourcePref.setValue(tracker);

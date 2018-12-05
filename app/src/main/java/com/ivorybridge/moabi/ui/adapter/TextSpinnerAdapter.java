@@ -41,7 +41,7 @@ public class TextSpinnerAdapter extends ArrayAdapter<String> {
             LayoutInflater mInflater = (LayoutInflater) mContext.
                     getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = mInflater.inflate(R.layout.spinner_item_without_icon, parent, false);
-            mViewHolder.name = (TextView) convertView.findViewById(R.id.spinner_item_without_icon_textview);
+            mViewHolder.name = convertView.findViewById(R.id.spinner_item_without_icon_textview);
             convertView.setTag(mViewHolder);
         } else {
             mViewHolder = (ViewHolder) convertView.getTag();

@@ -25,7 +25,7 @@ import com.ivorybridge.moabi.database.entity.timedactivity.TimedActivitySummary;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.database.firebase.FirebaseManager;
 import com.ivorybridge.moabi.repository.DataInUseRepository;
-import com.ivorybridge.moabi.service.TimerService;
+import com.ivorybridge.moabi.service.StopwatchService;
 import com.ivorybridge.moabi.ui.recyclerviewitem.timedactivity.TimedActivityShortSummaryItem;
 import com.ivorybridge.moabi.util.FormattedTime;
 import com.ivorybridge.moabi.viewmodel.TimedActivityViewModel;
@@ -110,7 +110,7 @@ public class TimerActivity extends AppCompatActivity implements PropertyChangeLi
     private long intervalOnPause = 0;
     private long intervalActive = 0;
     private FormattedTime formattedTime;
-    private TimerService timerService;
+    private StopwatchService stopwatchService;
 
 
     @Override
@@ -263,11 +263,11 @@ public class TimerActivity extends AppCompatActivity implements PropertyChangeLi
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (TimerService.TimeContainer.getInstance().getCurrentState() == TimerService.TimeContainer.STATE_RUNNING
-                || TimerService.TimeContainer.getInstance().getCurrentState() == TimerService.TimeContainer.STATE_PAUSED) {
+        if (StopwatchService.TimeContainer.getInstance().getCurrentState() == StopwatchService.TimeContainer.STATE_RUNNING
+                || StopwatchService.TimeContainer.getInstance().getCurrentState() == StopwatchService.TimeContainer.STATE_PAUSED) {
 
         } else {
-            stopService(new Intent(this, TimerService.class));
+            stopService(new Intent(this, StopwatchService.class));
         }
 
     }
@@ -278,7 +278,7 @@ public class TimerActivity extends AppCompatActivity implements PropertyChangeLi
         if (name == null || name.isEmpty()) {
             name = getString(R.string.activity_unknown_title);
         }
-        intervalActive = TimerService.TimeContainer.getInstance().getElapsedTime();
+        intervalActive = StopwatchService.TimeContainer.getInstance().getElapsedTime();
         /*
         intervalActive += SystemClock.elapsedRealtime() - chronometer.getBase();
         if (playButton.getText().equals("start")) {
@@ -308,7 +308,7 @@ public class TimerActivity extends AppCompatActivity implements PropertyChangeLi
                     .child(formattedTime.convertLongToHHMM(timedActivitySummary.getDateInLong()))
                     .child(name).setValue(timedActivitySummary.getDuration());
         }
-        TimerService.TimeContainer.getInstance().stopAndReset();
+        StopwatchService.TimeContainer.getInstance().stopAndReset();
         //playButton.setText("start");
         //reset(resetButton);
     }
@@ -339,7 +339,7 @@ public class TimerActivity extends AppCompatActivity implements PropertyChangeLi
             timer.cancel();
             timer = null;
         }
-        TimerService.TimeContainer.getInstance().removeObserver(this);
+        StopwatchService.TimeContainer.getInstance().removeObserver(this);
         super.onPause();
     }
 
@@ -347,15 +347,15 @@ public class TimerActivity extends AppCompatActivity implements PropertyChangeLi
     protected void onResume() {
         super.onResume();
         checkServiceRunning();
-        TimerService.TimeContainer t = TimerService.TimeContainer.getInstance();
-        if (t.getCurrentState() == TimerService.TimeContainer.STATE_RUNNING) {
+        StopwatchService.TimeContainer t = StopwatchService.TimeContainer.getInstance();
+        if (t.getCurrentState() == StopwatchService.TimeContainer.STATE_RUNNING) {
             playButton.setText(getString(R.string.pause_title));
             startUpdateTimer();
         } else {
             playButton.setText(getString(R.string.start_title));
             updateTimeText();
         }
-        TimerService.TimeContainer.getInstance().addObserver(this);
+        StopwatchService.TimeContainer.getInstance().addObserver(this);
         super.onResume();
     }
 
@@ -366,37 +366,37 @@ public class TimerActivity extends AppCompatActivity implements PropertyChangeLi
     }
 
     private void checkServiceRunning() {
-        if (!TimerService.TimeContainer.getInstance().isServiceRunning.get()) {
-            startService(new Intent(this, TimerService.class));
+        if (!StopwatchService.TimeContainer.getInstance().isServiceRunning.get()) {
+            startService(new Intent(this, StopwatchService.class));
         }
     }
 
     public void changeState(View v) {
         checkServiceRunning();
-        TimerService.TimeContainer tc = TimerService.TimeContainer.getInstance();
-        if (tc.getCurrentState() == TimerService.TimeContainer.STATE_RUNNING) {
-            TimerService.TimeContainer.getInstance().pause();
+        StopwatchService.TimeContainer tc = StopwatchService.TimeContainer.getInstance();
+        if (tc.getCurrentState() == StopwatchService.TimeContainer.STATE_RUNNING) {
+            StopwatchService.TimeContainer.getInstance().pause();
             playButton.setText(getString(R.string.start_title));
         } else {
-            TimerService.TimeContainer.getInstance().start();
+            StopwatchService.TimeContainer.getInstance().start();
             startUpdateTimer();
             playButton.setText(getString(R.string.pause_title));
         }
     }
 
     public void reset(View v) {
-        TimerService.TimeContainer.getInstance().stopAndReset();
+        StopwatchService.TimeContainer.getInstance().stopAndReset();
         editText.setText(null);
         editText.setVisibility(View.INVISIBLE);
         editButton.setVisibility(View.VISIBLE);
         timedActivitySPEditor.putString("current_activity", null);
         timedActivitySPEditor.apply();
         updateTimeText();
-        stopService(new Intent(this, TimerService.class));
+        stopService(new Intent(this, StopwatchService.class));
     }
 
     private void updateTimeText() {
-        timeTextView.setText(getTimeString(TimerService.TimeContainer.getInstance().getElapsedTime()));
+        timeTextView.setText(getTimeString(StopwatchService.TimeContainer.getInstance().getElapsedTime()));
     }
 
     public void startUpdateTimer() {
@@ -412,9 +412,9 @@ public class TimerActivity extends AppCompatActivity implements PropertyChangeLi
             }
         }, 0, 16);
         if (editText.getText().toString().isEmpty()) {
-            TimerService.TimeContainer.getInstance().setName(getString(R.string.activity_unknown_title));
+            StopwatchService.TimeContainer.getInstance().setName(getString(R.string.activity_unknown_title));
         } else {
-            TimerService.TimeContainer.getInstance().setName(editText.getText().toString().trim());
+            StopwatchService.TimeContainer.getInstance().setName(editText.getText().toString().trim());
         }
     }
 
@@ -475,9 +475,9 @@ public class TimerActivity extends AppCompatActivity implements PropertyChangeLi
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        if (event.getPropertyName() == TimerService.TimeContainer.STATE_CHANGED) {
-            TimerService.TimeContainer t = TimerService.TimeContainer.getInstance();
-            if (t.getCurrentState() == TimerService.TimeContainer.STATE_RUNNING) {
+        if (event.getPropertyName() == StopwatchService.TimeContainer.STATE_CHANGED) {
+            StopwatchService.TimeContainer t = StopwatchService.TimeContainer.getInstance();
+            if (t.getCurrentState() == StopwatchService.TimeContainer.STATE_RUNNING) {
                 playButton.setText(getString(R.string.pause_title));
                 startUpdateTimer();
             } else {

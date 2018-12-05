@@ -61,7 +61,6 @@ public class MotionSensorEndofDayDailyJob extends DailyJob {
                                         FormattedTime formattedTime = new FormattedTime();
                                         List<BuiltInProfile> builtInProfiles = builtInFitnessRepository.getUserProfileNow();
                                         double bmr = 1577.5;
-                                        double distance = 0;
                                         double calories = 0;
                                         long activeMins = 0;
                                         long sedentaryMins = 0;
@@ -75,29 +74,19 @@ public class MotionSensorEndofDayDailyJob extends DailyJob {
                                                     if (profile.getAge() != null) {
                                                         bmr = bmr - 5 * profile.getAge() + 5;
                                                     }
-                                                } else {
+                                                } else if (profile.getGender().equals(application.getString(R.string.profile_sex_female))){
                                                     bmr = profile.getWeight() * 10 + 6.25 * profile.getHeight();
                                                     if (profile.getAge() != null) {
                                                         bmr = bmr - 5 * profile.getAge() - 161;
                                                     }
+                                                } else {
+                                                    bmr = 1577.5;
                                                 }
                                             }
                                             BuiltInActivitySummary activitySummary = builtInFitnessRepository.getNow(formattedTime.getCurrentDateAsYYYYMMDD());
                                             if (activitySummary != null) {
                                                 long steps = activitySummary.getSteps();
                                                 activeMins = activitySummary.getActiveMinutes();
-                                                sedentaryMins = activitySummary.getSedentaryMinutes();
-                                                if (profile.getHeight() != null) {
-                                                    if (profile.getGender() == null) {
-                                                        distance = steps * (profile.getHeight() * 0.414) / 100;
-                                                    } else if (profile.getGender().equals(application.getString(R.string.profile_sex_male))) {
-                                                        distance = steps * profile.getHeight() * 0.415 / 100;
-                                                    } else {
-                                                        distance = steps * profile.getHeight() * 0.413 / 100;
-                                                    }
-                                                } else {
-                                                    distance = steps * 0.762;
-                                                }
                                                 calories = activitySummary.getCalories();
                                                 double elapsedTime = formattedTime.getCurrentTimeInMilliSecs() - formattedTime.getStartOfDay(formattedTime.getCurrentDateAsYYYYMMDD());
                                                 calories = (double) steps / 1000 * 40 + bmr * (elapsedTime / 86400000);

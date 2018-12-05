@@ -9,7 +9,7 @@
         android:id="@+id/rv_item_baactivity_wordcloud"
         android:layout_below="@id/rv_item_baactivity_radiogroup"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="156dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         app:autoSizeMinTextSize="12sp"

@@ -85,11 +85,7 @@ public class BuiltInFitnessRepository {
         inputHistory.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
         inputHistoryRepository.insert(inputHistory);
         AsyncTask.Status status = new insertAsyncTask(builtInFitnessDao).execute(builtInActivitySummary).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     public void sync() {
@@ -133,11 +129,7 @@ public class BuiltInFitnessRepository {
 
     public boolean insert(BuiltInProfile builtInProfile) {
         AsyncTask.Status status = new insertProfileAsyncTask(builtInFitnessDao).execute(builtInProfile).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertProfileAsyncTask extends AsyncTask<BuiltInProfile, Void, Void> {
@@ -157,11 +149,7 @@ public class BuiltInFitnessRepository {
 
     private boolean insertSuccess(AsyncTaskBoolean asyncTaskSuccess) {
         AsyncTask.Status status = new insertSuccessAsyncTask(mTaskSuccessDao).execute(asyncTaskSuccess).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertSuccessAsyncTask extends AsyncTask<AsyncTaskBoolean, Void, Void> {

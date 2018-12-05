@@ -121,20 +121,12 @@ public class StressRepository {
         inputHistory.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
         inputHistory.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
         inputHistoryRepository.insert(inputHistory);
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     public boolean processStress(List<Stress> stressList) {
         AsyncTask.Status status = new processStressAsyncTask(this, stressList).execute().getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class processStressAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -302,11 +294,7 @@ public class StressRepository {
 
     private boolean insertDailyStress(DailyStress dailyStress) {
         AsyncTask.Status status = new insertDailyStressAsyncTask(mDao).execute(dailyStress).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertDailyStressAsyncTask extends AsyncTask<DailyStress, Void, Void> {
@@ -326,11 +314,7 @@ public class StressRepository {
 
     private boolean insertWeeklyStress(WeeklyStress weeklyStress) {
         AsyncTask.Status status = new insertWeeklyStressAsyncTask(mDao).execute(weeklyStress).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertWeeklyStressAsyncTask extends AsyncTask<WeeklyStress, Void, Void> {
@@ -350,11 +334,7 @@ public class StressRepository {
 
     private boolean insertMonthlyStress(MonthlyStress monthlyStress) {
         AsyncTask.Status status = new insertMonthlyStressAsyncTask(mDao).execute(monthlyStress).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertMonthlyStressAsyncTask extends AsyncTask<MonthlyStress, Void, Void> {

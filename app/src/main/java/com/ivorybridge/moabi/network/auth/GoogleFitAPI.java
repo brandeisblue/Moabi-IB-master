@@ -634,11 +634,7 @@ public class GoogleFitAPI {
         googleFitInputHistory.setDate(date);
         inputHistoryRepository.insert(googleFitInputHistory);
         AsyncTask.Status status = new GoogleFitAPI.insertAsyncTask(mGoogleFitDao).execute(dailySummary).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertAsyncTask extends AsyncTask<GoogleFitSummary, Void, Void> {
@@ -658,11 +654,7 @@ public class GoogleFitAPI {
 
     private boolean insertSuccess(AsyncTaskBoolean taskBoolean) {
         AsyncTask.Status status = new insertSuccessAsyncTask(mTaskSuccessDao).execute(taskBoolean).getStatus();
-        if (status.equals(AsyncTask.Status.FINISHED)) {
-            return true;
-        } else {
-            return false;
-        }
+        return status.equals(AsyncTask.Status.FINISHED);
     }
 
     private static class insertSuccessAsyncTask extends AsyncTask<AsyncTaskBoolean, Void, Void> {

@@ -215,7 +215,7 @@ public class NoteEntryFragment extends Fragment {
             public void onResultEnd() {
                 ViewPager viewPager = new ViewPager(getContext());
                 if (getActivity() != null) {
-                    viewPager = (ViewPager) getActivity().findViewById(R.id.activity_make_entry_viewpager);
+                    viewPager = getActivity().findViewById(R.id.activity_make_entry_viewpager);
                 }
                 int currentItem = viewPager.getCurrentItem();
                 if (fragments.size() == 1 || currentItem == fragments.size() - 1) {

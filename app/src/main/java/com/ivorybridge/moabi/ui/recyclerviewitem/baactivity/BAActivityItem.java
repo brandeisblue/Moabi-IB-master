@@ -119,7 +119,7 @@ public class BAActivityItem extends AbstractItem<BAActivityItem, BAActivityItem.
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     // This will get the radiobutton that has changed in its check state
-                    RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                    RadioButton checkedRadioButton = group.findViewById(checkedId);
                     // This puts the value (true/false) into the variable
                     boolean isChecked = checkedRadioButton.isChecked();
                     // If the radiobutton that has changed in check state is now checked...
@@ -151,80 +151,83 @@ public class BAActivityItem extends AbstractItem<BAActivityItem, BAActivityItem.
         private void setWordCloud(BAActivityItem item, int numOfDay) {
             Long start = formattedTime.getStartOfDayBeforeSpecifiedNumberOfDays(item.mDate, numOfDay);
             Long end = formattedTime.getEndOfDay(item.mDate);
-            Log.i(TAG, formattedTime.convertLongToMDHHMMaa(start) + " - " + formattedTime.convertLongToMDHHMMaa(end));
+            //Log.i(TAG, formattedTime.convertLongToMDHHMMaa(start) + " - " + formattedTime.convertLongToMDHHMMaa(end));
             baActivityViewModel.getActivityEntries(start, end).observe(item.fragment,
                     new Observer<List<BAActivityEntry>>() {
-                @Override
-                public void onChanged(@Nullable List<BAActivityEntry> baActivityEntries) {
-                    if (baActivityEntries != null) {
-                        final Map<String, Long> nameFrequencyMap = new LinkedHashMap<>();
-                        final Map<String, Long> nameTypeMap = new LinkedHashMap<>();
-                        final Map<String, Set<String>> nameDatesMap = new LinkedHashMap<>();
-                        final List<WordCloudEntry> wordCloudEntryList = new ArrayList<>();
-                        Handler handler = new Handler();
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                for (BAActivityEntry baActivityEntry : baActivityEntries) {
-                                    if (nameFrequencyMap.get(baActivityEntry.getName()) != null) {
-                                        Long old = nameFrequencyMap.get(baActivityEntry.getName());
-                                        nameFrequencyMap.put(baActivityEntry.getName(), old + 1);
-                                    } else {
-                                        nameFrequencyMap.put(baActivityEntry.getName(), 1L);
-                                    }
-                                    if (nameDatesMap.get(baActivityEntry.getName()) != null) {
-                                        Set<String> old = nameDatesMap.get(baActivityEntry.getName());
-                                        old.add(formattedTime.convertLongToYYYYMMDD(baActivityEntry.getDateInLong()));
-                                        nameDatesMap.put(baActivityEntry.getName(), old);
-                                    } else {
-                                        Set<String> dates = new LinkedHashSet<>();
-                                        dates.add(formattedTime.convertLongToYYYYMMDD(baActivityEntry.getDateInLong()));
-                                        nameDatesMap.put(baActivityEntry.getName(), dates);
-                                    }
-                                    nameTypeMap.put(baActivityEntry.getName(), baActivityEntry.getActivityType());
-                                }
-
-                                for (Map.Entry<String, Long> nameFrequency : nameFrequencyMap.entrySet()) {
-                                    long type = nameTypeMap.get(nameFrequency.getKey());
-                                    WordCloudEntry worldCloudEntry = new WordCloudEntry(nameFrequency.getKey(),
-                                            nameFrequency.getValue(),
-                                            type);
-                                    wordCloudEntryList.add(worldCloudEntry);
-                                }
-                                Collections.shuffle(wordCloudEntryList);
-                                handler.post(new Runnable() {
+                        @Override
+                        public void onChanged(@Nullable List<BAActivityEntry> baActivityEntries) {
+                            if (baActivityEntries != null) {
+                                final Map<String, Long> nameFrequencyMap = new LinkedHashMap<>();
+                                final Map<String, Long> nameTypeMap = new LinkedHashMap<>();
+                                final Map<String, Set<String>> nameDatesMap = new LinkedHashMap<>();
+                                final List<WordCloudEntry> wordCloudEntryList = new ArrayList<>();
+                                Handler handler = new Handler();
+                                new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        displayWordCloud(wordCloudEntryList, nameDatesMap);
-                                        Log.i(TAG, baActivityEntries.toString());
+                                        for (BAActivityEntry baActivityEntry : baActivityEntries) {
+                                            if (nameFrequencyMap.get(baActivityEntry.getName()) != null) {
+                                                Long old = nameFrequencyMap.get(baActivityEntry.getName());
+                                                nameFrequencyMap.put(baActivityEntry.getName(), old + 1);
+                                            } else {
+                                                nameFrequencyMap.put(baActivityEntry.getName(), 1L);
+                                            }
+                                            if (nameDatesMap.get(baActivityEntry.getName()) != null) {
+                                                Set<String> old = nameDatesMap.get(baActivityEntry.getName());
+                                                old.add(formattedTime.convertLongToYYYYMMDD(baActivityEntry.getDateInLong()));
+                                                nameDatesMap.put(baActivityEntry.getName(), old);
+                                            } else {
+                                                Set<String> dates = new LinkedHashSet<>();
+                                                dates.add(formattedTime.convertLongToYYYYMMDD(baActivityEntry.getDateInLong()));
+                                                nameDatesMap.put(baActivityEntry.getName(), dates);
+                                            }
+                                            nameTypeMap.put(baActivityEntry.getName(), baActivityEntry.getActivityType());
+                                        }
+
+                                        for (Map.Entry<String, Long> nameFrequency : nameFrequencyMap.entrySet()) {
+                                            long type = nameTypeMap.get(nameFrequency.getKey());
+                                            WordCloudEntry worldCloudEntry = new WordCloudEntry(nameFrequency.getKey(),
+                                                    nameFrequency.getValue(),
+                                                    type);
+                                            wordCloudEntryList.add(worldCloudEntry);
+                                        }
+                                        Collections.shuffle(wordCloudEntryList);
+                                        handler.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (wordCloudEntryList.size() > 0) {
+                                                    Log.i(TAG, "has data");
+                                                    displayWordCloud(wordCloudEntryList, nameDatesMap);
+                                                } else {
+                                                    Log.i(TAG, "Empty");
+                                                    wordCloud.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorPrimaryDarkComplt));
+                                                    wordCloud.setText(itemView.getContext().getString(R.string.chart_no_entry));
+                                                    wordCloud.setTextSize(32f);
+                                                    wordCloud.setMinTextSize(32f);
+                                                }
+                                                //Log.i(TAG, baActivityEntries.toString());
+                                            }
+                                        });
                                     }
-                                });
+                                }).start();
                             }
-                        }).start();
-                    }
-                }
-            });
+                        }
+                    });
         }
 
         private void displayWordCloud(List<WordCloudEntry> wordCloudEntryList, Map<String, Set<String>> nameDatesMap) {
-            if (wordCloudEntryList.size() != 0) {
-                wordCloud.setMinTextSize(40f);
-                wordCloud.setTextSize(40f);
-                wordCloud.create(wordCloudEntryList);
-                wordCloud.setOnWordClickListener(new WordCloudClick() {
-                    @Override
-                    public void onWordClick(View widget, int index) {
-                        Log.i(TAG, "Index is " + index);
-                        Toast.makeText(itemView.getContext(), wordCloudEntryList.get(index).getEntryName()
-                                + "\n" + nameDatesMap.get(wordCloudEntryList.get(index).getEntryName().toString()), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                //wordCloud.setRandomFonts();
-            } else {
-                wordCloud.setText(itemView.getContext().getString(R.string.chart_no_entry));
-                wordCloud.setTextSize(12f);
-                wordCloud.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorPrimaryDarkComplt));
-            }
+            wordCloud.setMinTextSize(32f);
+            wordCloud.setTextSize(150f);
+            wordCloud.create(wordCloudEntryList);
+            wordCloud.setOnWordClickListener(new WordCloudClick() {
+                @Override
+                public void onWordClick(View widget, int index) {
+                    //Log.i(TAG, "Index is " + index);
+                    Toast.makeText(itemView.getContext(), wordCloudEntryList.get(index).getEntryName()
+                            + "\n" + nameDatesMap.get(wordCloudEntryList.get(index).getEntryName()), Toast.LENGTH_SHORT).show();
+                }
+            });
+            //wordCloud.setRandomFonts();
         }
 
         @Override

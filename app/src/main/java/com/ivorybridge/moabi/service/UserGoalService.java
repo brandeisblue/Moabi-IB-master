@@ -80,6 +80,7 @@ public class UserGoalService extends Service implements SensorEventListener {
     @Override
     public void onCreate() {
         super.onCreate();
+        builder = new NotificationCompat.Builder(this, getApplicationContext().getString(R.string.USER_GOAL_NOTIF_CHANNEL_ID));
         builtInFitnessRepository = new BuiltInFitnessRepository(getApplication());
         this.notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         new Thread(new Runnable() {
@@ -96,11 +97,13 @@ public class UserGoalService extends Service implements SensorEventListener {
                             if (profile.getAge() != null) {
                                 bmr = bmr - 5 * profile.getAge() + 5;
                             }
-                        } else {
+                        } else if (profile.getGender().equals(getString(R.string.profile_sex_female))){
                             bmr = profile.getWeight() * 10 + 6.25 * profile.getHeight();
                             if (profile.getAge() != null) {
                                 bmr = bmr - 5 * profile.getAge() - 161;
                             }
+                        } else {
+                            bmr = 1577.5;
                         }
                     }
                 } else {
@@ -185,11 +188,7 @@ public class UserGoalService extends Service implements SensorEventListener {
                     stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
                     sensorManager.unregisterListener(UserGoalService.this, stepDetectorSensor);
                 }
-                if (intent.getBooleanExtra("hasLong", false)) {
-                    hasLong = true;
-                } else {
-                    hasLong = false;
-                }
+                hasLong = intent.getBooleanExtra("hasLong", false);
                 if (hasLong) {
                     progressLong = intent.getLongExtra("progress", 0);
                 } else {
@@ -198,7 +197,7 @@ public class UserGoalService extends Service implements SensorEventListener {
                 startInForeground();
                 return START_STICKY;
             }
-        } else{
+        } else {
             stopForeground(true);
             return START_NOT_STICKY;
         }//return super.onStartCommand(intent, flags, startId);
@@ -277,8 +276,7 @@ public class UserGoalService extends Service implements SensorEventListener {
             int index = title.indexOf("Minutes");
             title = title.substring(0, index) + " " + title.substring(index);
         }
-        builder = new NotificationCompat.Builder(this, getApplicationContext().getString(R.string.USER_GOAL_NOTIF_CHANNEL_ID))
-                .setSmallIcon(R.drawable.ic_monogram_white)
+        builder.setSmallIcon(R.drawable.ic_monogram_white)
                 .setContentTitle(title)
                 .setContentText(tracker)
                 .setTicker(NOTIFICATION_CHANNEL_DESC)
@@ -354,8 +352,10 @@ public class UserGoalService extends Service implements SensorEventListener {
                                 distance = steps * (profile.getHeight() * 0.414) / 100;
                             } else if (profile.getGender().equals(getString(R.string.profile_sex_male))) {
                                 distance = steps * profile.getHeight() * 0.415 / 100;
-                            } else {
+                            } else if (profile.getGender().equals(getString(R.string.profile_sex_female))){
                                 distance = steps * profile.getHeight() * 0.413 / 100;
+                            } else {
+                                distance = steps * (profile.getHeight() * 0.414) / 100;
                             }
                         } else {
                             distance = steps * 0.762;
@@ -382,7 +382,7 @@ public class UserGoalService extends Service implements SensorEventListener {
                         gravity[2] = smoothed[2];
                         if (ignore) {
                             countdown--;
-                            ignore = (countdown < 0) ? false : ignore;
+                            ignore = (countdown >= 0) && ignore;
                         } else
                             countdown = 22;
                         if ((Math.abs(prevY - gravity[1]) > threshold) && !ignore) {
@@ -390,11 +390,13 @@ public class UserGoalService extends Service implements SensorEventListener {
                             ignore = true;
                             if (profile.getHeight() != null) {
                                 if (profile.getGender() == null) {
-                                    distance = steps * profile.getHeight() * 0.414 / 100;
+                                    distance = steps * (profile.getHeight() * 0.414) / 100;
                                 } else if (profile.getGender().equals(getString(R.string.profile_sex_male))) {
                                     distance = steps * profile.getHeight() * 0.415 / 100;
-                                } else {
+                                } else if (profile.getGender().equals(getString(R.string.profile_sex_female))){
                                     distance = steps * profile.getHeight() * 0.413 / 100;
+                                } else {
+                                    distance = steps * (profile.getHeight() * 0.414) / 100;
                                 }
                             } else {
                                 distance = steps * 0.762;
@@ -424,13 +426,13 @@ public class UserGoalService extends Service implements SensorEventListener {
         }
     }
 
-        protected float[] lowPassFilter(float[] input, float[] output) {
-            if (output == null) return input;
-            for (int i = 0; i < input.length; i++) {
-                output[i] = output[i] + 1.0f * (input[i] - output[i]);
-            }
-            return output;
+    protected float[] lowPassFilter(float[] input, float[] output) {
+        if (output == null) return input;
+        for (int i = 0; i < input.length; i++) {
+            output[i] = output[i] + 1.0f * (input[i] - output[i]);
         }
+        return output;
+    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -452,8 +454,7 @@ public class UserGoalService extends Service implements SensorEventListener {
             }
             progressMax = goal.intValue();
             progress = (int) steps;
-        }
-        else if (goalName.contains(getString(R.string.activity_active_minutes_camel_case))) {
+        } else if (goalName.contains(getString(R.string.activity_active_minutes_camel_case))) {
             tracker = TimeUnit.MILLISECONDS.toMinutes(activeMins) + " / " + goal.longValue() + " ";
             if (goal.longValue() > 1) {
                 tracker = tracker + getString(R.string.unit_time_plur);
@@ -462,8 +463,7 @@ public class UserGoalService extends Service implements SensorEventListener {
             }
             progressMax = goal.intValue();
             progress = (int) TimeUnit.MILLISECONDS.toMinutes(activeMins);
-        }
-        else if (goalName.contains(getString(R.string.activity_sedentary_minutes_camel_case))) {
+        } else if (goalName.contains(getString(R.string.activity_sedentary_minutes_camel_case))) {
             tracker = TimeUnit.MILLISECONDS.toMinutes(sedentaryMins) + " / " + goal.longValue() + " ";
             if (goal.longValue() > 1) {
                 tracker = tracker + getString(R.string.unit_time_plur);
@@ -472,8 +472,7 @@ public class UserGoalService extends Service implements SensorEventListener {
             }
             progressMax = goal.intValue();
             progress = (int) TimeUnit.MILLISECONDS.toMinutes(sedentaryMins);
-        }
-        else if (goalName.contains(getString(R.string.activity_distance_camel_case))) {
+        } else if (goalName.contains(getString(R.string.activity_distance_camel_case))) {
             tracker = String.format(Locale.US, "%.2f", distance / 1000) + " / " + String.format(Locale.US, "%.2f", goal) + " ";
             if (goal.longValue() > 1) {
                 tracker = tracker + getString(R.string.unit_distance_si);
@@ -482,9 +481,8 @@ public class UserGoalService extends Service implements SensorEventListener {
             }
             progressMax = goal.intValue();
             progress = (int) distance / 1000;
-        }
-        else if (goalType.contains(getString(R.string.activity_calories_camel_case))) {
-            tracker =  calories + " / " + goal.longValue() + " " + getString(R.string.unit_calories);
+        } else if (goalType.contains(getString(R.string.activity_calories_camel_case))) {
+            tracker = calories + " / " + goal.longValue() + " " + getString(R.string.unit_calories);
             progressMax = goal.intValue();
             progress = (int) calories;
         }
@@ -494,12 +492,12 @@ public class UserGoalService extends Service implements SensorEventListener {
             title = title.substring(0, index) + " " + title.substring(index);
         }
         Log.i(TAG, tracker);
-        builder = new NotificationCompat.Builder(this, getApplicationContext().getString(R.string.USER_GOAL_NOTIF_CHANNEL_ID))
-                .setSmallIcon(R.drawable.ic_monogram_white)
+        builder.setSmallIcon(R.drawable.ic_monogram_white)
                 .setContentTitle(title)
                 .setContentText(tracker)
                 .setTicker(NOTIFICATION_CHANNEL_DESC)
                 .setOngoing(true)
+                .setOnlyAlertOnce(true)
                 .setProgress(progressMax, progress, false)
                 .setColor(getColor(R.color.colorPrimary))
                 .setContentIntent(pendingIntent);

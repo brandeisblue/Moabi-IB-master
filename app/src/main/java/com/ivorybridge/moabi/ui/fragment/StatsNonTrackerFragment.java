@@ -198,7 +198,7 @@ public class StatsNonTrackerFragment extends Fragment {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     // This will get the radiobutton that has changed in its check state
-                    RadioButton checkedRadioButton = (RadioButton) group.findViewById(checkedId);
+                    RadioButton checkedRadioButton = group.findViewById(checkedId);
                     // This puts the value (true/false) into the variable
                     boolean isChecked = checkedRadioButton.isChecked();
                     // If the radiobutton that has changed in check state is now checked...
@@ -260,7 +260,7 @@ public class StatsNonTrackerFragment extends Fragment {
         super.onResume();
         if (getContext() != null && getActivity() != null) {
             int checkedId = radioGroup.getCheckedRadioButtonId();
-            RadioButton checkedRadioButton = (RadioButton) radioGroup.findViewById(checkedId);
+            RadioButton checkedRadioButton = radioGroup.findViewById(checkedId);
             // This puts the value (true/false) into the variable
             boolean isChecked = checkedRadioButton.isChecked();
             // If the radiobutton that has changed in check state is now checked...
@@ -416,15 +416,15 @@ public class StatsNonTrackerFragment extends Fragment {
 
     private void displayWordCloud(List<WordCloudEntry> wordCloudEntryList, Map<String, Set<String>> nameDatesMap) {
         if (wordCloudEntryList.size() != 0) {
-            wordCloud.setMinTextSize(70f);
-            wordCloud.setTextSize(70f);
+            wordCloud.setMinTextSize(32f);
+            wordCloud.setTextSize(200f);
             wordCloud.create(wordCloudEntryList);
             wordCloud.setOnWordClickListener(new WordCloudClick() {
                 @Override
                 public void onWordClick(View widget, int index) {
                     Log.i(TAG, "Index is " + index);
                     Toast.makeText(getContext(), wordCloudEntryList.get(index).getEntryName()
-                            + "\n" + nameDatesMap.get(wordCloudEntryList.get(index).getEntryName().toString()), Toast.LENGTH_SHORT).show();
+                            + "\n" + nameDatesMap.get(wordCloudEntryList.get(index).getEntryName()), Toast.LENGTH_SHORT).show();
                 }
             });
             //wordCloud.setRandomFonts();
@@ -2362,12 +2362,12 @@ public class StatsNonTrackerFragment extends Fragment {
         }
 
         YAxis leftAxis = lineChart.getAxisLeft();
+        leftAxis.setDrawGridLines(false);
+        leftAxis.setDrawAxisLine(false);
         YAxis rightAxis = lineChart.getAxisRight();
 
         if (inputType.equals(getString(R.string.mood_camel_case))
                 || inputType.equals(getString(R.string.energy_camel_case))) {
-            leftAxis.setDrawGridLines(false);
-            leftAxis.setDrawAxisLine(false);
             leftAxis.setAxisMaximum(3.5f);
             leftAxis.setAxisMinimum(1f);
             leftAxis.setTypeface(tf);
@@ -2390,13 +2390,15 @@ public class StatsNonTrackerFragment extends Fragment {
                 }
             });
         } else if (inputType.equals(getString(R.string.stress_camel_case))) {
+
             leftAxis.setDrawGridLines(false);
             leftAxis.setDrawAxisLine(false);
-            leftAxis.setAxisMaximum(10f);
+            leftAxis.setAxisMaximum(11f);
             leftAxis.setAxisMinimum(0f);
             leftAxis.setTypeface(tf);
             leftAxis.setTextSize(12);
-            leftAxis.setGranularity(5f);
+            leftAxis.setGranularity(1f);
+            leftAxis.setLabelCount(12, true);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
             leftAxis.setValueFormatter(new IAxisValueFormatter() {
@@ -2412,16 +2414,16 @@ public class StatsNonTrackerFragment extends Fragment {
                     }
                 }
             });
+
         } else if (inputType.equals(getString(R.string.daily_review_camel_case))) {
-            leftAxis.setDrawGridLines(false);
-            leftAxis.setDrawAxisLine(false);
-            leftAxis.setAxisMaximum(5f);
+            leftAxis.setAxisMaximum(5.5f);
             leftAxis.setAxisMinimum(1f);
             leftAxis.setTypeface(tf);
             leftAxis.setTextSize(12);
             leftAxis.setGranularity(1f);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
+            leftAxis.setLabelCount(10, true);
             leftAxis.setValueFormatter(new IAxisValueFormatter() {
                 @Override
                 public String getFormattedValue(float value, AxisBase axis) {
@@ -2436,16 +2438,14 @@ public class StatsNonTrackerFragment extends Fragment {
                 }
             });
         } else if (inputType.equals(getString(R.string.depression_phq9_camel_case))) {
-            leftAxis.setDrawGridLines(false);
-            leftAxis.setDrawAxisLine(false);
-            leftAxis.setAxisMaximum(28f);
+            leftAxis.setAxisMaximum(30f);
             leftAxis.setAxisMinimum(0f);
             leftAxis.setTypeface(tf);
             leftAxis.setTextSize(12);
-            leftAxis.setGranularity(1.0f);
+            leftAxis.setGranularity(3);
             leftAxis.setGranularityEnabled(true);
             leftAxis.setTextColor(Color.DKGRAY);
-            leftAxis.setLabelCount(29, true);
+            leftAxis.setLabelCount(11, true);
             leftAxis.setValueFormatter(new IAxisValueFormatter() {
                 @Override
                 public String getFormattedValue(float value, AxisBase axis) {
@@ -2453,11 +2453,9 @@ public class StatsNonTrackerFragment extends Fragment {
                     /*
                     if (value == 4f) {
                         return "Min";
-                    } */
+                    }*/
                     if (value == 9f) {
                         return getString(R.string.chart_mild_abbr);
-                    } else if ((int) value == 14f) {
-                        return getString(R.string.chart_moderate_abbr);
                     } /*else if (value == 19f) {
                         return "M.Sv";
                     } */ else if (value == 27f) {
@@ -2468,16 +2466,14 @@ public class StatsNonTrackerFragment extends Fragment {
                 }
             });
         } else if (inputType.equals(getString(R.string.anxiety_gad7_camel_case))) {
-            leftAxis.setDrawGridLines(false);
-            leftAxis.setDrawAxisLine(false);
-            leftAxis.setAxisMaximum(21f);
+            leftAxis.setAxisMaximum(24f);
             leftAxis.setAxisMinimum(0f);
             leftAxis.setTypeface(tf);
             leftAxis.setTextSize(12);
             leftAxis.setGranularity(1.0f);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
-            leftAxis.setLabelCount(22, true);
+            leftAxis.setLabelCount(9, true);
             leftAxis.setValueFormatter(new IAxisValueFormatter() {
                 @Override
                 public String getFormattedValue(float value, AxisBase axis) {
@@ -2487,8 +2483,6 @@ public class StatsNonTrackerFragment extends Fragment {
                     }*/
                     if (value == 9f) {
                         return getString(R.string.chart_mild_abbr);
-                    } else if (value == 14f) {
-                        return getString(R.string.chart_moderate_abbr);
                     } else if (value == 21f) {
                         return getString(R.string.chart_severe_abbr);
                     } else {
