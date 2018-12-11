@@ -175,14 +175,10 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/fragment_daily_review_entry_submitbutton"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                style="@style/TransparentButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="-6dp"
-                android:layout_marginBottom="-22dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:paddingStart="-16dp"
-                android:paddingEnd="-16dp"
                 android:text="@string/submit_title"
                 android:textSize="14sp" />
 

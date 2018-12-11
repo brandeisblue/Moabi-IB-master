@@ -316,14 +316,12 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/fragment_mood_entry_submitbutton"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/TransparentButton"
             android:layout_width="match_parent"
             android:layout_height="112dp"
             android:gravity="center"
             android:layout_marginTop="24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:paddingStart="-16dp"
-            android:paddingEnd="-16dp"
             android:textSize="14sp"
             android:text="@string/submit_title" />
     </LinearLayout>

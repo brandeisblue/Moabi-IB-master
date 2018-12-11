@@ -67,43 +67,31 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/fragment_survey_entry_back_button"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/TransparentButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginTop="-6dp"
-            android:layout_marginBottom="-22dp"
             android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:paddingStart="-16dp"
-            android:paddingEnd="-16dp"
             android:text="Back"
             android:textSize="14sp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/fragment_survey_entry_next_button"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/TransparentButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginTop="-6dp"
-            android:layout_marginBottom="-22dp"
             android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:paddingStart="-16dp"
-            android:paddingEnd="-16dp"
             android:text="Next"
             android:textSize="14sp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/fragment_survey_entry_submitbutton"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/TransparentButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginTop="-6dp"
-            android:layout_marginBottom="-22dp"
             android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:paddingStart="-16dp"
-            android:paddingEnd="-16dp"
             android:text="Submit"
             android:textSize="14sp"
             android:visibility="gone" />
