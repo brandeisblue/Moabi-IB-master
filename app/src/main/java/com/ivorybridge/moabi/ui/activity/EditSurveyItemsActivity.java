@@ -92,7 +92,7 @@ public class EditSurveyItemsActivity extends AppCompatActivity {
         } else {
             if (getIntent().getStringExtra("redirected_from") != null) {
                 if (getIntent().getStringExtra("redirected_from").equals("makeEntryActivity")) {
-                    Intent intent = new Intent(EditSurveyItemsActivity.this, MainActivity.class);
+                    Intent intent = new Intent(EditSurveyItemsActivity.this, MakeEntryActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent);
                 } else if (getIntent().getStringExtra("redirected_from").equals("settingsFragment")) {

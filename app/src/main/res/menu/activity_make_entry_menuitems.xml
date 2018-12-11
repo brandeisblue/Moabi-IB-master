@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/activity_make_entry_menuitem_edit_surveys"
+        android:title="@string/edit_surveys_title"
+        app:showAsAction="collapseActionView" />
+</menu>

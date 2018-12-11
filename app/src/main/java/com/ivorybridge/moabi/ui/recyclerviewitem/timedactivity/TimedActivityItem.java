@@ -241,7 +241,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
                         xAxis.setDrawGridLines(false);
                         xAxis.setAxisMaximum(6.5f);
                         xAxis.setAxisMinimum(-0.5f);
-                        xAxis.setTextSize(12f);
+                        xAxis.setTextSize(10f);
                         xAxis.setTypeface(tf);
                         //xAxis.setLabelCount(6, true);
                         xAxis.setDrawAxisLine(false);
@@ -381,7 +381,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
                         xAxis.setDrawGridLines(false);
                         xAxis.setAxisMaximum(6.5f);
                         xAxis.setAxisMinimum(-0.5f);
-                        xAxis.setTextSize(12f);
+                        xAxis.setTextSize(10f);
                         xAxis.setTypeface(tf);
                         xAxis.setTextColor(Color.DKGRAY);
                         //xAxis.setLabelCount(6, true);
@@ -477,7 +477,7 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
             leftAxis.setDrawGridLines(false);
             //leftAxis.setAxisMaximum(3);
             leftAxis.setAxisMinimum(0);
-            leftAxis.setTextSize(12f);
+            leftAxis.setTextSize(10f);
             //leftAxis.setGranularity(1f);
             //leftAxis.setGranularityEnabled(true);
             leftAxis.setLabelCount(3, true);

@@ -395,7 +395,7 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
                     xAxis.setDrawGridLines(false);
                     lineChart.setDragEnabled(false);
                     xAxis.setDrawAxisLine(false);
-                    xAxis.setTextSize(12);
+                    xAxis.setTextSize(10);
                     if (itemView.getContext() != null) {
                         xAxis.setAxisLineColor(ContextCompat.getColor(itemView.getContext(), R.color.transparent_gray));
                     }
@@ -441,7 +441,7 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
             leftAxis.setAxisMaximum(3.5f);
             leftAxis.setAxisMinimum(1f);
             leftAxis.setTypeface(tf);
-            leftAxis.setTextSize(12);
+            leftAxis.setTextSize(10);
             leftAxis.setGranularity(0.5f);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
@@ -467,7 +467,7 @@ public class EnergyItem extends AbstractItem<EnergyItem, EnergyItem.ViewHolder> 
             averageLL.setTextStyle(Paint.Style.FILL);
             averageLL.enableDashedLine(4, 8, 1);
             averageLL.setTextColor(Color.DKGRAY);
-            averageLL.setTextSize(12);
+            averageLL.setTextSize(10);
             averageLL.setLineColor(ContextCompat.getColor(itemView.getContext(), R.color.transparent_gray));
             leftAxis.addLimitLine(averageLL);
             LimitLine poor = new LimitLine(1f, "");

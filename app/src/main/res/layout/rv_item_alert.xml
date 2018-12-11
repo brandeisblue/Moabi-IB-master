@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.MaterialComponents.CardView"
+    android:layout_margin="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="104dp"
+    app:cardElevation="8dp"
+    app:cardMaxElevation="8dp"
+    android:orientation="vertical"
+    app:cardBackgroundColor="@color/colorPrimary">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/tutorial_lets_get_started_msg"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/rv_item_alert_action_1_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:maxWidth="112dp"
+                android:layout_height="match_parent"
+                app:rippleColor="@color/white"
+                android:gravity="center"
+                android:layout_marginEnd="16dp"
+                style="@style/TransparentButton"
+                android:textColor="@color/white"
+                android:text="@string/apps_and_services_title"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/rv_item_alert_action_2_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:maxWidth="112dp"
+                android:gravity="center"
+                android:layout_marginEnd="16dp"
+                style="@style/TransparentButton"
+                app:rippleColor="@color/white"
+                android:textColor="@color/white"
+                android:text="@string/surveys_title"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/rv_item_alert_action_3_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:maxWidth="112dp"
+                android:gravity="center"
+                style="@style/TransparentButton"
+                app:rippleColor="@color/white"
+                android:textColor="@color/white"
+                android:text="@string/dismiss_title"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

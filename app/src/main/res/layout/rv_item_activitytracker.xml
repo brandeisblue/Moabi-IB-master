@@ -11,7 +11,7 @@
         android:id="@+id/rv_item_activitytracker_horizontal_rv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal">
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -20,7 +20,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="112dp"
         android:layout_marginEnd="36dp"
         android:background="?attr/selectableItemBackground"
         android:clickable="true"
@@ -34,7 +34,7 @@
         android:layout_height="24dp"
         android:layout_alignParentStart="true"
         android:layout_marginStart="36dp"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="112dp"
         android:alpha="0.7"
         android:background="?attr/selectableItemBackground"
         android:clickable="true"

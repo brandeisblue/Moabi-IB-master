@@ -15,6 +15,7 @@ import com.ivorybridge.moabi.database.entity.util.DataInUseMediatorLiveData;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.database.entity.util.UserGoal;
 import com.ivorybridge.moabi.service.CheckInDailyJob;
+import com.ivorybridge.moabi.service.InsightDailySummaryNotifDailyJob;
 import com.ivorybridge.moabi.service.MotionSensorService;
 import com.ivorybridge.moabi.service.StopwatchService;
 import com.ivorybridge.moabi.service.UserGoalJob;
@@ -52,6 +53,7 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
     private ListPreference trackerSourcePref;
     private ListPreference measureListPref;
     private Preference checkInTimePref;
+    private Preference newRecommendationsNotifTimePref;
     private Boolean isFitnessNotifEnabled;
     private boolean isTimerNotifEnabled;
     private boolean isCheckInNotifEnabled;
@@ -62,6 +64,7 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
     private SwitchPreference personalGoalSwitchPref;
     private SwitchPreference dailyCheckInSwitchPref;
     private SwitchPreference dailyCheersSwitchPref;
+    private SwitchPreference newRecommendationsSwitchPref;
     private FormattedTime formattedTime;
 
     @Override
@@ -85,12 +88,15 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
                 findPreference("daily_check_in_preference");
         dailyCheersSwitchPref = (SwitchPreference)
                 findPreference("cheers_preference");
+        newRecommendationsSwitchPref = (SwitchPreference)
+                findPreference("new_recommendations_preference");
         dailyCheersSwitchPref.setVisible(false);
         trackerSourcePref = (ListPreference)
         findPreference("fitness_tracker_source_preference");
         measureListPref = (ListPreference)
         findPreference("fitness_tracker_measures_preference");
         checkInTimePref = findPreference("daily_check_in_time_preference");
+        newRecommendationsNotifTimePref = findPreference("new_recommendations_time_preference");
 
         timerSwitchPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
@@ -227,7 +233,6 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
         int minute = notificationSharedPreferences.getInt(getString(R.string.preference_daily_check_in_minute), 0);
         String time = hour + ":" + minute;
         checkInTimePref.setSummary(formattedTime.convertStringHMToHMMAA(time));
-
         checkInTimePref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -243,6 +248,53 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
                                 String time = hourOfDay + ":" + minute;
                                 checkInTimePref.setSummary(formattedTime.convertStringHMToHMMAA(time));
                                 CheckInDailyJob.scheduleJob(hourOfDay, minute);
+                            }
+                        },
+                        now.get(Calendar.HOUR_OF_DAY),
+                        now.get(Calendar.MINUTE), false);
+                tpd.show(getChildFragmentManager(), "Timepickerdialog");
+                return false;
+            }
+        });
+
+        newRecommendationsSwitchPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                Boolean isChecked = (Boolean) newValue;
+                newRecommendationsSwitchPref.setChecked(isChecked);
+                notificationSPEditor.putBoolean(getString(R.string.preference_new_recommendations_notification), isChecked);
+                notificationSPEditor.commit();
+                if (isChecked) {
+                    newRecommendationsNotifTimePref.setEnabled(true);
+                    int hour = notificationSharedPreferences.getInt(getString(R.string.preference_daily_new_recommendations_hour), 7);
+                    int minute = notificationSharedPreferences.getInt(getString(R.string.preference_daily_new_recommendations_minute), 0);
+                    InsightDailySummaryNotifDailyJob.scheduleJob(hour, minute);
+                } else {
+                    newRecommendationsNotifTimePref.setEnabled(false);
+                }
+                return false;
+            }
+        });
+
+        int notifHour = notificationSharedPreferences.getInt(getString(R.string.preference_daily_new_recommendations_hour), 7);
+        int notifMinute = notificationSharedPreferences.getInt(getString(R.string.preference_daily_new_recommendations_minute), 0);
+        String notifTime = notifHour + ":" + notifMinute;
+        newRecommendationsNotifTimePref.setSummary(formattedTime.convertStringHMToHMMAA(notifTime));
+        newRecommendationsNotifTimePref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Calendar now = Calendar.getInstance();
+                TimePickerDialog tpd = TimePickerDialog.newInstance(
+                        new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
+                                Log.i(TAG, hourOfDay + ":" + minute);
+                                notificationSPEditor.putInt(getString(R.string.preference_daily_new_recommendations_hour), hourOfDay);
+                                notificationSPEditor.putInt(getString(R.string.preference_daily_new_recommendations_minute), minute);
+                                notificationSPEditor.commit();
+                                String time = hourOfDay + ":" + minute;
+                                newRecommendationsNotifTimePref.setSummary(formattedTime.convertStringHMToHMMAA(time));
+                                InsightDailySummaryNotifDailyJob.scheduleJob(hourOfDay, minute);
                             }
                         },
                         now.get(Calendar.HOUR_OF_DAY),

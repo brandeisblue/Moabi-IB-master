@@ -18,6 +18,7 @@
             android:layout_height="match_parent"
             app:collapsedTitleTextAppearance="@style/CollapsedAppBar"
             app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleMarginStart="16dp"
             app:expandedTitleTextAppearance="@style/ExpandedAppBar"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
@@ -25,7 +26,7 @@
                 android:id="@+id/fragment_main_weather_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:layout_marginStart="32dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:gravity="center_vertical"
                 android:visibility="gone"
@@ -58,7 +59,7 @@
                 android:layout_height="56dp"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
-                app:contentInsetStartWithNavigation="8dp"
+                app:contentInsetStartWithNavigation="0dp"
                 app:layout_collapseMode="pin">
             </androidx.appcompat.widget.Toolbar>
 

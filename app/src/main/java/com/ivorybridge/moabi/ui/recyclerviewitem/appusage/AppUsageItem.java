@@ -237,7 +237,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             xAxis.setDrawGridLines(false);
             xAxis.setAxisMaximum(6.5f);
             xAxis.setAxisMinimum(0.5f);
-            xAxis.setTextSize(12f);
+            xAxis.setTextSize(10f);
             xAxis.setTypeface(tf);
             //xAxis.setLabelCount(5, true);
             xAxis.setDrawAxisLine(false);
@@ -435,7 +435,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             leftAxis.setDrawGridLines(false);
             //leftAxis.setAxisMaximum(3);
             leftAxis.setAxisMinimum(0);
-            leftAxis.setTextSize(12f);
+            leftAxis.setTextSize(10f);
             //leftAxis.setGranularity(1f);
             //leftAxis.setGranularityEnabled(true);
             leftAxis.setLabelCount(3, true);

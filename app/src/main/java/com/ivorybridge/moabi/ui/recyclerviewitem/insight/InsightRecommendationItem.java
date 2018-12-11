@@ -165,25 +165,33 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
                 depVarTextView.setText("Your day");
                 depVarDirectionTextView.setText("improves");
                 depVarImageView.setImageResource(R.drawable.ic_review_black);
-            } 
+            }
 
             int drawable = R.drawable.ic_monogram_colored;
             if (service.equals(itemView.getContext().getString(R.string.fitbit_camel_case))) {
                 drawable = R.drawable.ic_fitbit_logo;
+                service = itemView.getContext().getString(R.string.fitbit_title);
             } else if (service.equals(itemView.getContext().getString(R.string.phone_usage_camel_case))) {
                 drawable = R.drawable.ic_appusage;
+                service = itemView.getContext().getString(R.string.phone_usage_title);
             } else if (service.equals(itemView.getContext().getString(R.string.googlefit_camel_case))) {
                 drawable = R.drawable.ic_googlefit;
+                service = itemView.getContext().getString(R.string.googlefit_title);
             } else if (service.equals(itemView.getContext().getString(R.string.moabi_tracker_camel_case))) {
                 drawable = R.drawable.ic_monogram_colored;
+                service = itemView.getContext().getString(R.string.moabi_tracker_title);
             } else if (service.equals(itemView.getContext().getString(R.string.weather_camel_case))) {
                 drawable = R.drawable.ic_partly_cloudy;
+                service = itemView.getContext().getString(R.string.weather_title);
             } else if (service.equals(itemView.getContext().getString(R.string.timer_camel_case))) {
                 drawable = R.drawable.ic_stopwatch;
+                service = itemView.getContext().getString(R.string.timer_title);
             } else if (service.equals(itemView.getContext().getString(R.string.baactivity_camel_case))) {
                 drawable = R.drawable.ic_physical_activity_black;
+                service = itemView.getContext().getString(R.string.baactivity_title);
             } 
             final int finalDrawable = drawable;
+            final String dialogTitle = service;
             indepVarImageView.setImageResource(finalDrawable);
             Double correlation = summary.getCorrelation();
             correlationTextView.setText(String.format(Locale.US, "%.0f", Math.abs(correlation) * 100) + " %");
@@ -195,7 +203,7 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
                 @Override
                 public void onClick(View v) {
                     new MaterialDialog.Builder(itemView.getContext())
-                            .title(summary.getIndepVarType())
+                            .title(dialogTitle)
                             .content("Do you want to track the recommendation?")
                             .positiveText("Yes")
                             .negativeText("No")
@@ -231,7 +239,7 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
                 }
             });
             numDaysTextView.setText(numOfDays + " day average: ");
-            if (service.contains(itemView.getContext().getString(R.string.fitbit_camel_case))) {
+            if (service.contains(itemView.getContext().getString(R.string.fitbit_title))) {
                 recommendedGoal = String.format(Locale.US, "%.0f", recommendedGoalDouble);
                 averageActivityLevel = String.format(Locale.US, "%.0f", averageActivityLevelDouble);
                 if (independentVar.contains(itemView.getContext().getString(R.string.activity_steps_camel_case))) {
@@ -284,7 +292,7 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
                     recommendedGoalArrowImageView.setVisibility(View.INVISIBLE);
                     indepVarDirectionTextView.setText("the exact amount now!\nGreat Job!");
                 }
-            } else if (service.contains(itemView.getContext().getString(R.string.googlefit_camel_case)) || service.contains(itemView.getContext().getString(R.string.moabi_tracker_camel_case))) {
+            } else if (service.contains(itemView.getContext().getString(R.string.googlefit_title)) || service.contains(itemView.getContext().getString(R.string.moabi_tracker_title))) {
                 recommendedGoal = String.format(Locale.US, "%.0f", recommendedGoalDouble);
                 averageActivityLevel = String.format(Locale.US, "%.0f", averageActivityLevelDouble);
                 long acitveMinutesInMinutes = 0;
@@ -342,7 +350,7 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
                     recommendedGoalArrowImageView.setVisibility(View.INVISIBLE);
                     indepVarDirectionTextView.setText("the exact amount now!\nGreat Job!");
                 }
-            } else if (service.contains(itemView.getContext().getString(R.string.phone_usage_camel_case))) {
+            } else if (service.contains(itemView.getContext().getString(R.string.phone_usage_title))) {
                 recommendedGoal = TimeUnit.MILLISECONDS.toMinutes(recommendedGoalDouble.longValue()) + " mins";
                 averageActivityLevel = TimeUnit.MILLISECONDS.toMinutes(averageActivityLevelDouble.longValue()) + " mins";
                 indepVarTextView.setText("use " + independentVar);
@@ -365,7 +373,7 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
                     recommendedGoalArrowImageView.setVisibility(View.INVISIBLE);
                     indepVarDirectionTextView.setText("the exact amount now!\nGreat Job!");
                 }
-            } else if (service.contains(itemView.getContext().getString(R.string.timer_camel_case))) {
+            } else if (service.contains(itemView.getContext().getString(R.string.timer_title))) {
                 recommendedGoal = TimeUnit.MILLISECONDS.toMinutes(recommendedGoalDouble.longValue()) + " mins";
                 averageActivityLevel = TimeUnit.MILLISECONDS.toMinutes(averageActivityLevelDouble.longValue()) + " mins";
                 whenSubjectTextView.setText("when you do ");
@@ -386,9 +394,9 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
                     recommendedGoalArrowImageView.setVisibility(View.INVISIBLE);
                     indepVarDirectionTextView.setText("the exact amount now!\nGreat Job!");
                 }
-            } else if (service.contains(itemView.getContext().getString(R.string.baactivity_camel_case))) {
-                recommendedGoal = recommendedGoalDouble.longValue() + " times";
-                averageActivityLevel = averageActivityLevelDouble.longValue() + " times";
+            } else if (service.contains(itemView.getContext().getString(R.string.baactivity_title))) {
+                recommendedGoal = String.format(Locale.US, "%.2f", recommendedGoalDouble) + " times";
+                averageActivityLevel = String.format(Locale.US, "%.2f", averageActivityLevelDouble) + " times";
                 indepVarTextView.setText("do " + independentVar);
                 recommendedGoalTextView.setText(recommendedGoal);
                 currentGoalTextView.setText(averageActivityLevel);
@@ -406,7 +414,7 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
                     recommendedGoalArrowImageView.setVisibility(View.INVISIBLE);
                     indepVarDirectionTextView.setText("the exact amount now!\nGreat Job!");
                 }
-            } else if (service.contains(itemView.getContext().getString(R.string.weather_camel_case))) {
+            } else if (service.contains(itemView.getContext().getString(R.string.weather_title))) {
                 whenSubjectTextView.setText("when ");
                 recommendedGoal = String.format(Locale.US, "%.2f", recommendedGoalDouble);
                 averageActivityLevel = String.format(Locale.US, "%.2f", averageActivityLevelDouble);

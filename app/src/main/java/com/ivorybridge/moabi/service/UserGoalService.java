@@ -23,6 +23,8 @@ import com.ivorybridge.moabi.database.entity.builtinfitness.BuiltInProfile;
 import com.ivorybridge.moabi.repository.BuiltInFitnessRepository;
 import com.ivorybridge.moabi.repository.DataInUseRepository;
 import com.ivorybridge.moabi.ui.activity.MainActivity;
+import com.ivorybridge.moabi.ui.activity.MakeEntryActivity;
+import com.ivorybridge.moabi.ui.activity.TimerActivity;
 import com.ivorybridge.moabi.util.FormattedTime;
 
 import java.util.Date;
@@ -214,14 +216,15 @@ public class UserGoalService extends Service implements SensorEventListener {
         String tracker = "";
         int progressMax = 0;
         int progress = 0;
+        String title = goalName;
         if (hasLong) {
             tracker = progressLong + " / " + goal.longValue();
-            progressMax = goal.intValue();
-            progress = progressLong.intValue();
+            progressMax = (int) (goal.floatValue() * 100);
+            progress = (int) progressLong.floatValue() * 100;
         } else {
             tracker = String.format(Locale.US, "%.2f", progressDouble) + " / " + String.format(Locale.US, "%.2f", goal);
-            progressMax = goal.intValue();
-            progress = progressDouble.intValue();
+            progressMax = (int) (goal.floatValue() * 100);
+            progress = (int) progressDouble.floatValue() * 100;
         }
         if (goalName.contains(getString(R.string.activity_steps_camel_case))) {
             if (goal.longValue() > 1) {
@@ -229,23 +232,45 @@ public class UserGoalService extends Service implements SensorEventListener {
             } else {
                 tracker = tracker + " " + getString(R.string.unit_step_sing);
             }
-        } else if (goalName.contains("Minutes") || goalName.contains("sleep")) {
+            title = getString(R.string.activity_steps_title);
+        } else if (goalName.equals(getString(R.string.activity_active_minutes_camel_case))) {
             if (goal.longValue() > 1) {
                 tracker = tracker + " " + getString(R.string.unit_time_plur);
             } else {
                 tracker = tracker + " " + getString(R.string.unit_time_sing);
             }
+            title = getString(R.string.activity_active_minutes_title);
+        } else if (goalName.equals(getString(R.string.activity_sedentary_minutes_camel_case))) {
+            if (goal.longValue() > 1) {
+                tracker = tracker + " " + getString(R.string.unit_time_plur);
+            } else {
+                tracker = tracker + " " + getString(R.string.unit_time_sing);
+            }
+            title = getString(R.string.activity_sedentary_minutes_title);
+        } else if (goalName.contains("sleep")) {
+            if (goal.longValue() > 1) {
+                tracker = tracker + " " + getString(R.string.unit_time_plur);
+            } else {
+                tracker = tracker + " " + getString(R.string.unit_time_sing);
+            }
+            title = getString(R.string.activity_sleep_title);
         } else if (goalName.contains(getString(R.string.humidity_camel_case))) {
             tracker = tracker + " " + getString(R.string.unit_percent);
+            title = getString(R.string.humidity_title);
         } else if (goalName.contains(getString(R.string.temperature_camel_case))) {
             tracker = tracker + " " + getString(R.string.unit_temp_si);
+            title = getString(R.string.temperature_title);
         } else if (goalName.contains(getString(R.string.precipitation_camel_case))) {
             tracker = tracker + " " + getString(R.string.unit_precip_si);
+            title = getString(R.string.precipitation_title);
         } else if (goalName.contains(getString(R.string.activity_distance_camel_case))) {
             tracker = tracker + " " + getString(R.string.unit_distance_si);
+            title = getString(R.string.activity_distance_title);
         } else if (goalName.contains(getString(R.string.activity_calories_camel_case))) {
-            tracker = tracker + " Cal";
+            tracker = tracker + " " + getString(R.string.unit_calories);
+            title = getString(R.string.activity_calories_title);
         } else if (goalName.contains(getString(R.string.activity_floors_camel_case))) {
+            title = getString(R.string.activity_floors_title);
             if (goal.longValue() > 1) {
                 tracker = tracker + " " + getString(R.string.unit_floor_plur);
             } else {
@@ -257,6 +282,8 @@ public class UserGoalService extends Service implements SensorEventListener {
             } else {
                 tracker = tracker + " " + getString(R.string.unit_time_sing);
             }
+            Intent intent = new Intent(this, TimerActivity.class);
+            pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         } else if (goalType.contains(getString(R.string.phone_usage_camel_case))) {
             if (goal.longValue() > 1) {
                 tracker = tracker + " " + getString(R.string.unit_time_plur);
@@ -269,19 +296,16 @@ public class UserGoalService extends Service implements SensorEventListener {
             } else {
                 tracker = tracker + " " + getString(R.string.unit_activity_sing);
             }
+            Intent intent = new Intent(this, MakeEntryActivity.class);
+            pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         }
         Log.i(TAG, tracker);
-        String title = goalName.substring(0, 1).toUpperCase() + goalName.substring(1);
-        if (title.contains("Minutes")) {
-            int index = title.indexOf("Minutes");
-            title = title.substring(0, index) + " " + title.substring(index);
-        }
         builder.setSmallIcon(R.drawable.ic_monogram_white)
                 .setContentTitle(title)
                 .setContentText(tracker)
                 .setTicker(NOTIFICATION_CHANNEL_DESC)
                 .setOngoing(true)
-                .setOnlyAlertOnce(true)
+                .setShowWhen(false)
                 .setProgress(progressMax, progress, false)
                 .setColor(getColor(R.color.colorPrimary))
                 .setContentIntent(pendingIntent);
@@ -445,6 +469,7 @@ public class UserGoalService extends Service implements SensorEventListener {
         String tracker = "";
         int progressMax = 0;
         int progress = 0;
+        String title = goalName;
         if (goalName.contains(getString(R.string.activity_steps_camel_case))) {
             tracker = steps + " / " + goal.longValue() + " ";
             if (goal.longValue() > 1) {
@@ -454,6 +479,7 @@ public class UserGoalService extends Service implements SensorEventListener {
             }
             progressMax = goal.intValue();
             progress = (int) steps;
+            title = getString(R.string.activity_steps_title) + "(" + getString(R.string.moabi_tracker_title) + ")";
         } else if (goalName.contains(getString(R.string.activity_active_minutes_camel_case))) {
             tracker = TimeUnit.MILLISECONDS.toMinutes(activeMins) + " / " + goal.longValue() + " ";
             if (goal.longValue() > 1) {
@@ -463,6 +489,7 @@ public class UserGoalService extends Service implements SensorEventListener {
             }
             progressMax = goal.intValue();
             progress = (int) TimeUnit.MILLISECONDS.toMinutes(activeMins);
+            title = getString(R.string.activity_active_minutes_title) + "(" + getString(R.string.moabi_tracker_title) + ")";
         } else if (goalName.contains(getString(R.string.activity_sedentary_minutes_camel_case))) {
             tracker = TimeUnit.MILLISECONDS.toMinutes(sedentaryMins) + " / " + goal.longValue() + " ";
             if (goal.longValue() > 1) {
@@ -472,6 +499,7 @@ public class UserGoalService extends Service implements SensorEventListener {
             }
             progressMax = goal.intValue();
             progress = (int) TimeUnit.MILLISECONDS.toMinutes(sedentaryMins);
+            title = getString(R.string.activity_sedentary_minutes_title) + "(" + getString(R.string.moabi_tracker_title) + ")";
         } else if (goalName.contains(getString(R.string.activity_distance_camel_case))) {
             tracker = String.format(Locale.US, "%.2f", distance / 1000) + " / " + String.format(Locale.US, "%.2f", goal) + " ";
             if (goal.longValue() > 1) {
@@ -481,23 +509,21 @@ public class UserGoalService extends Service implements SensorEventListener {
             }
             progressMax = goal.intValue();
             progress = (int) distance / 1000;
+            title = getString(R.string.activity_distance_title) + "(" + getString(R.string.moabi_tracker_title) + ")";
         } else if (goalType.contains(getString(R.string.activity_calories_camel_case))) {
             tracker = calories + " / " + goal.longValue() + " " + getString(R.string.unit_calories);
             progressMax = goal.intValue();
             progress = (int) calories;
+            title = getString(R.string.activity_calories_title) + "(" + getString(R.string.moabi_tracker_title) + ")";
         }
-        String title = goalName.substring(0, 1).toUpperCase() + goalName.substring(1);
-        if (title.contains("Minutes")) {
-            int index = title.indexOf("Minutes");
-            title = title.substring(0, index) + " " + title.substring(index);
-        }
+
         Log.i(TAG, tracker);
         builder.setSmallIcon(R.drawable.ic_monogram_white)
                 .setContentTitle(title)
                 .setContentText(tracker)
                 .setTicker(NOTIFICATION_CHANNEL_DESC)
                 .setOngoing(true)
-                .setOnlyAlertOnce(true)
+                .setShowWhen(false)
                 .setProgress(progressMax, progress, false)
                 .setColor(getColor(R.color.colorPrimary))
                 .setContentIntent(pendingIntent);

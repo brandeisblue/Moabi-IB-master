@@ -52,6 +52,8 @@ public class AndroidJobCreator implements JobCreator {
                 return new MotionSensorEndofDayDailyJob(application);
             case CheckInDailyJob.TAG:
                 return new CheckInDailyJob(application);
+            case InsightDailySummaryNotifDailyJob.TAG:
+                return new InsightDailySummaryNotifDailyJob(application);
             default:
                 return null;
         }

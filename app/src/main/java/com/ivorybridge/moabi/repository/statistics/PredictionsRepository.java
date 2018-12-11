@@ -3277,7 +3277,7 @@ public class PredictionsRepository {
                 correlation = regression.getR();
 
                 recommendedActivityLevel = (depVarGoal - yintercept) / slope;
-
+                Log.i(TAG, application.getString(R.string.baactivity_camel_case) + "X" + application.getString(R.string.baactivity_camel_case) + ": " + regression1.length);
                 Log.i(TAG, Arrays.deepToString(regression1));
                 if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
                     SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
@@ -3730,7 +3730,6 @@ public class PredictionsRepository {
                 rsqured = regression.getRSquare();
                 correlation = regression.getR();
                 recommendedActivityLevel = (moodGoal - yintercept) / slope;
-
                 if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
                     SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
                             application.getString(R.string.mood_camel_case),
@@ -3761,7 +3760,6 @@ public class PredictionsRepository {
                 rsqured = regression.getRSquare();
                 correlation = regression.getR();
                 recommendedActivityLevel = (energyGoal - yintercept) / slope;
-
                 if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
                     SimpleRegressionSummary regressionResult =
                             new SimpleRegressionSummary(application.getString(R.string.energy_camel_case),
@@ -4123,7 +4121,6 @@ public class PredictionsRepository {
                 }
             }
         }
-
         activitiesSet.add(application.getString(R.string.activity_steps_camel_case));
         activitiesSet.add(application.getString(R.string.activity_calories_camel_case));
         activitiesSet.add(application.getString(R.string.activity_distance_camel_case));
@@ -4415,6 +4412,7 @@ public class PredictionsRepository {
     public void processMoodAndEnergyWithBAActivity(Map<String, AverageMood> moodsAndEnergyLevelMap, List<BAActivityEntry> baActivityEntries, int duration) {
         Map<String, List<String>> activitiesMap = new LinkedHashMap<>();
         Set<String> activitiesSet = new LinkedHashSet<>();
+
         for (BAActivityEntry activitySummary : baActivityEntries) {
             String date = formattedTime.convertLongToYYYYMMDD(activitySummary.getDateInLong());
             if (moodsAndEnergyLevelMap.get(date) != null) {
@@ -4496,79 +4494,76 @@ public class PredictionsRepository {
                 double moodAverage = moodTotal / regressionMoodsXActivity.length;
                 double energyAverage = energyLevelTotal / regressionEnergyXActivity.length;
                 double activityAverage = activityTotal / regressionMoodsXActivity.length;
+                double moodGoal = moodAverage * 1.01; // TODO - set up multiplier for mood goal
+                double energyGoal = energyAverage * 1.01; // TODO - set up multiplier for energy goal
+                //activityAverageMap.put(activityName, activityAverage);
+                //Log.i(TAG, application.getString(R.string.mood_and_energy_camel_case) average: " + moodAverage);
+                //Log.i(TAG, "Energy Level average: " + energyAverage);
 
-                if (TimeUnit.MILLISECONDS.toMinutes((long) activityAverage) > 5) {
-                    double moodGoal = moodAverage * 1.01; // TODO - set up multiplier for mood goal
-                    double energyGoal = energyAverage * 1.01; // TODO - set up multiplier for energy goal
-                    //activityAverageMap.put(activityName, activityAverage);
-                    //Log.i(TAG, application.getString(R.string.mood_and_energy_camel_case) average: " + moodAverage);
-                    //Log.i(TAG, "Energy Level average: " + energyAverage);
-
-                    // regression for mood x app
-                    regression.addData(regressionMoodsXActivity);
-                    slope = regression.getSlope();
-                    yintercept = regression.getIntercept();
-                    rsqured = regression.getRSquare();
-                    correlation = regression.getR();
-                    recommendedActivityLevel = (moodGoal - yintercept) / slope;
-
-                    if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
-                        SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
-                                application.getString(R.string.mood_camel_case),
-                                activityName, application.getString(R.string.baactivity_camel_case),
-                                slope, yintercept, rsqured, correlation,
-                                activityAverage, recommendedActivityLevel);
-                        moodRegressionMap.put(activityName, regressionResult);
-                        regressionResult.setDepXIndepVars(activityName + indepVarType + "X" + application.getString(R.string.mood_camel_case) + duration);
-                        regressionResult.setDepVarType(0L);
-                        regressionResult.setDuration(duration);
-                        regressionResult.setDepVarTypeString(application.getString(R.string.mood_and_energy_camel_case));
-                        regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
-                        regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
-                        regressionResult.setNumOfData((long) regressionMoodsXActivity.length);
-                        Log.i(TAG, activityName + ": " + "Slope is " + slope + ", Y-intercept is "
-                                + yintercept + ", Recommended activity level is "
-                                + recommendedActivityLevel
-                                + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
-                        insert(regressionResult);
-                    }
-
-                    regression.clear();
-
-                    // regression for energy x active minutes
-                    regression.addData(regressionEnergyXActivity);
-                    slope = regression.getSlope();
-                    yintercept = regression.getIntercept();
-                    rsqured = regression.getRSquare();
-                    correlation = regression.getR();
-                    recommendedActivityLevel = (energyGoal - yintercept) / slope;
-
-                    if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
-                        SimpleRegressionSummary regressionResult =
-                                new SimpleRegressionSummary(application.getString(R.string.energy_camel_case),
-                                        activityName,
-                                        application.getString(R.string.baactivity_camel_case), slope, yintercept,
-                                        rsqured, correlation,
-                                        activityAverage, recommendedActivityLevel);
-                        energyRegressionMap.put(activityName, regressionResult);
-                        regressionResult.setDepXIndepVars(activityName + indepVarType + "X" + application.getString(R.string.energy_camel_case) + duration);
-                        regressionResult.setDepVarType(0L);
-                        regressionResult.setDuration(duration);
-                        regressionResult.setDepVarTypeString(application.getString(R.string.mood_and_energy_camel_case));
-                        regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
-                        regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
-                        regressionResult.setNumOfData((long) regressionMoodsXActivity.length);
-                        Log.i(TAG, activityName + ": " + "Slope is " + slope + ", Y-intercept is "
-                                + yintercept + ", Recommended activity level is "
-                                + recommendedActivityLevel
-                                + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
-                        insert(regressionResult);
-                    }
-                    regression.clear();
+                // regression for mood x app
+                regression.addData(regressionMoodsXActivity);
+                slope = regression.getSlope();
+                yintercept = regression.getIntercept();
+                rsqured = regression.getRSquare();
+                correlation = regression.getR();
+                recommendedActivityLevel = (moodGoal - yintercept) / slope;
+                Log.i(TAG, "mood" + "X" + application.getString(R.string.baactivity_camel_case) + ": " + regressionMoodsXActivity.length);
+                if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                    SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
+                            application.getString(R.string.mood_camel_case),
+                            activityName, application.getString(R.string.baactivity_camel_case),
+                            slope, yintercept, rsqured, correlation,
+                            activityAverage, recommendedActivityLevel);
+                    moodRegressionMap.put(activityName, regressionResult);
+                    regressionResult.setDepXIndepVars(activityName + indepVarType + "X" + application.getString(R.string.mood_camel_case) + duration);
+                    regressionResult.setDepVarType(0L);
+                    regressionResult.setDuration(duration);
+                    regressionResult.setDepVarTypeString(application.getString(R.string.mood_and_energy_camel_case));
+                    regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                    regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                    regressionResult.setNumOfData((long) regressionMoodsXActivity.length);
+                    Log.i(TAG, activityName + ": " + "Slope is " + slope + ", Y-intercept is "
+                            + yintercept + ", Recommended activity level is "
+                            + recommendedActivityLevel
+                            + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                    insert(regressionResult);
                 }
-                Log.i(TAG, moodRegressionMap.toString());
-                Log.i(TAG, energyRegressionMap.toString());
+
+                regression.clear();
+
+                // regression for energy x active minutes
+                regression.addData(regressionEnergyXActivity);
+                slope = regression.getSlope();
+                yintercept = regression.getIntercept();
+                rsqured = regression.getRSquare();
+                correlation = regression.getR();
+                recommendedActivityLevel = (energyGoal - yintercept) / slope;
+                Log.i(TAG, "energy" + "X" + application.getString(R.string.baactivity_camel_case) + ": " + regressionMoodsXActivity.length);
+                if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
+                    SimpleRegressionSummary regressionResult =
+                            new SimpleRegressionSummary(application.getString(R.string.energy_camel_case),
+                                    activityName,
+                                    application.getString(R.string.baactivity_camel_case), slope, yintercept,
+                                    rsqured, correlation,
+                                    activityAverage, recommendedActivityLevel);
+                    energyRegressionMap.put(activityName, regressionResult);
+                    regressionResult.setDepXIndepVars(activityName + indepVarType + "X" + application.getString(R.string.energy_camel_case) + duration);
+                    regressionResult.setDepVarType(0L);
+                    regressionResult.setDuration(duration);
+                    regressionResult.setDepVarTypeString(application.getString(R.string.mood_and_energy_camel_case));
+                    regressionResult.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                    regressionResult.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                    regressionResult.setNumOfData((long) regressionMoodsXActivity.length);
+                    Log.i(TAG, activityName + ": " + "Slope is " + slope + ", Y-intercept is "
+                            + yintercept + ", Recommended activity level is "
+                            + recommendedActivityLevel
+                            + ", R square is " + rsqured + ", Correlation is " + correlation + ", Duration is " + duration);
+                    insert(regressionResult);
+                }
+                regression.clear();
             }
+            Log.i(TAG, moodRegressionMap.toString());
+            Log.i(TAG, energyRegressionMap.toString());
         }
     }
 
@@ -5421,11 +5416,21 @@ public class PredictionsRepository {
                         list.add(activitySummary.getName());
                         activitiesMap.put(date, list);
                     }
-                    refinedList.add(dailyStress);
                     activitiesSet.add(activitySummary.getName());
                 }
             }
         }
+
+        for (Map.Entry<String, List<String>> entry: activitiesMap.entrySet()) {
+            for (DailyStress dailyEntry: dailyStresses) {
+                if (dailyEntry.getDate().equals(entry.getKey())) {
+                    refinedList.add(dailyEntry);
+                }
+            }
+        }
+
+        Log.i(TAG, "stress" + "X" + refinedList.toString() + ": " + refinedList.size());
+        //Log.i(TAG, "stress" + "X" + refinedList.toString());
 
         for (Map.Entry<String, List<String>> entry : activitiesMap.entrySet()) {
             String date = entry.getKey();
@@ -5485,7 +5490,7 @@ public class PredictionsRepository {
                 rsqured = regression.getRSquare();
                 correlation = regression.getR();
                 recommendedActivityLevel = (depVarGoal - yintercept) / slope;
-
+                Log.i(TAG, "stress" + "X" + application.getString(R.string.baactivity_camel_case) + ": " + regressionDepVarXIndepVar.length);
                 if (!Double.isNaN(regression.getSlope()) && regression.getSlope() != 0 && !(recommendedActivityLevel < 0)) {
                     SimpleRegressionSummary regressionResult = new SimpleRegressionSummary(
                             depVar,
@@ -6184,8 +6189,15 @@ public class PredictionsRepository {
                         list.add(activitySummary.getName());
                         activitiesMap.put(date, list);
                     }
-                    refinedList.add(dailyDailyReview);
                     activitiesSet.add(activitySummary.getName());
+                }
+            }
+        }
+
+        for (Map.Entry<String, List<String>> entry: activitiesMap.entrySet()) {
+            for (DailyDailyReview dailyEntry: dailyDailyReviews) {
+                if (dailyEntry.getDate().equals(entry.getKey())) {
+                    refinedList.add(dailyEntry);
                 }
             }
         }
@@ -6847,8 +6859,15 @@ public class PredictionsRepository {
                         list.add(activitySummary.getName());
                         activitiesMap.put(date, list);
                     }
-                    refinedList.add(dailyPhq9);
                     activitiesSet.add(activitySummary.getName());
+                }
+            }
+        }
+
+        for (Map.Entry<String, List<String>> entry: activitiesMap.entrySet()) {
+            for (DailyPhq9 dailyEntry: dailyPhq9es) {
+                if (dailyEntry.getDate().equals(entry.getKey())) {
+                    refinedList.add(dailyEntry);
                 }
             }
         }
@@ -7610,8 +7629,15 @@ public class PredictionsRepository {
                         list.add(activitySummary.getName());
                         activitiesMap.put(date, list);
                     }
-                    refinedList.add(dailyGad7);
                     activitiesSet.add(activitySummary.getName());
+                }
+            }
+        }
+
+        for (Map.Entry<String, List<String>> entry: activitiesMap.entrySet()) {
+            for (DailyGad7 dailyEntry: dailyGad7es) {
+                if (dailyEntry.getDate().equals(entry.getKey())) {
+                    refinedList.add(dailyEntry);
                 }
             }
         }

@@ -24,6 +24,10 @@
         Our calculation assumes that achieving the recommendation will increase the construct of your interest by 1%.
         The average during the given time period is used as a reference point so that you can
         make small changes, one day at a time.</string>
+    <string name="tutorial_lets_get_started_msg">Let\'s get started!</string>
+
+    <!-- Boolean for tutorial completion -->
+    <string name="tut_lets_get_started_boolean">tut_lets_get_started_boolean</string>
 
 
     <!-- Strings for sign-in activity -->
@@ -42,13 +46,21 @@
     <string name="phone_usage_permission_granted">App usage permission is granted.</string>
     <string name="no_tracker_in_use_msg">No tracker is in use.</string>
 
+    <!-- Cheers Notification Messages -->
+    <string name="cheers_good_morning_msg">Good Morning</string>
+    <string name="cheers_good_afternoon_msg">Good Afternoon</string>
+    <string name="cheers_good_evening_msg">Good Evening</string>
+    <string name="cheers_good_night_msg">Good Night</string>
+    <string name="cheers_recommendations_ready_msg">Your personalized recommendations are ready!</string>
+
     <!-- Display Titles -->
     <string name="settings_notifications_title">Notifications</string>
     <string name="settings_profile_title">Profile</string>
     <string name="settings_title">Settings</string>
-    <string name="apps_and_services_title">Apps/Services</string>
+    <string name="apps_and_services_title">Services</string>
     <string name="edit_activity_title">Edit Activities</string>
     <string name="surveys_title">Surveys</string>
+    <string name="edit_surveys_title">Edit Surveys</string>
     <string name="mind_insight_title">Mind</string>
     <string name="body_insight_title">Body</string>
     <string name="average_title">Average</string>
@@ -73,7 +85,7 @@
         It is yet to find any meaningful connection\n or may need more data.\n\n
         Check again after a few more daily entries.\nThank you!</string>
     <string name="empty_view_survey_button">Surveys</string>
-    <string name="empty_view_apps_and_services_button">Apps/Services</string>
+    <string name="empty_view_apps_and_services_button">Services</string>
 
     <!-- Permission rationales -->
     <string name="location_rationale"><b>Allow access to your location?</b>\n\nAccess to your location data is required to connect Google Fit and weather to this app.</string>
@@ -180,6 +192,7 @@
     <string name="com.ivorybridge.mobai.TIME_RANGE_KEY" translatable="false">TIME_RANGE_DAY</string>
     <string name="com.ivorybridge.mobai.UNIT_KEY" translatable="false">UNIT</string>
     <string name="com.ivorybridge.mobai.NOTIFICATION_SHARED_PREFERENCE" translatable="false">NOTIFICATION_SHARED_PREFERENCE</string>
+    <string name="com.ivorybridge.mobai.TODAY_FRAG_SHARED_PREFERENCE" translatable="false">TODAY_FRAG_SHARED_PREFERENCE</string>
     <string name="com.ivorybridge.mobai.LAST_ACCESSED_FRAGMENT_IN_MAIN_ACTIVITY_SHARED_PREFERENCE_KEY" translatabe="false">LAST_ACCESSED_FRAGMENT_IN_MAIN_ACTIVITY_SHARED_PREFERENCE_KEY</string>
 
     <!-- Notification channels -->
@@ -187,6 +200,7 @@
     <string name="USER_GOAL_NOTIF_CHANNEL_ID">USER_GOAL_NOTIF_CHANNEL_ID</string>
     <string name="MOTION_SENSOR_NOTIF_CHANNEL_ID">MOTION_SENSOR_NOTIF_CHANNEL_ID</string>
     <string name="CHECK_IN_NOTIF_CHANNEL_ID">CHECK_IN_NOTIF_CHANNEL_ID</string>
+    <string name="FIREBASE_ENGAGMENT_NOTIF_CHANNEL_ID">FB_ENGAGEMENT_NOTIF_CHANNEL_ID</string>
 
     <!-- Preference -->
     <string name="preference_unit_title">Unit</string>
@@ -210,7 +224,10 @@
     <string name="preference_recommended_goal_notification_title">Recommended Goal Notification</string>
     <string name="preference_current_recommended_goal_notification_summary">Current</string>
     <string name="preference_cheers_notification_title">Cheers Notification</string>
-    <string name="preference_check_in_time_title">Check-In Time</string>
+    <string name="preference_daily_check_in_notification_title">Daily Check-In Notification</string>
+    <string name="preference_check_in_time_title">Notification Time</string>
+    <string name="preference_new_recommendations_notification_title">Recommendations Notification</string>
+    <string name="preference_new_recommendations_time_title">Notification Time</string>
     <string name="preference_about_title">About</string>
     <string name="preference_support_title">Support</string>
     <string name="preference_unit_si_title">SI</string>
@@ -233,7 +250,10 @@
     <string name="preference_daily_check_in_notification">pref_daily_check_in_notification</string>
     <string name="preference_daily_check_in_hour">check_in_hour</string>
     <string name="preference_daily_check_in_minute">check_in_minute</string>
+    <string name="preference_daily_new_recommendations_hour">new_recommendations_hour</string>
+    <string name="preference_daily_new_recommendations_minute">new_recommendations_minute</string>
     <string name="preference_daily_cheers_notification">pref_daily_cheers_notification</string>
+    <string name="preference_new_recommendations_notification">pref_new_recommendations_notification</string>
     <string name="preference_sign_in">pref_sign_in</string>
     <string name="preference_sign_out">pref_sign_out</string>
 
@@ -262,6 +282,8 @@
 
     <!-- Insight -->
     <string name="insight_best_and_worst_title">Best &amp; Worst</string>
+    <string name="insight_top1_title">Top 1 Factors</string>
+    <string name="insight_top2_title">Top 2 Factors</string>
     <string name="insight_top3_title">Top 3 Factors</string>
     <string name="correlation">\u0020related</string>
     <string name="recommendation_prompt">Recommended:\u0020</string>

@@ -738,7 +738,7 @@ public class StatsNonTrackerFragment extends Fragment {
             //xAxis.setXOffset(0.5f);
             xAxis.setSpaceMin(0.5f);
             xAxis.setSpaceMax(0.5f);
-            xAxis.setTextSize(12);
+            xAxis.setTextSize(10);
             xAxis.setTextColor(Color.DKGRAY);
             xAxis.setAxisLineColor(ContextCompat.getColor(getContext(), R.color.transparent_gray));
             xAxis.setCenterAxisLabels(false);
@@ -834,7 +834,7 @@ public class StatsNonTrackerFragment extends Fragment {
         leftAxis.setEnabled(true);
         leftAxis.setDrawGridLines(false);
         leftAxis.setAxisMinimum(0);
-        leftAxis.setTextSize(12);
+        leftAxis.setTextSize(10);
         leftAxis.setTypeface(tf);
         leftAxis.setSpaceMax(1f);
         leftAxis.setTextColor(Color.DKGRAY);
@@ -858,7 +858,7 @@ public class StatsNonTrackerFragment extends Fragment {
         averageLL.setTextStyle(Paint.Style.FILL);
         averageLL.enableDashedLine(4, 8, 1);
         averageLL.setTextColor(Color.DKGRAY);
-        averageLL.setTextSize(12);
+        averageLL.setTextSize(10);
         //averageLL.setLineColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
         averageLL.setLineColor(ContextCompat.getColor(getContext(), R.color.transparent_gray));
         leftAxis.addLimitLine(averageLL);
@@ -2268,7 +2268,7 @@ public class StatsNonTrackerFragment extends Fragment {
             //xAxis.setXOffset(0.5f);
             xAxis.setSpaceMin(0.5f);
             xAxis.setSpaceMax(0.5f);
-            xAxis.setTextSize(12);
+            xAxis.setTextSize(10);
             xAxis.setTextColor(Color.DKGRAY);
             if (getContext() != null) {
                 xAxis.setAxisLineColor(ContextCompat.getColor(getContext(), R.color.transparent_gray));
@@ -2371,7 +2371,7 @@ public class StatsNonTrackerFragment extends Fragment {
             leftAxis.setAxisMaximum(3.5f);
             leftAxis.setAxisMinimum(1f);
             leftAxis.setTypeface(tf);
-            leftAxis.setTextSize(12);
+            leftAxis.setTextSize(10);
             leftAxis.setGranularity(0.5f);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
@@ -2396,7 +2396,7 @@ public class StatsNonTrackerFragment extends Fragment {
             leftAxis.setAxisMaximum(11f);
             leftAxis.setAxisMinimum(0f);
             leftAxis.setTypeface(tf);
-            leftAxis.setTextSize(12);
+            leftAxis.setTextSize(10);
             leftAxis.setGranularity(1f);
             leftAxis.setLabelCount(12, true);
             leftAxis.setTextColor(Color.DKGRAY);
@@ -2419,7 +2419,7 @@ public class StatsNonTrackerFragment extends Fragment {
             leftAxis.setAxisMaximum(5.5f);
             leftAxis.setAxisMinimum(1f);
             leftAxis.setTypeface(tf);
-            leftAxis.setTextSize(12);
+            leftAxis.setTextSize(10);
             leftAxis.setGranularity(1f);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
@@ -2441,7 +2441,7 @@ public class StatsNonTrackerFragment extends Fragment {
             leftAxis.setAxisMaximum(30f);
             leftAxis.setAxisMinimum(0f);
             leftAxis.setTypeface(tf);
-            leftAxis.setTextSize(12);
+            leftAxis.setTextSize(10);
             leftAxis.setGranularity(3);
             leftAxis.setGranularityEnabled(true);
             leftAxis.setTextColor(Color.DKGRAY);
@@ -2469,7 +2469,7 @@ public class StatsNonTrackerFragment extends Fragment {
             leftAxis.setAxisMaximum(24f);
             leftAxis.setAxisMinimum(0f);
             leftAxis.setTypeface(tf);
-            leftAxis.setTextSize(12);
+            leftAxis.setTextSize(10);
             leftAxis.setGranularity(1.0f);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
@@ -2499,7 +2499,7 @@ public class StatsNonTrackerFragment extends Fragment {
         averageLL.setTextStyle(Paint.Style.FILL);
         averageLL.enableDashedLine(4, 8, 1);
         averageLL.setTextColor(Color.DKGRAY);
-        averageLL.setTextSize(12);
+        averageLL.setTextSize(10);
         //averageLL.setLineColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
         averageLL.setLineColor(ContextCompat.getColor(getContext(), R.color.transparent_gray));
         leftAxis.addLimitLine(averageLL);

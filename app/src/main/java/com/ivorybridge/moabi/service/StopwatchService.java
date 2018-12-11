@@ -260,7 +260,7 @@ public class StopwatchService extends Service implements PropertyChangeListener 
                     .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                             .setShowCancelButton(true)
                             .setCancelButtonIntent(exitPendingIntent)
-                            .setShowActionsInCompactView(1, 2, 5))
+                            .setShowActionsInCompactView(0, 2, 4))
                     .build();
         }
         //this.startForeground(NOTIFICATION_ID, customNotification);

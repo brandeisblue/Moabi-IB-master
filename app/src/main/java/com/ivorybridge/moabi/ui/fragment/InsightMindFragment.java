@@ -450,11 +450,11 @@ public class InsightMindFragment extends Fragment {
                                         if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
                                             sortedList.add(simpleRegressionSummary);
                                         }
-                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
+                                    } /*else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
                                         if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
                                             sortedList.add(simpleRegressionSummary);
                                         }
-                                    } else {
+                                    } */else {
                                         sortedList.add(simpleRegressionSummary);
                                     }
                                     Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
@@ -577,11 +577,11 @@ public class InsightMindFragment extends Fragment {
                                         if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
                                             sortedList.add(simpleRegressionSummary);
                                         }
-                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
+                                    } /*else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
                                         if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
                                             sortedList.add(simpleRegressionSummary);
                                         }
-                                    } else {
+                                    } */else {
                                         sortedList.add(simpleRegressionSummary);
                                     }
                                     Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
@@ -829,11 +829,11 @@ public class InsightMindFragment extends Fragment {
                                         if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
                                             sortedList.add(simpleRegressionSummary);
                                         }
-                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
+                                    } /*else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
                                         if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
                                             sortedList.add(simpleRegressionSummary);
                                         }
-                                    } else {
+                                    } */else {
                                         sortedList.add(simpleRegressionSummary);
                                     }
                                     Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
@@ -955,11 +955,11 @@ public class InsightMindFragment extends Fragment {
                                         if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
                                             sortedList.add(simpleRegressionSummary);
                                         }
-                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
+                                    } /*else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
                                         if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
                                             sortedList.add(simpleRegressionSummary);
                                         }
-                                    } else {
+                                    } */else {
                                         sortedList.add(simpleRegressionSummary);
                                     }
                                     Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
@@ -1081,11 +1081,11 @@ public class InsightMindFragment extends Fragment {
                                         if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 5) {
                                             sortedList.add(simpleRegressionSummary);
                                         }
-                                    } else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
+                                    }/* else if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
                                         if (TimeUnit.MILLISECONDS.toMinutes(simpleRegressionSummary.getRecommendedActivityLevel().longValue()) >= 1) {
                                             sortedList.add(simpleRegressionSummary);
                                         }
-                                    } else {
+                                    }*/ else {
                                         sortedList.add(simpleRegressionSummary);
                                     }
                                     Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());
@@ -1194,7 +1194,7 @@ public class InsightMindFragment extends Fragment {
                             } else if (itemType == MINDXACTIVITY) {
                                 for (SimpleRegressionSummary simpleRegressionSummary : simpleRegressionSummaries) {
                                     if (simpleRegressionSummary.getIndepVarType().equals(getString(R.string.baactivity_camel_case))) {
-                                        if (simpleRegressionSummary.getRecommendedActivityLevel() >= 1)
+                                        /*if (simpleRegressionSummary.getRecommendedActivityLevel() >= 1)*/
                                             simpleRegressionSummaryList.add(simpleRegressionSummary);
                                     }
                                     //Log.i(TAG, simpleRegressionSummary.getDepXIndepVars() + ": " + simpleRegressionSummary.getCoefOfDetermination() + " - " + simpleRegressionSummary.getRecommendedActivityLevel());

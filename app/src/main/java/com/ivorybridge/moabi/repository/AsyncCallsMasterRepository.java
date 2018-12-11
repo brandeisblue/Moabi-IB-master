@@ -21,6 +21,7 @@ import com.ivorybridge.moabi.util.FormattedTime;
 import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 public class AsyncCallsMasterRepository {
 
@@ -147,7 +148,7 @@ public class AsyncCallsMasterRepository {
                                         }
                                     }
                                     Intent intent = new Intent(application, MotionSensorService.class);
-                                    application.startService(intent);
+                                    ContextCompat.startForegroundService(application, intent);
                                     SharedPreferences notificationSharedPreferences =
                                             application.getSharedPreferences(application.getString(R.string.com_ivorybridge_mobai_NOTIFICATION_SHARED_PREFERENCE),
                                     Context.MODE_PRIVATE);

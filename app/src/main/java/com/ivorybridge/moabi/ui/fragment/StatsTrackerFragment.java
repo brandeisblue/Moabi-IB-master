@@ -2935,7 +2935,7 @@ public class StatsTrackerFragment extends Fragment {
             //xAxis.setXOffset(0.5f);
             xAxis.setSpaceMin(0.5f);
             xAxis.setSpaceMax(0.5f);
-            xAxis.setTextSize(12);
+            xAxis.setTextSize(10);
             xAxis.setTextColor(Color.DKGRAY);
             xAxis.setAxisLineColor(ContextCompat.getColor(context, R.color.transparent_gray));
             xAxis.setCenterAxisLabels(false);
@@ -3032,7 +3032,7 @@ public class StatsTrackerFragment extends Fragment {
         leftAxis.setDrawGridLines(false);
         leftAxis.setDrawAxisLine(false);
         leftAxis.setAxisMinimum(0f);
-        leftAxis.setTextSize(12f);
+        leftAxis.setTextSize(10f);
         leftAxis.setTypeface(tf);
         leftAxis.setSpaceMax(1f);
         leftAxis.setTextColor(Color.DKGRAY);
@@ -3066,7 +3066,7 @@ public class StatsTrackerFragment extends Fragment {
         averageLL.setTextStyle(Paint.Style.FILL);
         averageLL.enableDashedLine(4, 8, 1);
         averageLL.setTextColor(Color.DKGRAY);
-        averageLL.setTextSize(12);
+        averageLL.setTextSize(10);
         //averageLL.setLineColor(ContextCompat.getColor(context, R.color.colorPrimary));
         averageLL.setLineColor(ContextCompat.getColor(context, R.color.transparent_gray));
         leftAxis.addLimitLine(averageLL);

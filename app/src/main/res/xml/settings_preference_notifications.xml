@@ -55,7 +55,7 @@
 
         <androidx.preference.SwitchPreference
             android:key="daily_check_in_preference"
-            android:title="Daily Check-In Notification"
+            android:title="@string/preference_daily_check_in_notification_title"
             app:iconSpaceReserved="false" />
 
         <Preference
@@ -67,6 +67,16 @@
             android:key="cheers_preference"
             android:title="@string/preference_cheers_notification_title"
             app:iconSpaceReserved="false" />
+
+        <androidx.preference.SwitchPreference
+            android:key="new_recommendations_preference"
+            android:title="@string/preference_new_recommendations_notification_title"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:fontFamily="@font/source_sans_pro"
+            android:key="new_recommendations_time_preference"
+            android:title="@string/preference_new_recommendations_time_title" />
 
     </androidx.preference.PreferenceCategory>
 

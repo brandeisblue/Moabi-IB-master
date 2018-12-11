@@ -32,6 +32,7 @@ import com.ivorybridge.moabi.database.entity.weather.WeatherDailySummary;
 import com.ivorybridge.moabi.repository.AsyncCallsMasterRepository;
 import com.ivorybridge.moabi.ui.activity.MainActivity;
 import com.ivorybridge.moabi.ui.activity.SettingsActivity;
+import com.ivorybridge.moabi.ui.recyclerviewitem.AlertItem;
 import com.ivorybridge.moabi.ui.recyclerviewitem.EmptyItem;
 import com.ivorybridge.moabi.ui.recyclerviewitem.activitytracker.ActivityTrackerItem;
 import com.ivorybridge.moabi.ui.recyclerviewitem.appusage.AppUsageItem;
@@ -111,6 +112,7 @@ public class TodayFragment extends Fragment implements
 
     // adapters
     private FastAdapter<IItem> recyclerAdapter;
+    private ItemAdapter<AlertItem> alertItemAdapter;
     private ItemAdapter<ActivityTrackerItem> activityTrackerItemItemAdapter;
     private ItemAdapter<AppUsageItem> appUsageItemItemAdapter;
     private ItemAdapter<MoodItem> moodItemAdapter;
@@ -123,6 +125,9 @@ public class TodayFragment extends Fragment implements
     private ItemAdapter<EmptyItem> mEmptyAdapter;
     private ItemAdapter<BAActivityItem> bAActivityItemAdapter;
     private SharedPreferences unitSharedPreferences;
+    private SharedPreferences todayFragmentSharedPreferences;
+    private SharedPreferences.OnSharedPreferenceChangeListener todayFragSPListener;
+    private SharedPreferences.Editor todayFragSPEditor;
     private FormattedTime formattedTime;
     private WeatherViewModel weatherViewModel;
 
@@ -168,6 +173,10 @@ public class TodayFragment extends Fragment implements
                 Toast.makeText(getContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show();
             }
         }
+        unitSharedPreferences = getContext().getSharedPreferences(getString(R.string.com_ivorybridge_moabi_UNIT_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
+        todayFragmentSharedPreferences = getContext().getSharedPreferences(getString(R.string.com_ivorybridge_mobai_TODAY_FRAG_SHARED_PREFERENCE), Context.MODE_PRIVATE);
+        todayFragSPEditor = todayFragmentSharedPreferences.edit();
+
     }
 
     @Override
@@ -178,8 +187,24 @@ public class TodayFragment extends Fragment implements
         if (bundle != null && bundle.getString("date") != null) {
             mDate = bundle.getString("date");
         }
+
+
         if (getContext() != null) {
-            unitSharedPreferences = getContext().getSharedPreferences(getString(R.string.com_ivorybridge_moabi_UNIT_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
+            //todayFragSPEditor.putBoolean(getString(R.string.tut_lets_get_started_boolean), false);
+            //todayFragSPEditor.commit();
+            todayFragSPListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                    if (key.equals(getString(R.string.tut_lets_get_started_boolean))) {
+                        if (sharedPreferences.getBoolean(key, false)) {
+                            if (alertItemAdapter.getAdapterItemCount() > 0) {
+                                alertItemAdapter.remove(0);
+                            }
+                        }
+                    }
+                }
+            };
+            todayFragmentSharedPreferences.registerOnSharedPreferenceChangeListener(todayFragSPListener);
             String unit = unitSharedPreferences.getString(getString(R.string.com_ivorybridge_mobai_UNIT_KEY), getContext().getString(R.string.preference_unit_si_title));
             setItemsToRecyclerView(unit);
             configureWeather(unit);
@@ -191,12 +216,20 @@ public class TodayFragment extends Fragment implements
     public void onPause() {
         super.onPause();
         recyclerView.setAdapter(null);
+        if (todayFragSPListener != null) {
+            todayFragmentSharedPreferences.unregisterOnSharedPreferenceChangeListener(todayFragSPListener);
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
     }
 
     @Nullable
@@ -416,6 +449,7 @@ public class TodayFragment extends Fragment implements
             }
         });
         recyclerAdapter = new FastAdapter<>();
+        alertItemAdapter = new ItemAdapter<>();
         activityTrackerItemItemAdapter = new ItemAdapter<>();
         appUsageItemItemAdapter = new ItemAdapter<>();
         moodItemAdapter = new ItemAdapter<>();
@@ -428,7 +462,7 @@ public class TodayFragment extends Fragment implements
         bAActivityItemAdapter = new ItemAdapter<>();
         timedActivityItemAdapter = new ItemAdapter<>();
         recyclerAdapter.withSelectable(true);
-        recyclerAdapter = FastAdapter.with(Arrays.asList(activityTrackerItemItemAdapter,
+        recyclerAdapter = FastAdapter.with(Arrays.asList(alertItemAdapter, activityTrackerItemItemAdapter,
                 mEmptyAdapter, appUsageItemItemAdapter, timedActivityItemAdapter, dailyReviewItemAdapter,
                 moodItemAdapter, energyItemAdapter, stressItemAdapter, phq9ItemAdapter, gad7ItemAdapter,
                 bAActivityItemAdapter));
@@ -481,6 +515,13 @@ public class TodayFragment extends Fragment implements
     }
 
     private void setItemsToRecyclerView(String unit) {
+        boolean isDone = todayFragmentSharedPreferences.getBoolean(getString(R.string.tut_lets_get_started_boolean), false);
+        if (!isDone) {
+            alertItemAdapter.clear();
+            alertItemAdapter.add(new AlertItem());
+        } else {
+            alertItemAdapter.clear();
+        }
         DataInUseMediatorLiveData dataInUseMediatorLiveData = new DataInUseMediatorLiveData(dataInUseViewModel.getAllInputsInUse(), dataInUseViewModel.getAllConnectedServices());
         dataInUseMediatorLiveData.observe(getViewLifecycleOwner(), new Observer<Pair<List<InputInUse>, List<ConnectedService>>>() {
             @Override

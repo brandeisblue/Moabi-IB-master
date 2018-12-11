@@ -128,7 +128,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             xAxis.setDrawGridLines(false);
             barChart.setDragEnabled(false);
             xAxis.setDrawAxisLine(false);
-            xAxis.setTextSize(12);
+            xAxis.setTextSize(10);
             xAxis.setTextColor(Color.DKGRAY);
             xAxis.setAxisLineColor(ContextCompat.getColor(itemView.getContext(), R.color.transparent_gray));
             xAxis.setCenterAxisLabels(false);
@@ -167,7 +167,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 leftAxis.setAxisMaximum(3.5f);
                 leftAxis.setAxisMinimum(1f);
                 leftAxis.setTypeface(tf);
-                leftAxis.setTextSize(12);
+                leftAxis.setTextSize(10);
                 leftAxis.setGranularity(0.5f);
                 leftAxis.setTextColor(Color.DKGRAY);
                 leftAxis.setGranularityEnabled(true);
@@ -190,7 +190,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 leftAxis.setAxisMaximum(11f);
                 leftAxis.setAxisMinimum(0f);
                 leftAxis.setTypeface(tf);
-                leftAxis.setTextSize(12);
+                leftAxis.setTextSize(10);
                 leftAxis.setGranularity(1f);
                 leftAxis.setLabelCount(12, true);
                 leftAxis.setTextColor(Color.DKGRAY);
@@ -212,7 +212,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 leftAxis.setAxisMaximum(5.5f);
                 leftAxis.setAxisMinimum(1f);
                 leftAxis.setTypeface(tf);
-                leftAxis.setTextSize(12);
+                leftAxis.setTextSize(10);
                 leftAxis.setGranularity(1f);
                 leftAxis.setTextColor(Color.DKGRAY);
                 leftAxis.setGranularityEnabled(true);
@@ -235,7 +235,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 leftAxis.setAxisMaximum(30f);
                 leftAxis.setAxisMinimum(0f);
                 leftAxis.setTypeface(tf);
-                leftAxis.setTextSize(12);
+                leftAxis.setTextSize(10);
                 leftAxis.setGranularity(3);
                 leftAxis.setGranularityEnabled(true);
                 leftAxis.setTextColor(Color.DKGRAY);
@@ -264,7 +264,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 leftAxis.setAxisMaximum(24f);
                 leftAxis.setAxisMinimum(0f);
                 leftAxis.setTypeface(tf);
-                leftAxis.setTextSize(12);
+                leftAxis.setTextSize(10);
                 leftAxis.setGranularity(1.0f);
                 leftAxis.setTextColor(Color.DKGRAY);
                 leftAxis.setGranularityEnabled(true);
@@ -295,7 +295,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 leftAxis.setTextColor(Color.DKGRAY);
                 //leftAxis.setAxisMaximum(3);
                 leftAxis.setAxisMinimum(0);
-                leftAxis.setTextSize(12f);
+                leftAxis.setTextSize(10f);
                 //leftAxis.setGranularity(1f);
                 //leftAxis.setGranularityEnabled(true);
                 leftAxis.setLabelCount(3, true);
@@ -311,7 +311,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             } else {
                 leftAxis.setAxisMinimum(0f);
                 leftAxis.setTypeface(tf);
-                leftAxis.setTextSize(12);
+                leftAxis.setTextSize(10);
                 leftAxis.setGranularity(1f);
                 leftAxis.setTextColor(Color.DKGRAY);
                 leftAxis.setGranularityEnabled(true);
@@ -327,7 +327,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             averageLL.setTextStyle(Paint.Style.FILL);
             averageLL.enableDashedLine(4, 8, 1);
             averageLL.setTextColor(Color.DKGRAY);
-            averageLL.setTextSize(12);
+            averageLL.setTextSize(10);
             //averageLL.setLineColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
             averageLL.setLineColor(ContextCompat.getColor(itemView.getContext(), R.color.transparent_gray));
             leftAxis.addLimitLine(averageLL);

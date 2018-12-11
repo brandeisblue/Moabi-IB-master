@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -19,7 +21,7 @@ import java.util.List;
 
 import androidx.annotation.ColorRes;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -39,18 +41,17 @@ public class MakeEntryActivity extends AppCompatActivity {
     ImageButton backButton;
     @BindView(R.id.activity_make_entry_toolbar_checkbutton)
     ImageButton checkButton;
+    @BindView(R.id.activity_make_entry_toolbar)
+    Toolbar toolbar;
     private MakeEntryFragmentPagerAdapter fragmentPagerAdapter;
     private DataInUseViewModel dataInUseViewModel;
-
-    static {
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_make_entry);
         ButterKnife.bind(this);
+        setSupportActionBar(toolbar);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,6 +110,28 @@ public class MakeEntryActivity extends AppCompatActivity {
         //fragmentPagerAdapter = new MakeEntryFragmentPagerAdapter(getApplicationContext(), getSupportFragmentManager(), );
         //viewPager.setAdapter(fragmentPagerAdapter);
         //tabLayout.setupWithViewPager(viewPager);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_make_entry_menuitems, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.activity_make_entry_menuitem_edit_surveys:
+                Intent intent = new Intent(MakeEntryActivity.this, EditSurveyItemsActivity.class);
+                intent.putExtra("redirected_from", "makeEntryActivity");
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivity(intent);
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

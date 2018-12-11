@@ -20,9 +20,13 @@ import android.widget.LinearLayout;
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.getkeepsafe.taptargetview.TapTargetView;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.entity.util.DataInUseMediatorLiveData;
 import com.ivorybridge.moabi.repository.AsyncCallsMasterRepository;
@@ -96,6 +100,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.i(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+                        // Log and toast
+                        Log.i(TAG, token);
+                        //Toast.makeText(MainActivity.this, "Token is : " + token, Toast.LENGTH_SHORT).show();
+                    }
+                });
         //  Declare a new thread to do a preference check
         //  Make a new preferences editor
         SharedPreferences getPrefs = PreferenceManager
@@ -437,6 +456,10 @@ public class MainActivity extends AppCompatActivity {
             if (intent.getStringExtra("redirected_from") != null &&
                     intent.getStringExtra("redirected_from").equals("SplashActivity")) {
                 bundle.putString("redirected_from", "SplashActivity");
+            }
+            if (intent.getStringExtra("redirected_from") != null &&
+                    intent.getStringExtra("redirected_from").equals("insight_notif")) {
+                currentFragment = 1;
             }
             todayFragment.setArguments(bundle);
             InsightFragment insightFragment = new InsightFragment();

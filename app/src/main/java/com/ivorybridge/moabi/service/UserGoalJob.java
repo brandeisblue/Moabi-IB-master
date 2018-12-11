@@ -270,10 +270,10 @@ public class UserGoalJob extends Job {
                         counter++;
                     }
                 }
-                progressLong = (long) counter;
+                progressDouble = (double) counter;
                 Log.i(TAG, "Current progress is " + goalName + ": " + counter);
             } else {
-                progressLong = 0L;
+                progressDouble = 0d;
             }
         }
         Intent serviceIntent = new Intent(application, UserGoalService.class);

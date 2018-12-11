@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.auth.FirebaseAuth;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.entity.baactivity.BAActivityFavorited;
@@ -73,13 +74,11 @@ public class SplashActivity extends AppCompatActivity {
     private FormattedTime formattedTime;
     private BuiltInFitnessRepository builtInFitnessRepository;
 
-    static {
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         mAuth = FirebaseAuth.getInstance();
         MotionSensorEndofDayDailyJob.scheduleJob();
         MotionSensorResetDailyJob.scheduleJob();

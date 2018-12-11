@@ -20,6 +20,14 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'io.fabric'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'MoabiKey'
+            keyPassword 'EodrnfEodrnf!23'
+            storeFile file('C:/Users/skim2/OneDrive/App Development/MOABI Key/moabi.jks')
+            storePassword 'EodrnfEodrnf!23!23'
+        }
+    }
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.ivorybridge.moabi"
@@ -33,6 +41,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
     compileOptions {
@@ -57,6 +66,7 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:4.2.1'
     implementation 'com.facebook.android:facebook-android-sdk:4.29.0'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.6'
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
     // Google dependencies
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
@@ -122,11 +132,10 @@ dependencies {
     implementation 'com.evernote:android-job:1.2.6'
     implementation 'com.github.fiskurgit:ChipCloud:3.0.5'
     implementation 'com.github.chrisbanes:PhotoView:2.2.0'
-    implementation "ru.tinkoff.scrollingpagerindicator:scrollingpagerindicator:1.0.6"
+    implementation 'ru.tinkoff.scrollingpagerindicator:scrollingpagerindicator:1.0.6'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
-    implementation 'com.kofigyan.stateprogressbar:stateprogressbar:1.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
-    testImplementation "org.robolectric:robolectric:3.8"
+    testImplementation 'org.robolectric:robolectric:3.8'
 }
