@@ -29,6 +29,11 @@ public class FormattedTime {
         return df.format(Calendar.getInstance().getTime());
     }
 
+    public int getCurrentHour() {
+        Calendar rightNow = Calendar.getInstance();
+        return rightNow.get(Calendar.HOUR_OF_DAY);
+    }
+
     public Long getCurrentTimeInMilliSecs() {
         LocalDateTime now = LocalDateTime.now();
         ZonedDateTime zdt = now.atZone(ZoneId.systemDefault());

@@ -10,11 +10,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.entity.stats.SimpleRegressionSummary;
 import com.ivorybridge.moabi.repository.statistics.PredictionsRepository;
-import com.ivorybridge.moabi.ui.activity.MainActivity;
+import com.ivorybridge.moabi.ui.activity.DailyBriefingActivity;
 import com.ivorybridge.moabi.util.FormattedTime;
 
 import java.util.ArrayList;
@@ -25,9 +26,9 @@ import java.util.concurrent.TimeUnit;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-public class InsightDailySummaryNotifService extends Service {
+public class DailyBriefingNotifService extends Service {
 
-    private static final String TAG = InsightDailySummaryNotifService.class.getSimpleName();
+    private static final String TAG = DailyBriefingNotifService.class.getSimpleName();
     private static final int NOTIFICATION_ID = 39040918;
     private static final String NOTIFICATION_CHANNEL_NAME = "Daily Insight Summary";
     private static final String NOTIFICATION_CHANNEL_DESC = "";
@@ -67,6 +68,7 @@ public class InsightDailySummaryNotifService extends Service {
                     hasBodySummaries = true;
                 }
                 if (showNotification) {
+                    Log.i(TAG, "notification enabled");
                     List<SimpleRegressionSummary> sortedList = new ArrayList<>();
                     if (hasMindSummaries && hasBodySummaries) {
                         showNotification();
@@ -149,12 +151,12 @@ public class InsightDailySummaryNotifService extends Service {
     }
 
     private void showNotification() {
-        Intent notificationIntent = new Intent(this, MainActivity.class);
+        Intent notificationIntent = new Intent(this, DailyBriefingActivity.class);
         notificationIntent.putExtra("redirected_from", "insight_notif");
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, getApplicationContext().getString(R.string.USER_GOAL_NOTIF_CHANNEL_ID));
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, getApplicationContext().getString(R.string.NEW_RECOMMENDATIONS_NOTIF_ID));
         String title = getString(R.string.cheers_good_morning_msg);
-        int notifHour = notificationSharedPreferences.getInt(getString(R.string.preference_daily_new_recommendations_hour), 7);
+        int notifHour = formattedTime.getCurrentHour();
         if (notifHour < 12) {
             title = getString(R.string.cheers_good_morning_msg);
         } else if (notifHour < 17) {
@@ -175,7 +177,7 @@ public class InsightDailySummaryNotifService extends Service {
                 .setContentIntent(pendingIntent);
         Notification notification = builder.build();
         if (Build.VERSION.SDK_INT >= 26) {
-            NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.USER_GOAL_NOTIF_CHANNEL_ID),
+            NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.NEW_RECOMMENDATIONS_NOTIF_ID),
                     NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
             channel.setDescription(NOTIFICATION_CHANNEL_DESC);
             notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

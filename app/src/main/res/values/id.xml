@@ -25,6 +25,7 @@
     <item name="insight_body_average_item" type="id"/>
     <item name="insight_bestandworst_item" type="id"/>
     <item name="insight_recommendations_item" type="id"/>
+    <item name="insight_new_topthree_item" type="id"/>
     <item name="insight_topthree_item" type="id"/>
     <item name="phq9_question_item" type="id"/>
     <item name="gad7_question_item" type="id"/>

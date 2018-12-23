@@ -138,7 +138,7 @@ public class UserGoalService extends Service implements SensorEventListener {
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             builtInFitnessRepository = new BuiltInFitnessRepository(getApplication());
             dataInUseRepository = new DataInUseRepository(getApplication());
-            Log.i(TAG, intent.getStringExtra("goalType") + ": " + intent.getStringExtra("goalName") + " " + intent.getDoubleExtra("goal", 0));
+            //Log.i(TAG, intent.getStringExtra("goalType") + ": " + intent.getStringExtra("goalName") + " " + intent.getDoubleExtra("goal", 0));
             if (intent.getStringExtra("goalType") != null) {
                 goalType = intent.getStringExtra("goalType");
             }

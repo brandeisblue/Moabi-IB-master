@@ -30,6 +30,7 @@ import com.ivorybridge.moabi.database.entity.util.InputHistory;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.database.entity.weather.WeatherDailySummary;
 import com.ivorybridge.moabi.repository.AsyncCallsMasterRepository;
+import com.ivorybridge.moabi.ui.activity.DailyBriefingActivity;
 import com.ivorybridge.moabi.ui.activity.MainActivity;
 import com.ivorybridge.moabi.ui.activity.SettingsActivity;
 import com.ivorybridge.moabi.ui.recyclerviewitem.AlertItem;
@@ -306,6 +307,9 @@ public class TodayFragment extends Fragment implements
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
+            case R.id.fragment_main_menuitems_daily_briefing:
+                startActivity(new Intent(getContext(), DailyBriefingActivity.class));
+                break;
             case R.id.fragment_main_menuitems_refresh:
                 if (getActivity() != null) {
                     if (isOnline()) {

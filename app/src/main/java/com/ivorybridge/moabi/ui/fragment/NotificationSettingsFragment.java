@@ -15,7 +15,7 @@ import com.ivorybridge.moabi.database.entity.util.DataInUseMediatorLiveData;
 import com.ivorybridge.moabi.database.entity.util.InputInUse;
 import com.ivorybridge.moabi.database.entity.util.UserGoal;
 import com.ivorybridge.moabi.service.CheckInDailyJob;
-import com.ivorybridge.moabi.service.InsightDailySummaryNotifDailyJob;
+import com.ivorybridge.moabi.service.DailyBriefingNotifDailyJob;
 import com.ivorybridge.moabi.service.MotionSensorService;
 import com.ivorybridge.moabi.service.StopwatchService;
 import com.ivorybridge.moabi.service.UserGoalJob;
@@ -268,7 +268,7 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
                     newRecommendationsNotifTimePref.setEnabled(true);
                     int hour = notificationSharedPreferences.getInt(getString(R.string.preference_daily_new_recommendations_hour), 7);
                     int minute = notificationSharedPreferences.getInt(getString(R.string.preference_daily_new_recommendations_minute), 0);
-                    InsightDailySummaryNotifDailyJob.scheduleJob(hour, minute);
+                    DailyBriefingNotifDailyJob.scheduleJob(hour, minute);
                 } else {
                     newRecommendationsNotifTimePref.setEnabled(false);
                 }
@@ -294,7 +294,7 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
                                 notificationSPEditor.commit();
                                 String time = hourOfDay + ":" + minute;
                                 newRecommendationsNotifTimePref.setSummary(formattedTime.convertStringHMToHMMAA(time));
-                                InsightDailySummaryNotifDailyJob.scheduleJob(hourOfDay, minute);
+                                DailyBriefingNotifDailyJob.scheduleJob(hourOfDay, minute);
                             }
                         },
                         now.get(Calendar.HOUR_OF_DAY),

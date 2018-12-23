@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -37,10 +38,19 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
 
     private SimpleRegressionSummary simpleRegressionSummary;
     private Fragment fragment;
+    private int ranking;
+    private AppCompatActivity activity;
 
-    public InsightRecommendationItem(SimpleRegressionSummary simpleRegressionSummary, Fragment fragment) {
+    public InsightRecommendationItem(SimpleRegressionSummary simpleRegressionSummary, int ranking, Fragment fragment) {
         this.simpleRegressionSummary = simpleRegressionSummary;
+        this.ranking = ranking;
         this.fragment = fragment;
+    }
+
+    public InsightRecommendationItem(SimpleRegressionSummary simpleRegressionSummary, int ranking, AppCompatActivity activity) {
+        this.simpleRegressionSummary = simpleRegressionSummary;
+        this.ranking = ranking;
+        this.activity = activity;
     }
 
     @Override
@@ -66,6 +76,8 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
         TextView emptyTextView;
         @BindView(R.id.rv_item_insight_recommendations_item_nonemptyview_relativelayout)
         RelativeLayout nonEmptyLayout;
+        @BindView(R.id.rv_item_insight_recommendations_item_ranking_textview)
+        TextView rankingTextView;
         @BindView(R.id.rv_item_insight_recommendations_item_depvar_imageview)
         ImageView depVarImageView;
         @BindView(R.id.rv_item_insight_recommendations_item_indepvar_imageview)
@@ -109,27 +121,48 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
                 nonEmptyLayout.setVisibility(View.GONE);
                 return;
             }
-
-            formattedTime = new FormattedTime();
-            userGoalRepository = new UserGoalRepository(item.fragment.getActivity().getApplication());
             SimpleRegressionSummary summary = item.simpleRegressionSummary;
-            userGoalViewModel = ViewModelProviders.of(item.fragment).get(UserGoalViewModel.class);
-            userGoalViewModel.getGoal(0).observe(item.fragment, new Observer<UserGoal>() {
-                @Override
-                public void onChanged(UserGoal userGoal) {
-                    if (userGoal != null) {
-                        Log.i(TAG, userGoal.getGoalName() + ", " + userGoal.getGoalType() + ", " + userGoal.getGoal());
-                        Log.i(TAG, summary.getIndepVar() + ", " + summary.getIndepVarType() + ", " + summary.getRecommendedActivityLevel());
-                        if (userGoal.getGoalName().equals(summary.getIndepVar()) &&
-                                userGoal.getGoalType().equals(summary.getIndepVarType())
-                                && userGoal.getGoal().equals(summary.getRecommendedActivityLevel())) {
-                            checkBox.setChecked(true);
-                        } else {
-                            checkBox.setChecked(false);
+            rankingTextView.setText("#" + (item.ranking + 1) + " Factor (");
+            formattedTime = new FormattedTime();
+            if (item.fragment != null) {
+                userGoalRepository = new UserGoalRepository(item.fragment.getActivity().getApplication());
+                userGoalViewModel = ViewModelProviders.of(item.fragment).get(UserGoalViewModel.class);
+                userGoalViewModel.getGoal(0).observe(item.fragment, new Observer<UserGoal>() {
+                    @Override
+                    public void onChanged(UserGoal userGoal) {
+                        if (userGoal != null) {
+                            Log.i(TAG, userGoal.getGoalName() + ", " + userGoal.getGoalType() + ", " + userGoal.getGoal());
+                            Log.i(TAG, summary.getIndepVar() + ", " + summary.getIndepVarType() + ", " + summary.getRecommendedActivityLevel());
+                            if (userGoal.getGoalName().equals(summary.getIndepVar()) &&
+                                    userGoal.getGoalType().equals(summary.getIndepVarType())
+                                    && userGoal.getGoal().equals(summary.getRecommendedActivityLevel())) {
+                                checkBox.setChecked(true);
+                            } else {
+                                checkBox.setChecked(false);
+                            }
                         }
                     }
-                }
-            });
+                });
+            } else {
+                userGoalRepository = new UserGoalRepository(item.activity.getApplication());
+                userGoalViewModel = ViewModelProviders.of(item.activity).get(UserGoalViewModel.class);
+                userGoalViewModel.getGoal(0).observe(item.activity, new Observer<UserGoal>() {
+                    @Override
+                    public void onChanged(UserGoal userGoal) {
+                        if (userGoal != null) {
+                            Log.i(TAG, userGoal.getGoalName() + ", " + userGoal.getGoalType() + ", " + userGoal.getGoal());
+                            Log.i(TAG, summary.getIndepVar() + ", " + summary.getIndepVarType() + ", " + summary.getRecommendedActivityLevel());
+                            if (userGoal.getGoalName().equals(summary.getIndepVar()) &&
+                                    userGoal.getGoalType().equals(summary.getIndepVarType())
+                                    && userGoal.getGoal().equals(summary.getRecommendedActivityLevel())) {
+                                checkBox.setChecked(true);
+                            } else {
+                                checkBox.setChecked(false);
+                            }
+                        }
+                    }
+                });
+            }
             emptyTextView.setVisibility(View.INVISIBLE);
             nonEmptyLayout.setVisibility(View.VISIBLE);
             Long numOfDays = summary.getNumOfData();
@@ -143,27 +176,27 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
 
             if (depVar.equals(itemView.getContext().getString(R.string.mood_camel_case))) {
                 depVarImageView.setImageResource(R.drawable.ic_emotion);
-                depVarTextView.setText("Your mood");
-                depVarDirectionTextView.setText("improves");
+                depVarTextView.setText("Mood");
+                depVarDirectionTextView.setText("is better");
             } else if (depVar.equals(itemView.getContext().getString(R.string.energy_camel_case))) {
                 depVarImageView.setImageResource(R.drawable.ic_emotion);
-                depVarTextView.setText("Your energy");
-                depVarDirectionTextView.setText("improves");
+                depVarTextView.setText("Energy level");
+                depVarDirectionTextView.setText("is higher");
             } else if (depVarType.equals(itemView.getContext().getString(R.string.depression_phq9_camel_case))) {
                 depVarImageView.setImageResource(R.drawable.ic_depression_rain_black);
                 depVarTextView.setText("Depression severity");
-                depVarDirectionTextView.setText("decreases");
+                depVarDirectionTextView.setText("is lower");
             } else if (depVarType.equals(itemView.getContext().getString(R.string.anxiety_gad7_camel_case))) {
                 depVarTextView.setText("Anxiety severity");
-                depVarDirectionTextView.setText("decreases");
+                depVarDirectionTextView.setText("is lower");
                 depVarImageView.setImageResource(R.drawable.ic_anxiety_insomnia_black);
             } else if (depVarType.equals(itemView.getContext().getString(R.string.stress_camel_case))) {
                 depVarTextView.setText("Stress level");
-                depVarDirectionTextView.setText("decreases");
+                depVarDirectionTextView.setText("is lower");
                 depVarImageView.setImageResource(R.drawable.ic_stress);
             } else if (depVarType.equals(itemView.getContext().getString(R.string.daily_review_camel_case))) {
-                depVarTextView.setText("Your day");
-                depVarDirectionTextView.setText("improves");
+                depVarTextView.setText("Daily rating");
+                depVarDirectionTextView.setText("is higher");
                 depVarImageView.setImageResource(R.drawable.ic_review_black);
             }
 
@@ -194,7 +227,7 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
             final String dialogTitle = service;
             indepVarImageView.setImageResource(finalDrawable);
             Double correlation = summary.getCorrelation();
-            correlationTextView.setText(String.format(Locale.US, "%.0f", Math.abs(correlation) * 100) + " %");
+            correlationTextView.setText(String.format(Locale.US, "%.0f", Math.abs(correlation) * 100) + "%");
             String recommendedGoal = "";
             String averageActivityLevel = "";
             final Double recommendedGoalDouble = summary.getRecommendedActivityLevel();
@@ -358,6 +391,10 @@ public class InsightRecommendationItem extends AbstractItem<InsightRecommendatio
                 currentGoalTextView.setText(averageActivityLevel);
                 if (independentVar.contains(itemView.getContext().getString(R.string.phone_usage_total_title))) {
                     indepVarTextView.setText("use phone");
+                }
+                //TODO - get rid of this line later
+                if (independentVar.contains("Tinder")) {
+                    indepVarTextView.setText("Moabi");
                 }
                 if (Double.compare(recommendedGoalDouble, averageActivityLevelDouble) < 0) {
                     recommendedGoalArrowImageView.setImageResource(R.drawable.ic_arrow_downward_black);

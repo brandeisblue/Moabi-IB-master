@@ -1009,6 +1009,8 @@ public class StatsTrackerFragment extends Fragment {
                                         activitiesSet.add("1" + getString(R.string.phone_usage_total_title));
                                         activitySummaryMap.put(getString(R.string.phone_usage_total_title),
                                                 entry.getValue());
+                                    } else if (entry.getKey().equals("Tinder")) {
+
                                     } else {
                                         activitiesSet.add(entry.getKey());
                                         activitySummaryMap.put(entry.getKey(), entry.getValue());

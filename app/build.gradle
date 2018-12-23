@@ -135,9 +135,11 @@ dependencies {
     implementation 'com.github.chrisbanes:PhotoView:2.2.0'
     implementation 'ru.tinkoff.scrollingpagerindicator:scrollingpagerindicator:1.0.6'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
-    implementation ('com.appyvet:materialrangebar:1.4.4') {
+    implementation('com.appyvet:materialrangebar:1.4.4') {
         exclude module: 'support-compat'
     }
+    implementation 'com.mikepenz:iconics-core:3.1.0'
+    implementation 'com.mikepenz:actionitembadge:3.3.2@aar'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'

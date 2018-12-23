@@ -47,11 +47,11 @@
     <string name="no_tracker_in_use_msg">No tracker is in use.</string>
 
     <!-- Cheers Notification Messages -->
-    <string name="cheers_good_morning_msg">Good Morning</string>
-    <string name="cheers_good_afternoon_msg">Good Afternoon</string>
-    <string name="cheers_good_evening_msg">Good Evening</string>
-    <string name="cheers_good_night_msg">Good Night</string>
-    <string name="cheers_recommendations_ready_msg">Your personalized recommendations are ready!</string>
+    <string name="cheers_good_morning_msg">Good morning!</string>
+    <string name="cheers_good_afternoon_msg">Good afternoon!</string>
+    <string name="cheers_good_evening_msg">Good evening!</string>
+    <string name="cheers_good_night_msg">Ready for bed?</string>
+    <string name="cheers_recommendations_ready_msg">Your personalized recommendations are ready.</string>
 
     <!-- Display Titles -->
     <string name="settings_notifications_title">Notifications</string>
@@ -68,7 +68,7 @@
     <string name="worst_day_title">Worst Day</string>
 
     <!-- Fragment Titles -->
-    <string name="fragment_today_title">Today</string>
+    <string name="fragment_today_title">Home</string>
     <string name="fragment_insight_title">Insight</string>
     <string name="fragment_stats_title">Stats</string>
     <string name="fragment_settings_title">Settings</string>
@@ -81,9 +81,7 @@
     <string name="empty_insight_body_title">Not Connected</string>
     <string name="empty_insight_body_body">Connect your favorite apps and services.</string>
     <string name="empty_insight_analysis_title">Not available</string>
-    <string name="empty_insight_analysis_body">The analysis isn\'t ready yet.\n
-        It is yet to find any meaningful connection\n or may need more data.\n\n
-        Check again after a few more daily entries.\nThank you!</string>
+    <string name="empty_insight_analysis_body">Your data isn\'t ready.\nIt is yet to find any meaningful connection\nor may need more data.\n\n\Check again after a few more daily entries.\nThank you!</string>
     <string name="empty_view_survey_button">Surveys</string>
     <string name="empty_view_apps_and_services_button">Services</string>
 
@@ -194,12 +192,14 @@
     <string name="com.ivorybridge.mobai.NOTIFICATION_SHARED_PREFERENCE" translatable="false">NOTIFICATION_SHARED_PREFERENCE</string>
     <string name="com.ivorybridge.mobai.TODAY_FRAG_SHARED_PREFERENCE" translatable="false">TODAY_FRAG_SHARED_PREFERENCE</string>
     <string name="com.ivorybridge.mobai.LAST_ACCESSED_FRAGMENT_IN_MAIN_ACTIVITY_SHARED_PREFERENCE_KEY" translatabe="false">LAST_ACCESSED_FRAGMENT_IN_MAIN_ACTIVITY_SHARED_PREFERENCE_KEY</string>
+    <string name="com.ivorybridge.moabi.DAILY_BRIEFING_SHARED_PREFERENCE_KEY" translatable="false">DAILY_BRIEFING_SHARED_PREFERENCE</string>
 
     <!-- Notification channels -->
     <string name="CHRONOMETER_NOTIF_CHANNEL_ID">CHRONOMETER_NOTIF_CHANNEL_ID</string>
     <string name="USER_GOAL_NOTIF_CHANNEL_ID">USER_GOAL_NOTIF_CHANNEL_ID</string>
     <string name="MOTION_SENSOR_NOTIF_CHANNEL_ID">MOTION_SENSOR_NOTIF_CHANNEL_ID</string>
     <string name="CHECK_IN_NOTIF_CHANNEL_ID">CHECK_IN_NOTIF_CHANNEL_ID</string>
+    <string name="NEW_RECOMMENDATIONS_NOTIF_ID">NEW_RECOMMENDATIONS_NOTIF_CHANNEL_ID</string>
     <string name="FIREBASE_ENGAGMENT_NOTIF_CHANNEL_ID">FB_ENGAGEMENT_NOTIF_CHANNEL_ID</string>
 
     <!-- Preference -->
@@ -226,7 +226,7 @@
     <string name="preference_cheers_notification_title">Cheers Notification</string>
     <string name="preference_daily_check_in_notification_title">Daily Check-In Notification</string>
     <string name="preference_check_in_time_title">Notification Time</string>
-    <string name="preference_new_recommendations_notification_title">Recommendations Notification</string>
+    <string name="preference_new_recommendations_notification_title">Daily Briefing Notification</string>
     <string name="preference_new_recommendations_time_title">Notification Time</string>
     <string name="preference_about_title">About</string>
     <string name="preference_support_title">Support</string>
@@ -285,7 +285,7 @@
     <string name="insight_top1_title">Top 1 Factors</string>
     <string name="insight_top2_title">Top 2 Factors</string>
     <string name="insight_top3_title">Top 3 Factors</string>
-    <string name="correlation">\u0020related</string>
+    <string name="correlation">\u0020related)</string>
     <string name="recommendation_prompt">Recommended:\u0020</string>
     <string name="recommendation_camel_case">recommendation</string>
     <string name="survey_camel_case">survey</string>
@@ -492,5 +492,11 @@
 
     <!-- Check-in Notification -->
     <string name="notif_check_in_title">How are you?</string>
-    <string name="notif_check_in_description">Check-in to record your day.</string>
+    <string name="notif_check_in_description">Let\'s record your day.</string>
+
+    <!-- Daily Briefing -->
+    <string name="activity_daily_briefing_title">Daily Briefing</string>
+    <string name="activity_daily_briefing_camel_Case">dailyBriefing</string>
+    <string name="activity_daily_briefing_recommendations_ready_msg">Here are recommendations to improve your day.</string>
+
 </resources>

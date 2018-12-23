@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_marginStart="8dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:id="@+id/spinner_item_with_icon_linearlayout"
     android:layout_height="36dp"
     >
 
     <ImageView
-        android:id="@+id/spinner_item_with_icon_imageview"
+        android:id="@+id/spinner_item_with_icon_no_margin_imageview"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginStart="8dp"
         app:srcCompat="@drawable/ic_fitbit_logo" />
 
     <TextView
-        android:id="@+id/spinner_item_with_icon_textview"
+        android:id="@+id/spinner_item_with_icon_no_margin_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
         android:gravity="center_vertical"
         android:textSize="14sp"
         android:paddingLeft="8dp"

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.activity.DailyBriefingActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/activity_daily_briefing_appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/activity_daily_briefing_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            app:layout_collapseMode="pin"
+            app:titleTextAppearance="@style/CollapsedAppBar"></androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Daily Insights"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+             />
+
+        <Spinner
+            android:id="@+id/activity_daily_briefing_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:minHeight="36dp"></Spinner>
+
+        <TextView
+            android:id="@+id/activity_daily_briefing_greetings_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:text="Good morning, Sung kyu."/>
+
+        <TextView
+            android:id="@+id/activity_daily_briefing_explanation_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:text="Here are recommendations to improve your day."/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/activity_daily_briefing_recommendation_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_marginTop="16dp"
+            android:layout_height="wrap_content"></androidx.recyclerview.widget.RecyclerView>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

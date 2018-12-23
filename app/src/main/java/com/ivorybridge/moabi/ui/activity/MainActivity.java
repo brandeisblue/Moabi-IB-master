@@ -28,7 +28,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.ivorybridge.moabi.R;
-import com.ivorybridge.moabi.database.entity.util.DataInUseMediatorLiveData;
 import com.ivorybridge.moabi.repository.AsyncCallsMasterRepository;
 import com.ivorybridge.moabi.service.MotionSensorService;
 import com.ivorybridge.moabi.ui.adapter.FragmentAdapter;
@@ -263,13 +262,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        DataInUseMediatorLiveData dataInUseMediatorLiveData = new DataInUseMediatorLiveData(
-                dataInUseViewModel.getAllInputsInUse(), dataInUseViewModel.getAllConnectedServices());
+        //startService(new Intent(this, DailyBriefingNotifService.class));
         SharedPreferences notificationSharedPreferences = getSharedPreferences(
                 getString(R.string.com_ivorybridge_mobai_NOTIFICATION_SHARED_PREFERENCE),
                 Context.MODE_PRIVATE);
         SharedPreferences.Editor notificationSPEditor = notificationSharedPreferences.edit();
         /*
+        DataInUseMediatorLiveData dataInUseMediatorLiveData = new DataInUseMediatorLiveData(
+                dataInUseViewModel.getAllInputsInUse(), dataInUseViewModel.getAllConnectedServices());
         dataInUseMediatorLiveData.observe(this, new Observer<Pair<List<InputInUse>, List<ConnectedService>>>() {
             @Override
             public void onChanged(Pair<List<InputInUse>, List<ConnectedService>> listListPair) {
@@ -459,8 +459,10 @@ public class MainActivity extends AppCompatActivity {
             }
             if (intent.getStringExtra("redirected_from") != null &&
                     intent.getStringExtra("redirected_from").equals("insight_notif")) {
+                Log.i(TAG, "redirected from insight notif");
                 currentFragment = 1;
             }
+            Log.i(TAG, "current fragment - " + currentFragment);
             todayFragment.setArguments(bundle);
             InsightFragment insightFragment = new InsightFragment();
             StatsFragment statsFragment = new StatsFragment();

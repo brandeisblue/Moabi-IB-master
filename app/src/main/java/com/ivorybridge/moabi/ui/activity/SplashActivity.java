@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.auth.FirebaseAuth;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.entity.baactivity.BAActivityFavorited;
@@ -26,8 +25,9 @@ import com.ivorybridge.moabi.service.DailyReviewInsightCalculatorJob;
 import com.ivorybridge.moabi.service.DepressionInsightCalculatorJob;
 import com.ivorybridge.moabi.service.MoodAndEnergyInsightCalculatorDailyJob;
 import com.ivorybridge.moabi.service.MoodAndEnergyInsightCalculatorJob;
-import com.ivorybridge.moabi.service.MotionSensorEndofDayDailyJob;
+import com.ivorybridge.moabi.service.MotionSensorEndofDayUpdateDailyJob;
 import com.ivorybridge.moabi.service.MotionSensorResetDailyJob;
+import com.ivorybridge.moabi.service.MotionSensorUpdateJob;
 import com.ivorybridge.moabi.service.StressInsightCalculatorDailyJob;
 import com.ivorybridge.moabi.service.StressInsightCalculatorJob;
 import com.ivorybridge.moabi.util.FormattedTime;
@@ -38,7 +38,6 @@ import java.util.UUID;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
@@ -80,8 +79,9 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         mAuth = FirebaseAuth.getInstance();
-        MotionSensorEndofDayDailyJob.scheduleJob();
+        MotionSensorEndofDayUpdateDailyJob.scheduleJob();
         MotionSensorResetDailyJob.scheduleJob();
+        MotionSensorUpdateJob.scheduleJob();
         MoodAndEnergyInsightCalculatorDailyJob.scheduleJob();
         MoodAndEnergyInsightCalculatorJob.scheduleJob();
         BodyInsightCalculatorDailyJob.scheduleJob();
@@ -181,6 +181,7 @@ public class SplashActivity extends AppCompatActivity {
                     builtInProfile.setWeight(70d);
                     builtInProfile.setUniqueID(UUID.randomUUID().toString());
                     builtInFitnessRepository.insert(builtInProfile);
+                    activityViewModel.initializeFavoritedActivities();
                     //builtInProfile.setId();
                     final Intent i = new Intent(SplashActivity.this, MainActivity.class);
                     i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

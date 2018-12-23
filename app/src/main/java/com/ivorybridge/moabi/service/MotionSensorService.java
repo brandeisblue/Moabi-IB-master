@@ -119,6 +119,11 @@ public class MotionSensorService extends Service implements SensorEventListener 
         }
         fitbitRepository = new FitbitRepository(getApplication());
         googleFitRepository = new GoogleFitRepository(getApplication());
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Handler handler = new Handler();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -151,16 +156,6 @@ public class MotionSensorService extends Service implements SensorEventListener 
                     builtInProfile.setUniqueID(UUID.randomUUID().toString());
                     builtInFitnessRepository.insert(builtInProfile);
                 }
-            }
-        }).start();
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Handler handler = new Handler();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
                 unit = unitSharedPreferences.getString(getString(R.string.com_ivorybridge_mobai_UNIT_KEY), getString(R.string.preference_unit_si_title));
                 dataSource = notificationSharedPreferences.getString(getString(R.string.preference_fitness_tracker_source_notification),
                         getString(R.string.moabi_tracker_title));
@@ -238,6 +233,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
             }
             builder.setSmallIcon(R.drawable.ic_monogram_white)
                     .setContentTitle(measure)
+                    .setContentText(null)
                     //.setContentText("Today: " + String.format(Locale.US, "%.2f", distance / 1000) + " km, " + TimeUnit.MILLISECONDS.toMinutes(activeMins) + " mins, " + TimeUnit.MILLISECONDS.toMinutes(sedentaryMins) + " mins, " + calories + " Cal")
                     .setColor(getColor(R.color.colorPrimary))
                     .setOngoing(true)
@@ -290,13 +286,13 @@ public class MotionSensorService extends Service implements SensorEventListener 
                         } else if (mainMeasure.equals(getString(R.string.activity_sedentary_minutes_title))) {
                             for (GoogleFitSummary.Summary summary : todaySummarySummaries) {
                                 if (summary.getName().equals(getString(R.string.activity_sedentary_minutes_camel_case))) {
-                                    gFitMeasure = getString(R.string.activity_sedentary_minutes_camel_case) + ": " + TimeUnit.MILLISECONDS.toMinutes(summary.getValue().longValue()) + " " + getString(R.string.unit_time_sing);
+                                    gFitMeasure = getString(R.string.activity_sedentary_minutes_title) + ": " + TimeUnit.MILLISECONDS.toMinutes(summary.getValue().longValue()) + " " + getString(R.string.unit_time_sing);
                                 }
                             }
                         } else if (mainMeasure.equals(getString(R.string.activity_calories_title))) {
                             for (GoogleFitSummary.Summary summary : todaySummarySummaries) {
                                 if (summary.getName().equals(getString(R.string.activity_calories_camel_case))) {
-                                    gFitMeasure = getString(R.string.activity_calories_camel_case) + ": " + String.format(Locale.US, "%.0f", summary.getValue()) + " " + getString(R.string.unit_calories);
+                                    gFitMeasure = getString(R.string.activity_calories_title) + ": " + String.format(Locale.US, "%.0f", summary.getValue()) + " " + getString(R.string.unit_calories);
                                 }
                             }
                         }
@@ -337,9 +333,9 @@ public class MotionSensorService extends Service implements SensorEventListener 
                         } else if (mainMeasure.equals(getString(R.string.activity_active_minutes_title))) {
                             gFitMeasure = getString(R.string.activity_active_minutes_title) + ": " + 0 + " " + getString(R.string.unit_time_sing);
                         } else if (mainMeasure.equals(getString(R.string.activity_sedentary_minutes_title))) {
-                            gFitMeasure = getString(R.string.activity_sedentary_minutes_camel_case) + ": " + 0 + " " + getString(R.string.unit_time_sing);
+                            gFitMeasure = getString(R.string.activity_sedentary_minutes_title) + ": " + 0 + " " + getString(R.string.unit_time_sing);
                         } else if (mainMeasure.equals(getString(R.string.activity_calories_title))) {
-                            gFitMeasure = getString(R.string.activity_calories_camel_case) + ": " + 0 + " " + getString(R.string.unit_calories);
+                            gFitMeasure = getString(R.string.activity_calories_title) + ": " + 0 + " " + getString(R.string.unit_calories);
                         }
                         final String s = gFitMeasure;
                         handler.post(new Runnable() {
@@ -543,7 +539,6 @@ public class MotionSensorService extends Service implements SensorEventListener 
             @Override
             public void run() {
                 activitySummary = builtInFitnessRepository.getNow(formattedTime.getCurrentDateAsYYYYMMDD());
-
                 if (activitySummary == null) {
                     activitySummary = new BuiltInActivitySummary();
                     activitySummary.setDate(formattedTime.getCurrentDateAsYYYYMMDD());

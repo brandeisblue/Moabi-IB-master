@@ -3,7 +3,7 @@ package com.ivorybridge.moabi.service;
 import android.app.Application;
 import android.content.Intent;
 
-import com.evernote.android.job.DailyJob;
+import com.evernote.android.job.Job;
 import com.evernote.android.job.JobRequest;
 import com.google.firebase.auth.FirebaseAuth;
 import com.ivorybridge.moabi.R;
@@ -22,20 +22,20 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 
-public class MotionSensorEndofDayDailyJob extends DailyJob {
+public class MotionSensorUpdateJob extends Job {
 
-    public static final String TAG = "motion_sensor_end_of_daydaily_job";
+    public static final String TAG = "motion_sensor_update_job";
     private Application application;
     private FirebaseManager firebaseManager;
     private FormattedTime formattedTime;
 
-    public MotionSensorEndofDayDailyJob(Application application) {
+    public MotionSensorUpdateJob(Application application) {
         this.application = application;
     }
 
     @NonNull
     @Override
-    protected DailyJobResult onRunDailyJob(@NonNull Params params) {
+    protected Result onRunJob(@NonNull Params params) {
         formattedTime = new FormattedTime();
         new Thread(new Runnable() {
             @Override
@@ -113,15 +113,19 @@ public class MotionSensorEndofDayDailyJob extends DailyJob {
                         }
                     }
                 }
-                application.stopService(new Intent(application, MotionSensorService.class));
                 application.startService(new Intent(application, MotionSensorService.class));
             }
         }).start();
-        return DailyJobResult.SUCCESS;
+        return Result.SUCCESS;
     }
 
     public static void scheduleJob() {
-        DailyJob.schedule(new JobRequest.Builder(TAG), TimeUnit.HOURS.toMillis(23)+TimeUnit.MINUTES.toMillis(55)+TimeUnit.SECONDS.toMillis(0),
-                TimeUnit.HOURS.toMillis(23)+TimeUnit.MINUTES.toMillis(59)+TimeUnit.SECONDS.toMillis(0));
+        new JobRequest.Builder(MoodAndEnergyInsightCalculatorJob.TAG)
+                .setPeriodic(TimeUnit.MINUTES.toMillis(15), TimeUnit.MINUTES.toMillis(5))
+                //.setRequiresDeviceIdle(true)
+                .setUpdateCurrent(true)
+                //.setRequirementsEnforced(true)
+                .build()
+                .schedule();
     }
 }

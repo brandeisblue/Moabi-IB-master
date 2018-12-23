@@ -77,7 +77,6 @@ public class MotionSensorResetDailyJob extends DailyJob {
                         }
                     }
                 }
-                application.stopService(new Intent(application, MotionSensorService.class));
                 application.startService(new Intent(application, MotionSensorService.class));
             }
         }).start();

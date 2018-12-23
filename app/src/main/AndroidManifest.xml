@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
@@ -28,7 +27,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/WhiteBlackAndBlueAppTheme">
-
         <service
             android:name=".service.CheckInService"
             android:exported="false" />
@@ -40,19 +38,25 @@
             android:exported="false" />
         <service
             android:name=".service.MotionSensorService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
         <service android:name=".service.FBMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <service
+            android:name=".service.DailyBriefingNotifService"
+            android:exported="false" />
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_logo_monogram_colored" />
-        <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
-             notification message. See README(https://goo.gl/6BKBk7) for more. -->
+        <!--
+             Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more.
+        -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorPrimary" />
@@ -67,11 +71,12 @@
             android:label="RestartServiceWhenStopped">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
 
-        <!--android:description="Background service for timer."-->
+        <!-- android:description="Background service for timer." -->
         <activity
             android:name=".ui.activity.IntroActivity"
             android:screenOrientation="portrait" />
@@ -81,6 +86,7 @@
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -109,8 +115,10 @@
             tools:node="replace">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
                     android:host="logincallback/fitbit"
                     android:scheme="moabi" />
@@ -136,6 +144,10 @@
             android:name=".ui.activity.TimerActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|stateHidden" />
+        <activity
+            android:name=".ui.activity.DailyBriefingActivity"
+            android:parentActivityName=".ui.activity.MainActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

@@ -43,18 +43,18 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.refactor.library.SmoothCheckBox;
 
-public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, InsightTopThreeItem.ViewHolder> {
+public class InsightNewTopThreeItem extends AbstractItem<InsightNewTopThreeItem, InsightNewTopThreeItem.ViewHolder> {
 
-    private static final String TAG = InsightTopThreeItem.class.getSimpleName();
+    private static final String TAG = InsightNewTopThreeItem.class.getSimpleName();
     private List<SimpleRegressionSummary> data;
     private String insightType;
     private Fragment fragment;
     private Activity activity;
 
-    public InsightTopThreeItem() {
+    public InsightNewTopThreeItem() {
     }
 
-    public InsightTopThreeItem(Fragment fragment, Activity activity, String insightType, List<SimpleRegressionSummary> data) {
+    public InsightNewTopThreeItem(Fragment fragment, Activity activity, String insightType, List<SimpleRegressionSummary> data) {
         this.fragment = fragment;
         this.insightType = insightType;
         this.data = data;
@@ -64,78 +64,78 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
 
     @Override
     public int getType() {
-        return R.id.insight_topthree_item;
+        return R.id.insight_new_topthree_item;
     }
 
     @Override
     public int getLayoutRes() {
-        return R.layout.rv_item_insight_topthree_item;
+        return R.layout.rv_item_insight_new_topthree_item;
     }
 
     @NonNull
     @Override
-    public InsightTopThreeItem.ViewHolder getViewHolder(View v) {
-        return new InsightTopThreeItem.ViewHolder(v);
+    public InsightNewTopThreeItem.ViewHolder getViewHolder(View v) {
+        return new InsightNewTopThreeItem.ViewHolder(v);
     }
 
     // Manually create the ViewHolder class
-    protected static class ViewHolder extends FastAdapter.ViewHolder<InsightTopThreeItem> {
+    protected static class ViewHolder extends FastAdapter.ViewHolder<InsightNewTopThreeItem> {
 
-        @BindView(R.id.rv_item_insight_topthree_item_title_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_title_textview)
         TextView titleTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top1_imageview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top1_imageview)
         ImageView top1ImageView;
-        @BindView(R.id.rv_item_insight_topthree_item_top1_average_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top1_average_textview)
         TextView top1AvgTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top1_average_name_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top1_average_name_textview)
         TextView top1AvgNameTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top1_average_proposition_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top1_average_proposition_textview)
         TextView top1AvgPropTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top1_layout)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top1_layout)
         RelativeLayout top1Layout;
-        @BindView(R.id.rv_item_insight_topthree_item_top1_recommendation_prompt_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top1_recommendation_prompt_textview)
         TextView top1RecPromptTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top1_recommendation_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top1_recommendation_textview)
         TextView top1RecTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top1_recommendation_arrow_imageview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top1_recommendation_arrow_imageview)
         ImageView top1ArrowImageView;
-        @BindView(R.id.rv_item_insight_topthree_item_top1_recommendation_checkbox)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top1_recommendation_checkbox)
         SmoothCheckBox top1CheckBox;
-        @BindView(R.id.rv_item_insight_topthree_item_top2_imageview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top2_imageview)
         ImageView top2ImageView;
-        @BindView(R.id.rv_item_insight_topthree_item_top2_average_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top2_average_textview)
         TextView top2AvgTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top2_average_name_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top2_average_name_textview)
         TextView top2AvgNameTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top2_average_proposition_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top2_average_proposition_textview)
         TextView top2AvgPropTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top2_layout)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top2_layout)
         RelativeLayout top2Layout;
-        @BindView(R.id.rv_item_insight_topthree_item_top2_recommendation_prompt_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top2_recommendation_prompt_textview)
         TextView top2RecPromptTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top2_recommendation_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top2_recommendation_textview)
         TextView top2RecTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top2_recommendation_arrow_imageview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top2_recommendation_arrow_imageview)
         ImageView top2ArrowImageView;
-        @BindView(R.id.rv_item_insight_topthree_item_top2_recommendation_checkbox)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top2_recommendation_checkbox)
         SmoothCheckBox top2CheckBox;
-        @BindView(R.id.rv_item_insight_topthree_item_top3_imageview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top3_imageview)
         ImageView top3ImageView;
-        @BindView(R.id.rv_item_insight_topthree_item_top3_average_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top3_average_textview)
         TextView top3AvgTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top3_average_name_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top3_average_name_textview)
         TextView top3AvgNameTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top3_average_proposition_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top3_average_proposition_textview)
         TextView top3AvgPropTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top3_layout)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top3_layout)
         RelativeLayout top3Layout;
-        @BindView(R.id.rv_item_insight_topthree_item_top3_recommendation_prompt_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top3_recommendation_prompt_textview)
         TextView top3RecPromptTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top3_recommendation_textview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top3_recommendation_textview)
         TextView top3RecTextView;
-        @BindView(R.id.rv_item_insight_topthree_item_top3_recommendation_arrow_imageview)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top3_recommendation_arrow_imageview)
         ImageView top3ArrowImageView;
-        @BindView(R.id.rv_item_insight_topthree_item_top3_recommendation_checkbox)
+        @BindView(R.id.rv_item_insight_new_topthree_item_top3_recommendation_checkbox)
         SmoothCheckBox top3CheckBox;
         private UserGoalRepository userGoalRepository;
         private FormattedTime formattedTime;
@@ -151,7 +151,7 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
         }
 
         @Override
-        public void bindView(final InsightTopThreeItem item, List<Object> payloads) {
+        public void bindView(final InsightNewTopThreeItem item, List<Object> payloads) {
             unitSharedPreferences = itemView.getContext().getSharedPreferences(
                     itemView.getContext().getString(
                             R.string.com_ivorybridge_moabi_UNIT_SHARED_PREFERENCE_KEY),
@@ -225,9 +225,6 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
                     //top1ImageView.setImageResource(R.drawable.ic_appusage);
                     if (summary.getIndepVar().equals(itemView.getContext().getString(R.string.phone_usage_total_title))) {
                         indepVarAction = "Using phone";
-                    } else if (summary.getIndepVar().equals("Tinder")) {
-                        //TODO - remove this eventually
-                        indepVarAction = "Using Moabi";
                     } else {
                         indepVarAction = "Using " + summary.getIndepVar();
                     }
@@ -455,73 +452,75 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
                                 }
                             });
                         } else {
-                            TapTargetView.showFor(item.activity, TapTarget.forView(itemView.getRootView().findViewById(R.id.rv_item_insight_topthree_item_top1_layout),
-                                    itemView.getContext().getString(R.string.tutorial_insight_title),
-                                    "")
-                                            .outerCircleColor(R.color.colorPrimary)
-                                            .outerCircleAlpha(0.7f)
-                                            .targetCircleColor(R.color.white)
-                                            .titleTextSize(16)
-                                            //.titleTextColor(R.color.colorPrimary)      // Specify the color of the title text
-                                            .descriptionTextSize(16)            // Specify the size (in sp) of the description text
-                                            //.descriptionTextColor(R.color.white)  // Specify the color of the description text
-                                            .textColor(R.color.white)
-                                            .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
-                                            .dimColor(R.color.black)            // If set, will dim behind the view with 30% opacity of the given color
-                                            .drawShadow(true)                   // Whether to draw a drop shadow or not
-                                            .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
-                                            .tintTarget(false)                   // Whether to tint the target view's color
-                                            .transparentTarget(true)          // Specify whether the target is transparent (displays the content underneath)
-                                            //.icon(ContextCompat.getDrawable(this, R.drawable.bg_rectangle_rounded_white))           // Specify a custom drawable to draw as the target
-                                            .targetRadius(72),                  // Specify the target radius (in dp)
-                                    new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
-                                        @Override
-                                        public void onTargetClick(TapTargetView view) {
-                                            super.onTargetClick(view);      // This call is optional
-                                            Log.i(TAG, "Top 1 layout clicked");
-                                            new MaterialDialog.Builder(itemView.getContext())
-                                                    .title(indepVarTypeName)
-                                                    .content("Do you want to track the recommendation?")
-                                                    .positiveText("Yes")
-                                                    .negativeText("No")
-                                                    .limitIconToDefaultSize()
-                                                    .iconRes(finalDrawable)
-                                                    .stackingBehavior(StackingBehavior.ADAPTIVE)
-                                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                                        @Override
-                                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                            e.putBoolean("tut_insight_complete", true);
-                                                            e.commit();
-                                                            userGoalSPEditor.putString("inputType", summary.getIndepVarType());
-                                                            userGoalSPEditor.putString("activityName", summary.getIndepVar());
-                                                            userGoalSPEditor.commit();
-                                                            UserGoal userGoal = new UserGoal();
-                                                            userGoal.setGoalName(summary.getIndepVar());
-                                                            userGoal.setGoalType(summary.getIndepVarType());
-                                                            userGoal.setPriority(0);
-                                                            userGoal.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
-                                                            userGoal.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
-                                                            userGoal.setGoal(summary.getRecommendedActivityLevel());
-                                                            userGoalRepository.insert(userGoal);
-                                                            UserGoalJob.runJobImmediately();
-                                                            UserGoalPeriodicJob.schedulePeriodicJob();
-                                                            dialog.dismiss();
-                                                        }
-                                                    })
-                                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                                        @Override
-                                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                            dialog.dismiss();
-                                                        }
-                                                    })
-                                                    .show();
-                                        }
-                                    });
+                            if (!tutInsightComplete && item.fragment instanceof InsightMindFragment) {
+                                TapTargetView.showFor(item.activity, TapTarget.forView(itemView.getRootView().findViewById(R.id.rv_item_insight_new_topthree_item_top1_layout),
+                                        itemView.getContext().getString(R.string.tutorial_insight_title),
+                                        "")
+                                                .outerCircleColor(R.color.colorPrimary)
+                                                .outerCircleAlpha(0.7f)
+                                                .targetCircleColor(R.color.white)
+                                                .titleTextSize(16)
+                                                //.titleTextColor(R.color.colorPrimary)      // Specify the color of the title text
+                                                .descriptionTextSize(16)            // Specify the size (in sp) of the description text
+                                                //.descriptionTextColor(R.color.white)  // Specify the color of the description text
+                                                .textColor(R.color.white)
+                                                .textTypeface(Typeface.SANS_SERIF)  // Specify a typeface for the text
+                                                .dimColor(R.color.black)            // If set, will dim behind the view with 30% opacity of the given color
+                                                .drawShadow(true)                   // Whether to draw a drop shadow or not
+                                                .cancelable(false)                  // Whether tapping outside the outer circle dismisses the view
+                                                .tintTarget(false)                   // Whether to tint the target view's color
+                                                .transparentTarget(true)          // Specify whether the target is transparent (displays the content underneath)
+                                                //.icon(ContextCompat.getDrawable(this, R.drawable.bg_rectangle_rounded_white))           // Specify a custom drawable to draw as the target
+                                                .targetRadius(72),                  // Specify the target radius (in dp)
+                                        new TapTargetView.Listener() {          // The listener can listen for regular clicks, long clicks or cancels
+                                            @Override
+                                            public void onTargetClick(TapTargetView view) {
+                                                super.onTargetClick(view);      // This call is optional
+                                                Log.i(TAG, "Top 1 layout clicked");
+                                                new MaterialDialog.Builder(itemView.getContext())
+                                                        .title(indepVarTypeName)
+                                                        .content("Do you want to track the recommendation?")
+                                                        .positiveText("Yes")
+                                                        .negativeText("No")
+                                                        .limitIconToDefaultSize()
+                                                        .iconRes(finalDrawable)
+                                                        .stackingBehavior(StackingBehavior.ADAPTIVE)
+                                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                                            @Override
+                                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                                e.putBoolean("tut_insight_complete", true);
+                                                                e.commit();
+                                                                userGoalSPEditor.putString("inputType", summary.getIndepVarType());
+                                                                userGoalSPEditor.putString("activityName", summary.getIndepVar());
+                                                                userGoalSPEditor.commit();
+                                                                UserGoal userGoal = new UserGoal();
+                                                                userGoal.setGoalName(summary.getIndepVar());
+                                                                userGoal.setGoalType(summary.getIndepVarType());
+                                                                userGoal.setPriority(0);
+                                                                userGoal.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                                                                userGoal.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                                                                userGoal.setGoal(summary.getRecommendedActivityLevel());
+                                                                userGoalRepository.insert(userGoal);
+                                                                UserGoalJob.runJobImmediately();
+                                                                UserGoalPeriodicJob.schedulePeriodicJob();
+                                                                dialog.dismiss();
+                                                            }
+                                                        })
+                                                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                                            @Override
+                                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                                dialog.dismiss();
+                                                            }
+                                                        })
+                                                        .show();
+                                            }
+                                        });
+                            }
                         }
                     }
                 });
                 if (!tutInsightComplete && item.fragment instanceof InsightMindFragment) {
-                    TapTargetView.showFor(item.activity, TapTarget.forView(itemView.getRootView().findViewById(R.id.rv_item_insight_topthree_item_top1_layout),
+                    TapTargetView.showFor(item.activity, TapTarget.forView(itemView.getRootView().findViewById(R.id.rv_item_insight_new_topthree_item_top1_layout),
                             itemView.getContext().getString(R.string.tutorial_insight_title),
                             "")
                                     .outerCircleColor(R.color.colorPrimary)
@@ -712,10 +711,7 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
                         //top1ImageView.setImageResource(R.drawable.ic_appusage);
                         if (summary.getIndepVar().equals(itemView.getContext().getString(R.string.phone_usage_total_title))) {
                             indepVarAction = "Using phone";
-                        }  else if (summary.getIndepVar().equals("Tinder")) {
-                            //TODO - remove this eventually
-                            indepVarAction = "Using Moabi";
-                        }  else {
+                        } else {
                             indepVarAction = "Using " + summary.getIndepVar();
                         }
                         avgProposition = " for ";
@@ -943,7 +939,7 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
                                         }
                                     });
                                 } else {
-                                    TapTargetView.showFor(item.activity, TapTarget.forView(itemView.getRootView().findViewById(R.id.rv_item_insight_topthree_item_top1_layout),
+                                    TapTargetView.showFor(item.activity, TapTarget.forView(itemView.getRootView().findViewById(R.id.rv_item_insight_new_topthree_item_top1_layout),
                                             itemView.getContext().getString(R.string.tutorial_insight_title),
                                             "")
                                                     .outerCircleColor(R.color.colorPrimary)
@@ -1009,7 +1005,7 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
                             }
                         });
                         if (!tutInsightComplete && item.fragment instanceof InsightMindFragment) {
-                            TapTargetView.showFor(item.activity, TapTarget.forView(itemView.getRootView().findViewById(R.id.rv_item_insight_topthree_item_top1_layout),
+                            TapTargetView.showFor(item.activity, TapTarget.forView(itemView.getRootView().findViewById(R.id.rv_item_insight_new_topthree_item_top1_layout),
                                     itemView.getContext().getString(R.string.tutorial_insight_title),
                                     "")
                                             .outerCircleColor(R.color.colorPrimary)
@@ -1267,9 +1263,6 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
                         //top1ImageView.setImageResource(R.drawable.ic_appusage);
                         if (summary.getIndepVar().equals(itemView.getContext().getString(R.string.phone_usage_total_title))) {
                             indepVarAction = "Using phone";
-                        }  else if (summary.getIndepVar().equals("Tinder")) {
-                            //TODO - remove this eventually
-                            indepVarAction = "Using Moabi";
                         } else {
                             indepVarAction = "Using " + summary.getIndepVar();
                         }
@@ -1498,7 +1491,7 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
                                         }
                                     });
                                 } else {
-                                    TapTargetView.showFor(item.activity, TapTarget.forView(itemView.getRootView().findViewById(R.id.rv_item_insight_topthree_item_top1_layout),
+                                    TapTargetView.showFor(item.activity, TapTarget.forView(itemView.getRootView().findViewById(R.id.rv_item_insight_new_topthree_item_top1_layout),
                                             itemView.getContext().getString(R.string.tutorial_insight_title),
                                             "")
                                                     .outerCircleColor(R.color.colorPrimary)
@@ -1564,7 +1557,7 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
                             }
                         });
                         if (!tutInsightComplete && item.fragment instanceof InsightMindFragment) {
-                            TapTargetView.showFor(item.activity, TapTarget.forView(itemView.getRootView().findViewById(R.id.rv_item_insight_topthree_item_top1_layout),
+                            TapTargetView.showFor(item.activity, TapTarget.forView(itemView.getRootView().findViewById(R.id.rv_item_insight_new_topthree_item_top1_layout),
                                     itemView.getContext().getString(R.string.tutorial_insight_title),
                                     "")
                                             .outerCircleColor(R.color.colorPrimary)
@@ -1801,7 +1794,7 @@ public class InsightTopThreeItem extends AbstractItem<InsightTopThreeItem, Insig
         }
 
         @Override
-        public void unbindView(InsightTopThreeItem item) {
+        public void unbindView(InsightNewTopThreeItem item) {
         }
     }
 }

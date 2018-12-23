@@ -12,20 +12,20 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 
-public class InsightDailySummaryNotifDailyJob extends DailyJob {
+public class DailyBriefingNotifDailyJob extends DailyJob {
 
     public static final String TAG = "insight_notif_daily_job";
     private Application application;
     private static int jobId;
 
-    public InsightDailySummaryNotifDailyJob(Application application) {
+    public DailyBriefingNotifDailyJob(Application application) {
         this.application = application;
     }
 
     @NonNull
     @Override
     protected DailyJobResult onRunDailyJob(@NonNull Job.Params params) {
-        Intent serviceIntent = new Intent(application, InsightDailySummaryNotifService.class);
+        Intent serviceIntent = new Intent(application, DailyBriefingNotifService.class);
         application.startService(serviceIntent);
         return DailyJobResult.SUCCESS;
     }

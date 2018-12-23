@@ -513,6 +513,9 @@ public class InsightBodyFragment extends Fragment {
                                 if ((TimeUnit.MILLISECONDS.toMinutes(entry.getValue()) / numDays) > 5) {
                                     if (entry.getKey().equals(getString(R.string.phone_usage_total_title))) {
                                         apps.add("0" + getString(R.string.phone_usage_total_title));
+                                        // TODO - remove this eventually
+                                    } else if (entry.getKey().equals("Tinder")) {
+                                        //apps.add(entry.getKey());
                                     } else {
                                         apps.add(entry.getKey());
                                     }
@@ -693,7 +696,7 @@ public class InsightBodyFragment extends Fragment {
                 getString(R.string.com_ivorybridge_moabi_UNIT_SHARED_PREFERENCE_KEY),
                 Context.MODE_PRIVATE);
         String unit = unitSharedPreferences.getString(getContext()
-                .getString(R.string.com_ivorybridge_mobai_UNIT_KEY),
+                        .getString(R.string.com_ivorybridge_mobai_UNIT_KEY),
                 getContext().getString(R.string.preference_unit_si_title));
         if (inputType.equals(FITBIT)) {
             Handler handler = new Handler();
@@ -825,8 +828,7 @@ public class InsightBodyFragment extends Fragment {
                             } else {
                                 if (entry.getValue() < lowest) {
                                     lowest = entry.getValue();
-                                }
-                                else if (entry.getValue() > highest) {
+                                } else if (entry.getValue() > highest) {
                                     highest = entry.getValue();
                                 }
                             }
@@ -860,7 +862,7 @@ public class InsightBodyFragment extends Fragment {
                                 bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                 if (sortedList.size() > 0) {
                                     if (getActivity() != null) {
-                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(),getString(R.string.mood_camel_case), sortedList));
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(), getString(R.string.mood_camel_case), sortedList));
                                     }
                                 }
                             }
@@ -1002,8 +1004,7 @@ public class InsightBodyFragment extends Fragment {
                             } else {
                                 if (entry.getValue() < lowest) {
                                     lowest = entry.getValue();
-                                }
-                                else if (entry.getValue() > highest) {
+                                } else if (entry.getValue() > highest) {
                                     highest = entry.getValue();
                                 }
                             }
@@ -1037,7 +1038,7 @@ public class InsightBodyFragment extends Fragment {
                                 bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                 if (sortedList.size() > 0) {
                                     if (getActivity() != null) {
-                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(),getString(R.string.mood_camel_case), sortedList));
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(), getString(R.string.mood_camel_case), sortedList));
                                     }
                                 }
                             }
@@ -1161,8 +1162,7 @@ public class InsightBodyFragment extends Fragment {
                             } else {
                                 if (entry.getValue() < lowest) {
                                     lowest = entry.getValue();
-                                }
-                                else if (entry.getValue() > highest) {
+                                } else if (entry.getValue() > highest) {
                                     highest = entry.getValue();
                                 }
                             }
@@ -1196,7 +1196,7 @@ public class InsightBodyFragment extends Fragment {
                                 bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                 if (sortedList.size() > 0) {
                                     if (getActivity() != null) {
-                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(),getString(R.string.mood_camel_case), sortedList));
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(), getString(R.string.mood_camel_case), sortedList));
                                     }
                                 }
                             }
@@ -1424,8 +1424,7 @@ public class InsightBodyFragment extends Fragment {
                             } else {
                                 if (entry.getValue() < lowest) {
                                     lowest = entry.getValue();
-                                }
-                                else if (entry.getValue() > highest) {
+                                } else if (entry.getValue() > highest) {
                                     highest = entry.getValue();
                                 }
                             }
@@ -1459,7 +1458,7 @@ public class InsightBodyFragment extends Fragment {
                                 bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                 if (sortedList.size() > 0) {
                                     if (getActivity() != null) {
-                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(),getString(R.string.mood_camel_case), sortedList));
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(), getString(R.string.mood_camel_case), sortedList));
                                     }
                                 }
                             }
@@ -1652,8 +1651,7 @@ public class InsightBodyFragment extends Fragment {
                             } else {
                                 if (entry.getValue() < lowest) {
                                     lowest = entry.getValue();
-                                }
-                                else if (entry.getValue() > highest) {
+                                } else if (entry.getValue() > highest) {
                                     highest = entry.getValue();
                                 }
                             }
@@ -1709,7 +1707,7 @@ public class InsightBodyFragment extends Fragment {
                                 bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                 if (sortedList.size() > 0) {
                                     if (getActivity() != null) {
-                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(),getString(R.string.mood_camel_case), sortedList));
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(), getString(R.string.mood_camel_case), sortedList));
                                     }
                                 }
                             }
@@ -1905,8 +1903,7 @@ public class InsightBodyFragment extends Fragment {
                             } else {
                                 if (entry.getValue() < lowest) {
                                     lowest = entry.getValue();
-                                }
-                                else if (entry.getValue() > highest) {
+                                } else if (entry.getValue() > highest) {
                                     highest = entry.getValue();
                                 }
                             }
@@ -1959,7 +1956,7 @@ public class InsightBodyFragment extends Fragment {
                                 bestAndAverageItemItemAdapter.add(bestAndWorstItem);
                                 if (sortedList.size() > 0) {
                                     if (getActivity() != null) {
-                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(),getString(R.string.mood_camel_case), sortedList));
+                                        topThreeItemItemAdapter.add(new InsightTopThreeItem(InsightBodyFragment.this, getActivity(), getString(R.string.mood_camel_case), sortedList));
                                     }
                                 }
                             }
