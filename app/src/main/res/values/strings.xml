@@ -208,7 +208,7 @@
     <string name="preference_app_settings_title">App Settings</string>
     <string name="preference_data_settings_title">Data Settings</string>
     <string name="preference_notifications_title">Notifications</string>
-    <string name="preference_apps_and_services_title">Apps/Services</string>
+    <string name="preference_apps_and_services_title">Services</string>
     <string name="preference_surveys_title">Surveys</string>
     <string name="preference_edit_activities_title">Edit Activities</string>
     <string name="preference_sync_title">Sync</string>

@@ -170,19 +170,19 @@ public class DailyBriefingNotifService extends Service {
                 .setContentTitle(title)
                 .setContentText(getString(R.string.cheers_recommendations_ready_msg))
                 .setTicker(NOTIFICATION_CHANNEL_DESC)
-                .setOngoing(true)
-                .setOnlyAlertOnce(true)
+                .setAutoCancel(true)
                 .setShowWhen(true)
                 .setColor(getColor(R.color.colorPrimary))
                 .setContentIntent(pendingIntent);
-        Notification notification = builder.build();
-        if (Build.VERSION.SDK_INT >= 26) {
+            Notification notification = builder.build();
+            if (Build.VERSION.SDK_INT >= 26) {
             NotificationChannel channel = new NotificationChannel(getApplicationContext().getString(R.string.NEW_RECOMMENDATIONS_NOTIF_ID),
-                    NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
+                    NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
             channel.setDescription(NOTIFICATION_CHANNEL_DESC);
             notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(channel);
         }
         startForeground(NOTIFICATION_ID, notification);
+        stopForeground(false);
     }
 }

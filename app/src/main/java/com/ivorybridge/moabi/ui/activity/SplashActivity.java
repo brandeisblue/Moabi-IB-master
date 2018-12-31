@@ -20,16 +20,13 @@ import com.ivorybridge.moabi.service.AsyncCallsForTodayJob;
 import com.ivorybridge.moabi.service.AsyncCallsForYesterdayJob;
 import com.ivorybridge.moabi.service.BodyInsightCalculatorDailyJob;
 import com.ivorybridge.moabi.service.CheckInDailyJob;
+import com.ivorybridge.moabi.service.DailyBriefingNotifDailyJob;
 import com.ivorybridge.moabi.service.DailyReviewInsightCalculatorDailyJob;
-import com.ivorybridge.moabi.service.DailyReviewInsightCalculatorJob;
-import com.ivorybridge.moabi.service.DepressionInsightCalculatorJob;
 import com.ivorybridge.moabi.service.MoodAndEnergyInsightCalculatorDailyJob;
-import com.ivorybridge.moabi.service.MoodAndEnergyInsightCalculatorJob;
 import com.ivorybridge.moabi.service.MotionSensorEndofDayUpdateDailyJob;
 import com.ivorybridge.moabi.service.MotionSensorResetDailyJob;
 import com.ivorybridge.moabi.service.MotionSensorUpdateJob;
 import com.ivorybridge.moabi.service.StressInsightCalculatorDailyJob;
-import com.ivorybridge.moabi.service.StressInsightCalculatorJob;
 import com.ivorybridge.moabi.util.FormattedTime;
 import com.ivorybridge.moabi.viewmodel.BAActivityViewModel;
 
@@ -83,13 +80,13 @@ public class SplashActivity extends AppCompatActivity {
         MotionSensorResetDailyJob.scheduleJob();
         MotionSensorUpdateJob.scheduleJob();
         MoodAndEnergyInsightCalculatorDailyJob.scheduleJob();
-        MoodAndEnergyInsightCalculatorJob.scheduleJob();
+        //MoodAndEnergyInsightCalculatorJob.scheduleJob();
         BodyInsightCalculatorDailyJob.scheduleJob();
-        StressInsightCalculatorJob.scheduleJob();
+        //StressInsightCalculatorJob.scheduleJob();
         StressInsightCalculatorDailyJob.scheduleJob();
-        DailyReviewInsightCalculatorJob.scheduleJob();
+        //DailyReviewInsightCalculatorJob.scheduleJob();
         DailyReviewInsightCalculatorDailyJob.scheduleJob();
-        DepressionInsightCalculatorJob.scheduleJob();
+        //DepressionInsightCalculatorJob.scheduleJob();
         AnxietyInsightCalculatorJob.scheduleJob();
         AsyncCallsForTodayJob.scheduleJob();
         AsyncCallsForYesterdayJob.scheduleJob();
@@ -126,11 +123,12 @@ public class SplashActivity extends AppCompatActivity {
         int hour = notificationSharedPreferences.getInt(getString(R.string.preference_daily_check_in_hour), 20);
         int minute = notificationSharedPreferences.getInt(getString(R.string.preference_daily_check_in_minute), 0);
         CheckInDailyJob.scheduleJob(hour, minute);
+        int notifHour = notificationSharedPreferences.getInt(getString(R.string.preference_daily_new_recommendations_hour), 7);
+        int notifMinute = notificationSharedPreferences.getInt(getString(R.string.preference_daily_new_recommendations_minute), 0);
+        DailyBriefingNotifDailyJob.scheduleJob(notifHour, notifMinute);
         configureSharedPreferences();
 
-
         BAActivityViewModel activityViewModel = ViewModelProviders.of(this).get(BAActivityViewModel.class);
-
         activityViewModel.getAllActivitiesInLibrary().observe(this, new Observer<List<BAActivityInLibrary>>() {
             @Override
             public void onChanged(@Nullable List<BAActivityInLibrary> baActivityInLibraries) {

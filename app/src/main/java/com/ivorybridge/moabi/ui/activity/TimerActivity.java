@@ -208,7 +208,7 @@ public class TimerActivity extends AppCompatActivity implements PropertyChangeLi
                     @Override
                     public void run() {
                         Date myRunTime = new Date();
-                        if ((lastTypeTime.getTime() + 1000) <= myRunTime.getTime()) {
+                        if ((lastTypeTime.getTime() + 2000) <= myRunTime.getTime()) {
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -233,7 +233,7 @@ public class TimerActivity extends AppCompatActivity implements PropertyChangeLi
                         }
                     }
                 };
-                t.schedule(tt, 1000);
+                t.schedule(tt, 3000);
             }
 
             @Override

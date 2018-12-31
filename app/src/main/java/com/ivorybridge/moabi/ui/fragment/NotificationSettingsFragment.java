@@ -229,9 +229,9 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
-        int hour = notificationSharedPreferences.getInt(getString(R.string.preference_daily_check_in_hour), 20);
-        int minute = notificationSharedPreferences.getInt(getString(R.string.preference_daily_check_in_minute), 0);
-        String time = hour + ":" + minute;
+        int hourC = notificationSharedPreferences.getInt(getString(R.string.preference_daily_check_in_hour), 20);
+        int minuteC = notificationSharedPreferences.getInt(getString(R.string.preference_daily_check_in_minute), 0);
+        String time = hourC + ":" + minuteC;
         checkInTimePref.setSummary(formattedTime.convertStringHMToHMMAA(time));
         checkInTimePref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
