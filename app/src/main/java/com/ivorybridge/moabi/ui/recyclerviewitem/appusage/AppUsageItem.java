@@ -191,7 +191,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
                     }
                 });
             } else if (defaultTimeRange.equals(itemView.getContext().getString(R.string.this_month))) {
-                appUsageViewModel.getAll(formattedTime.getStartOfWeek(item.mDate), formattedTime.getEndOfDay(item.mDate)).observe(item.mFragment, new Observer<List<AppUsageSummary>>() {
+                appUsageViewModel.getAll(formattedTime.getStartOfMonth(item.mDate), formattedTime.getEndOfDay(item.mDate)).observe(item.mFragment, new Observer<List<AppUsageSummary>>() {
                     @Override
                     public void onChanged(@Nullable List<AppUsageSummary> appUsageSummaries) {
                         if (appUsageSummaries != null) {
@@ -332,6 +332,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             for (Map.Entry<String, Long> entry : appUsageTotalSummaryMap.entrySet()) {
                 appUsageSortedMap.put(entry.getValue(), entry.getKey());
             }
+
             Log.i(TAG, appUsageTotalSummaryMap.toString());
             Log.i(TAG, appUsageSortedMap.toString());
 
@@ -403,8 +404,10 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             barData.setBarWidth(0.4f);
             barChart.setFitBars(false);
             barChart.setData(barData);
+            barChart.setMinOffset(0);
+            barChart.setExtraBottomOffset(8);
+            barChart.setExtraTopOffset(8);
             barChart.invalidate();
-
         }
 
 
@@ -448,7 +451,6 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
                     return convertToTimeString(value);
                 }
             });
-
 
             rightAxis.setAxisMinimum(0);
             rightAxis.setEnabled(false);
