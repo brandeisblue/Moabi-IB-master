@@ -78,7 +78,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                     getString(R.string.preference_unit_si_title));
         }
 
-        ListPreference unitPreference = (ListPreference) findPreference("preference_unit");
+        ListPreference unitPreference = findPreference("preference_unit");
         unitPreference.setTitle(getString(R.string.preference_unit_title));
         if (unit != null) {
             if (unit.equals(getString(R.string.preference_unit_si_title))) {
@@ -255,7 +255,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         findPreference("preference_edit_activities").setVisible(false);
         findPreference("preference_sync").setOnPreferenceClickListener(this);
 
-        final SwitchPreference switchPreference = (SwitchPreference) findPreference("preference_phone_usage_permission");
+        final SwitchPreference switchPreference = findPreference("preference_phone_usage_permission");
         if (isUsagePermissionGranted(mContext)) {
             switchPreference.setChecked(true);
         } else {

@@ -39,7 +39,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -75,7 +75,9 @@ public class WeatherRepository {
                 = application.getSharedPreferences(application.getString(
                         R.string.com_ivorybridge_moabi_WEATHER_SHARED_PREFERENCE_KEY), Context.MODE_PRIVATE);
         context = application;
-        queue = Volley.newRequestQueue(application);
+        if (queue == null) {
+            queue = Volley.newRequestQueue(application);
+        }
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(application);
         AsyncTaskBooleanDB successDB = AsyncTaskBooleanDB.getDatabase(application);
         this.mTaskSuccessDao = successDB.asyncTaskBooleanDao();
@@ -158,11 +160,7 @@ public class WeatherRepository {
                 NetworkResponse errorRes = error.networkResponse;
                 String stringData = "";
                 if (errorRes != null && errorRes.data != null) {
-                    try {
-                        stringData = new String(errorRes.data, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+                    stringData = new String(errorRes.data, StandardCharsets.UTF_8);
                 }
                 Log.i(TAG, "Error response is " + stringData);
             }
@@ -189,11 +187,7 @@ public class WeatherRepository {
                 NetworkResponse errorRes = error.networkResponse;
                 String stringData = "";
                 if (errorRes != null && errorRes.data != null) {
-                    try {
-                        stringData = new String(errorRes.data, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+                    stringData = new String(errorRes.data, StandardCharsets.UTF_8);
                 }
                 Log.i(TAG, "Error response is " + stringData);
             }

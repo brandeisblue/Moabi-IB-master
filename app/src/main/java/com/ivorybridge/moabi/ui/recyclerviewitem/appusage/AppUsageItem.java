@@ -288,6 +288,9 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             barChart.setFitBars(false);
             //barChart.animateY(1000, Easing.EasingOption.Linear);
             barChart.setData(barData);
+            //barChart.setMinOffset(0);
+            barChart.setExtraBottomOffset(8);
+            barChart.setExtraTopOffset(8);
             barChart.invalidate();
         }
 
@@ -404,7 +407,7 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             barData.setBarWidth(0.4f);
             barChart.setFitBars(false);
             barChart.setData(barData);
-            barChart.setMinOffset(0);
+            //barChart.setMinOffset(0);
             barChart.setExtraBottomOffset(8);
             barChart.setExtraTopOffset(8);
             barChart.invalidate();

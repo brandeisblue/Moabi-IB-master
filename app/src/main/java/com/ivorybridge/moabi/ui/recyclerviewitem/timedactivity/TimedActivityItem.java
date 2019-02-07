@@ -491,7 +491,6 @@ public class TimedActivityItem extends AbstractItem<TimedActivityItem, TimedActi
                 }
             });
 
-
             rightAxis.setAxisMinimum(0);
             rightAxis.setEnabled(false);
             rightAxis.setDrawGridLines(true);

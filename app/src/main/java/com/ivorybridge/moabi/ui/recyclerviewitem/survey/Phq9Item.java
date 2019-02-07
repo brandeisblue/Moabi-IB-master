@@ -271,9 +271,9 @@ public class Phq9Item extends AbstractItem<Phq9Item, Phq9Item.ViewHolder> {
                                 for (int j = 0; j < dailyEntries.size(); j++) {
                                     for (String date : entryDatesList) {
                                         if (dailyEntries.get(j).getDate().equals(date)) {
-                                            entries.put(date, dailyEntries.get(j).getAverageScore().floatValue());
-                                            if (dailyEntries.get(j).getAverageScore() > max) {
-                                                max = dailyEntries.get(j).getAverageScore();
+                                            entries.put(date, dailyEntries.get(j).getAverage().floatValue());
+                                            if (dailyEntries.get(j).getAverage() > max) {
+                                                max = dailyEntries.get(j).getAverage();
                                             }
                                         }
                                     }

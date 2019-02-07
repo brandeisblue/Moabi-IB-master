@@ -5,10 +5,10 @@ import android.util.Log;
 
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.ui.fragment.BAActivityEntryFragment;
+import com.ivorybridge.moabi.ui.fragment.DailyReviewEntryFragment;
 import com.ivorybridge.moabi.ui.fragment.Gad7EntryFragment;
 import com.ivorybridge.moabi.ui.fragment.MoodEntryFragment;
-import com.ivorybridge.moabi.ui.fragment.DailyReviewEntryFragment;
-import com.ivorybridge.moabi.ui.fragment.PainEntryFragment;
+import com.ivorybridge.moabi.ui.fragment.PainTextEntryFragment;
 import com.ivorybridge.moabi.ui.fragment.Phq9EntryFragment;
 import com.ivorybridge.moabi.ui.fragment.StressEntryFragment;
 
@@ -41,7 +41,7 @@ public class MakeEntryFragmentPagerAdapter extends FragmentPagerAdapter {
             } else if (survey.equals(context.getString(R.string.stress_camel_case))) {
                 fragmentsToShow.add(new StressEntryFragment());
             } else if (survey.equals(context.getString(R.string.pain_camel_case))) {
-                fragmentsToShow.add(new PainEntryFragment());
+                fragmentsToShow.add(new PainTextEntryFragment());
             } else if (survey.equals(context.getString(R.string.daily_review_camel_case))) {
                 fragmentsToShow.add(new DailyReviewEntryFragment());
             } else if (survey.equals(context.getString(R.string.depression_phq9_camel_case))) {

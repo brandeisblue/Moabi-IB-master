@@ -1,9 +1,9 @@
 package com.ivorybridge.moabi.database.entity.stress;
 
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 @Keep
 @Entity(tableName = "monthly_stress_table")
@@ -12,7 +12,7 @@ public class MonthlyStress {
     @PrimaryKey
     @NonNull
     public String YYYYMM;
-    public Double averageStress;
+    public Double average;
     public Long startDateInLong;
     public Long endDateInLong;
     public Long timeOfEntry;
@@ -28,11 +28,11 @@ public class MonthlyStress {
     }
 
     public Double getAverageStress() {
-        return averageStress;
+        return average;
     }
 
-    public void setAverageStress(Double averageStress) {
-        this.averageStress = averageStress;
+    public void setAverageStress(Double average) {
+        this.average = average;
     }
 
     public Long getStartDateInLong() {

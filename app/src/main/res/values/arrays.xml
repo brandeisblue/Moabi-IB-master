@@ -130,8 +130,17 @@
     </string-array>-->
 
     <string-array name="pain_seekbar_array">
-        <item>No Pain</item>
-        <item>Worst Ever</item>
+        <item>No\nPain</item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>Worst\nPossible\nPain</item>
     </string-array>
 
     <string-array name="sex_array">

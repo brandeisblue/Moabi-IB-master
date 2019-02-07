@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.ivorybridge.moabi.R;
@@ -24,13 +23,11 @@ import butterknife.ButterKnife;
 public class PainTextEntryFragment extends Fragment {
 
     private static final String TAG = PainTextEntryFragment.class.getSimpleName();
-    @BindView(R.id.fragment_pain_entry_seekbar)
+    @BindView(R.id.fragment_pain_text_entry_seekbar)
     IndicatorSeekBar seekBar;
     /*
     @BindView(R.id.fragment_pain_entry_body_imageview)
     DrawImageView bodyImageView;*/
-    @BindView(R.id.fragment_pain_entry_entry_framelayout)
-    RelativeLayout bodyLayout;
     private FirebaseManager firebaseManager;
     private FormattedTime formattedTime;
     private Toast mCurrentToast;
@@ -66,7 +63,7 @@ public class PainTextEntryFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View mView = inflater.inflate(R.layout.fragment_pain_entry, container, false);
+        View mView = inflater.inflate(R.layout.fragment_pain_text_entry, container, false);
         ButterKnife.bind(this, mView);
 
         seekBar.setOnSeekChangeListener(new OnSeekChangeListener() {

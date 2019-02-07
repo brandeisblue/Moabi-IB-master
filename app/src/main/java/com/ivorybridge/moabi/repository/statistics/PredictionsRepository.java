@@ -6349,8 +6349,8 @@ public class PredictionsRepository {
                         regressionDepVarXIndepVar[index][0] = activitySummary.getActivitySummary().getSummary().getCaloriesOut().doubleValue();
                         activityTotal += activitySummary.getActivitySummary().getSummary().getCaloriesOut().doubleValue();
                     }
-                    depVarTotal += refinedList.get(index).getAverageScore();
-                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverageScore();
+                    depVarTotal += refinedList.get(index).getAverage();
+                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverage();
                     index++;
                 }
                 Log.i(TAG, activityName + " X Phq:" + Arrays.deepToString(regressionDepVarXIndepVar));
@@ -6449,8 +6449,8 @@ public class PredictionsRepository {
                             activityTotal += 0;
                         }
                     }
-                    depVarTotal += refinedList.get(index).getAverageScore();
-                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverageScore();
+                    depVarTotal += refinedList.get(index).getAverage();
+                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverage();
                     index++;
                 }
                 Log.i(TAG, activityName + " X Phq:" + Arrays.deepToString(regressionDepVarXIndepVar));
@@ -6557,8 +6557,8 @@ public class PredictionsRepository {
                         regressionDepVarXIndepVar[index][0] = activitySummary.getCalories();
                         activityTotal += activitySummary.getCalories();
                     }
-                    depVarTotal += refinedList.get(index).getAverageScore();
-                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverageScore();
+                    depVarTotal += refinedList.get(index).getAverage();
+                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverage();
                     index++;
                 }
 
@@ -6657,8 +6657,8 @@ public class PredictionsRepository {
                         regressionDepVarXIndepVar[index][0] = weatherDailySummary.getTotalPrecipmm();
                         activityTotal += weatherDailySummary.getTotalPrecipmm();
                     }
-                    depVarTotal += refinedList.get(index).getAverageScore();
-                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverageScore();
+                    depVarTotal += refinedList.get(index).getAverage();
+                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverage();
                     index++;
                 }
 
@@ -6784,8 +6784,8 @@ public class PredictionsRepository {
                             activityTotal += 0;
                         }
                     }
-                    depVarTotal += refinedList.get(index).getAverageScore();
-                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverageScore();
+                    depVarTotal += refinedList.get(index).getAverage();
+                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverage();
                     index++;
                 }
 
@@ -6901,8 +6901,8 @@ public class PredictionsRepository {
                             activityTotal += 0;
                         }
                     }
-                    depVarTotal += refinedList.get(index).getAverageScore();
-                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverageScore();
+                    depVarTotal += refinedList.get(index).getAverage();
+                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverage();
                     index++;
                 }
 
@@ -7002,8 +7002,8 @@ public class PredictionsRepository {
                             activityTotal += 0;
                         }
                     }
-                    depVarTotal += refinedList.get(index).getAverageScore();
-                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverageScore();
+                    depVarTotal += refinedList.get(index).getAverage();
+                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverage();
                     index++;
                 }
                 Log.i(TAG, activityName + " X Mood:" + Arrays.deepToString(regressionDepVarXIndepVar));
@@ -7119,8 +7119,8 @@ public class PredictionsRepository {
                         regressionDepVarXIndepVar[index][0] = activitySummary.getActivitySummary().getSummary().getCaloriesOut().doubleValue();
                         activityTotal += activitySummary.getActivitySummary().getSummary().getCaloriesOut().doubleValue();
                     }
-                    depVarTotal += refinedList.get(index).getAverageScore();
-                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverageScore();
+                    depVarTotal += refinedList.get(index).getAverage();
+                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverage();
                     index++;
                 }
                 Log.i(TAG, activityName + " X Phq:" + Arrays.deepToString(regressionDepVarXIndepVar));
@@ -7219,8 +7219,8 @@ public class PredictionsRepository {
                             activityTotal += 0;
                         }
                     }
-                    depVarTotal += refinedList.get(index).getAverageScore();
-                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverageScore();
+                    depVarTotal += refinedList.get(index).getAverage();
+                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverage();
                     index++;
                 }
                 Log.i(TAG, activityName + " X Phq:" + Arrays.deepToString(regressionDepVarXIndepVar));
@@ -7327,8 +7327,8 @@ public class PredictionsRepository {
                         regressionDepVarXIndepVar[index][0] = activitySummary.getCalories();
                         activityTotal += activitySummary.getCalories();
                     }
-                    depVarTotal += refinedList.get(index).getAverageScore();
-                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverageScore();
+                    depVarTotal += refinedList.get(index).getAverage();
+                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverage();
                     index++;
                 }
 
@@ -7427,8 +7427,8 @@ public class PredictionsRepository {
                         regressionDepVarXIndepVar[index][0] = weatherDailySummary.getTotalPrecipmm();
                         activityTotal += weatherDailySummary.getTotalPrecipmm();
                     }
-                    depVarTotal += refinedList.get(index).getAverageScore();
-                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverageScore();
+                    depVarTotal += refinedList.get(index).getAverage();
+                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverage();
                     index++;
                 }
 
@@ -7554,8 +7554,8 @@ public class PredictionsRepository {
                             activityTotal += 0;
                         }
                     }
-                    depVarTotal += refinedList.get(index).getAverageScore();
-                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverageScore();
+                    depVarTotal += refinedList.get(index).getAverage();
+                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverage();
                     index++;
                 }
 
@@ -7671,8 +7671,8 @@ public class PredictionsRepository {
                             activityTotal += 0;
                         }
                     }
-                    depVarTotal += refinedList.get(index).getAverageScore();
-                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverageScore();
+                    depVarTotal += refinedList.get(index).getAverage();
+                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverage();
                     index++;
                 }
 
@@ -7772,8 +7772,8 @@ public class PredictionsRepository {
                             activityTotal += 0;
                         }
                     }
-                    depVarTotal += refinedList.get(index).getAverageScore();
-                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverageScore();
+                    depVarTotal += refinedList.get(index).getAverage();
+                    regressionDepVarXIndepVar[index][1] = refinedList.get(index).getAverage();
                     index++;
                 }
                 Log.i(TAG, activityName + " X Gad7:" + Arrays.deepToString(regressionDepVarXIndepVar));

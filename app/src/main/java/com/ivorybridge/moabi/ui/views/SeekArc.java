@@ -178,7 +178,7 @@ public class SeekArc extends View {
                     mArcWidth);
             mStartAngle = a.getInt(R.styleable.SeekArc_startAngle, mStartAngle);
             mSweepAngle = a.getInt(R.styleable.SeekArc_sweepAngle, mSweepAngle);
-            mRotation = a.getInt(R.styleable.SeekArc_rotation, mRotation);
+            mRotation = a.getInt(R.styleable.SeekArc_rotationArc, mRotation);
             mRoundedEdges = a.getBoolean(R.styleable.SeekArc_roundEdges,
                     mRoundedEdges);
             mTouchInside = a.getBoolean(R.styleable.SeekArc_touchInside,

@@ -226,7 +226,7 @@ public class DepressionRepository {
                     Float averagePhq9 = phq9Entry.getValue();
                     DailyPhq9 phq9 = new DailyPhq9();
                     phq9.setDate(date);
-                    phq9.setAverageScore(averagePhq9.doubleValue());
+                    phq9.setAverage(averagePhq9.doubleValue());
                     phq9.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
                     phq9.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
                     phq9.setNumOfEntries(numDailyEntries.get(date));
@@ -238,7 +238,7 @@ public class DepressionRepository {
                     Float averagePhq9 = phq9Entry.getValue();
                     WeeklyPhq9 phq9 = new WeeklyPhq9();
                     phq9.setYYYYW(date);
-                    phq9.setAverageScore(averagePhq9.doubleValue());
+                    phq9.setAverage(averagePhq9.doubleValue());
                     int year = Integer.parseInt(date.substring(0, 4));
                     int week = Integer.parseInt(date.substring(5));
                     Long startTime = formattedTime.getStartTimeOfYYYYW(week, year);
@@ -256,7 +256,7 @@ public class DepressionRepository {
                     Float averagePhq9 = phq9Entry.getValue();
                     MonthlyPhq9 phq9 = new MonthlyPhq9();
                     phq9.setYYYYMM(date);
-                    phq9.setAverageScore(averagePhq9.doubleValue());
+                    phq9.setAverage(averagePhq9.doubleValue());
                     Long startTime = formattedTime.getStartTimeOfYYYYMM(date);
                     Long endTime = formattedTime.getEndTimeOfYYYYMM(date);
                     phq9.setStartDateInLong(startTime);

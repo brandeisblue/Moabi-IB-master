@@ -12,7 +12,7 @@ public class DailyStress {
     @PrimaryKey
     @NonNull
     public String date;
-    public Double averageStress;
+    public Double average;
     public Long dateInLong;
     public Long timeOfEntry;
     public Long numOfEntries;
@@ -27,11 +27,11 @@ public class DailyStress {
     }
 
     public Double getAverageStress() {
-        return averageStress;
+        return average;
     }
 
-    public void setAverageStress(Double averageStress) {
-        this.averageStress = averageStress;
+    public void setAverageStress(Double average) {
+        this.average = average;
     }
 
     public Long getDateInLong() {

@@ -12,7 +12,7 @@ public class WeeklyPhq9 {
     @PrimaryKey
     @NonNull
     public String YYYYW;
-    public Double averageScore;
+    public Double average;
     public Long startDateInLong;
     public Long endDateInLong;
     public Long timeOfEntry;
@@ -27,12 +27,12 @@ public class WeeklyPhq9 {
         this.YYYYW = YYYYW;
     }
 
-    public Double getAverageScore() {
-        return averageScore;
+    public Double getAverage() {
+        return average;
     }
 
-    public void setAverageScore(Double averageScore) {
-        this.averageScore = averageScore;
+    public void setAverage(Double average) {
+        this.average = average;
     }
 
     public Long getStartDateInLong() {
@@ -70,6 +70,6 @@ public class WeeklyPhq9 {
     @NonNull
     @Override
     public String toString() {
-        return getYYYYW() + ": " + getAverageScore();
+        return getYYYYW() + ": " + getAverage();
     }
 }

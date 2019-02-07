@@ -224,10 +224,10 @@ public class DailyReviewRepository {
 
                 for (Map.Entry<String, Float> dailyReviewEntry : dailyReviewDailyEntries.entrySet()) {
                     String date = dailyReviewEntry.getKey();
-                    Float averageDailyReview = dailyReviewEntry.getValue();
+                    Float average = dailyReviewEntry.getValue();
                     DailyDailyReview dailyReview = new DailyDailyReview();
                     dailyReview.setDate(date);
-                    dailyReview.setAverageDailyReview(averageDailyReview.doubleValue());
+                    dailyReview.setAverageDailyReview(average.doubleValue());
                     dailyReview.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
                     dailyReview.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
                     dailyReview.setNumOfEntries(numDailyEntries.get(date));
@@ -236,10 +236,10 @@ public class DailyReviewRepository {
 
                 for (Map.Entry<String, Float> dailyReviewEntry : dailyReviewWeeklyEntries.entrySet()) {
                     String date = dailyReviewEntry.getKey();
-                    Float averageDailyReview = dailyReviewEntry.getValue();
+                    Float average = dailyReviewEntry.getValue();
                     WeeklyDailyReview dailyReview = new WeeklyDailyReview();
                     dailyReview.setYYYYW(date);
-                    dailyReview.setAverageDailyReview(averageDailyReview.doubleValue());
+                    dailyReview.setAverageDailyReview(average.doubleValue());
                     int year = Integer.parseInt(date.substring(0, 4));
                     int week = Integer.parseInt(date.substring(5));
                     Long startTime = formattedTime.getStartTimeOfYYYYW(week, year);
@@ -254,10 +254,10 @@ public class DailyReviewRepository {
 
                 for (Map.Entry<String, Float> dailyReviewEntry : dailyReviewMonthlyEntries.entrySet()) {
                     String date = dailyReviewEntry.getKey();
-                    Float averageDailyReview = dailyReviewEntry.getValue();
+                    Float average = dailyReviewEntry.getValue();
                     MonthlyDailyReview dailyReview = new MonthlyDailyReview();
                     dailyReview.setYYYYMM(date);
-                    dailyReview.setAverageDailyReview(averageDailyReview.doubleValue());
+                    dailyReview.setAverageDailyReview(average.doubleValue());
                     Long startTime = formattedTime.getStartTimeOfYYYYMM(date);
                     Long endTime = formattedTime.getEndTimeOfYYYYMM(date);
                     dailyReview.setStartDateInLong(startTime);

@@ -263,7 +263,7 @@ public class UserGoalJob extends Job {
         } else if (goalType.equals(application.getString(R.string.baactivity_camel_case))) {
             List<BAActivityEntry> dailySummaries = baActivityRepository.getActivityEntriesNow(startOfDay, endOfDay);
             if (dailySummaries != null && dailySummaries.size() > 0) {
-                Log.i(TAG, "Size is " + dailySummaries.size());
+                Log.i(TAG, "Size is " +dailySummaries .size());
                 int counter = 0;
                 for (BAActivityEntry activity : dailySummaries) {
                     if (activity.getName().equals(goalName)) {

@@ -1,4 +1,4 @@
-package com.ivorybridge.moabi.database.entity.stress;
+package com.ivorybridge.moabi.database.entity.pain;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
@@ -6,8 +6,8 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Keep
-@Entity(tableName = "weekly_stress_table")
-public class WeeklyStress {
+@Entity(tableName = "weekly_pain_table")
+public class WeeklyPain {
 
     @PrimaryKey
     @NonNull
@@ -27,11 +27,11 @@ public class WeeklyStress {
         this.YYYYW = YYYYW;
     }
 
-    public Double getAverageStress() {
+    public Double getAverage() {
         return average;
     }
 
-    public void setAverageStress(Double average) {
+    public void setAverage(Double average) {
         this.average = average;
     }
 
@@ -70,6 +70,6 @@ public class WeeklyStress {
     @NonNull
     @Override
     public String toString() {
-        return getYYYYW() + ": " + getAverageStress();
+        return getYYYYW() + ": " + getAverage();
     }
 }

@@ -139,65 +139,70 @@ public class UserGoalService extends Service implements SensorEventListener {
             builtInFitnessRepository = new BuiltInFitnessRepository(getApplication());
             dataInUseRepository = new DataInUseRepository(getApplication());
             //Log.i(TAG, intent.getStringExtra("goalType") + ": " + intent.getStringExtra("goalName") + " " + intent.getDoubleExtra("goal", 0));
-            if (intent.getStringExtra("goalType") != null) {
-                goalType = intent.getStringExtra("goalType");
-            }
-            if (intent.getStringExtra("goalName") != null) {
-                goalName = intent.getStringExtra("goalName");
-            }
-            goal = intent.getDoubleExtra("goal", 0);
-            if (goalType.equals(getString(R.string.moabi_tracker_camel_case))) {
-                Handler handler = new Handler();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) != null) {
-                            stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
-                            sensorManager.registerListener(UserGoalService.this, stepDetectorSensor, SensorManager.SENSOR_DELAY_FASTEST);
-                        }
-                        activitySummary = builtInFitnessRepository.getNow(formattedTime.getCurrentDateAsYYYYMMDD());
-                        if (activitySummary == null) {
-                            activitySummary = new BuiltInActivitySummary();
-                            activitySummary.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
-                            activitySummary.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
-                        }
-                        if (activitySummary.getSteps() != null) {
-                            steps = activitySummary.getSteps();
-                        }
-                        if (activitySummary.getActiveMinutes() != null) {
-                            activeMins = activitySummary.getActiveMinutes();
-                        }
-                        if (activitySummary.getSedentaryMinutes() != null) {
-                            sedentaryMins = activitySummary.getSedentaryMinutes();
-                        }
-                        if (activitySummary.getDistance() != null) {
-                            distance = activitySummary.getDistance();
-                        }
-                        if (activitySummary.getCalories() != null) {
-                            calories = activitySummary.getCalories();
-                        }
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                showMoabiNotification();
+            if (intent != null) {
+                if (intent.getStringExtra("goalType") != null) {
+                    goalType = intent.getStringExtra("goalType");
+                }
+                if (intent.getStringExtra("goalName") != null) {
+                    goalName = intent.getStringExtra("goalName");
+                }
+                goal = intent.getDoubleExtra("goal", 0);
+                if (goalType.equals(getString(R.string.moabi_tracker_camel_case))) {
+                    Handler handler = new Handler();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) != null) {
+                                stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+                                sensorManager.registerListener(UserGoalService.this, stepDetectorSensor, SensorManager.SENSOR_DELAY_FASTEST);
                             }
-                        });
-                    }
-                }).start();
-                return START_STICKY;
-            } else {
-                if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) != null) {
-                    stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
-                    sensorManager.unregisterListener(UserGoalService.this, stepDetectorSensor);
-                }
-                hasLong = intent.getBooleanExtra("hasLong", false);
-                if (hasLong) {
-                    progressLong = intent.getLongExtra("progress", 0);
+                            activitySummary = builtInFitnessRepository.getNow(formattedTime.getCurrentDateAsYYYYMMDD());
+                            if (activitySummary == null) {
+                                activitySummary = new BuiltInActivitySummary();
+                                activitySummary.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
+                                activitySummary.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
+                            }
+                            if (activitySummary.getSteps() != null) {
+                                steps = activitySummary.getSteps();
+                            }
+                            if (activitySummary.getActiveMinutes() != null) {
+                                activeMins = activitySummary.getActiveMinutes();
+                            }
+                            if (activitySummary.getSedentaryMinutes() != null) {
+                                sedentaryMins = activitySummary.getSedentaryMinutes();
+                            }
+                            if (activitySummary.getDistance() != null) {
+                                distance = activitySummary.getDistance();
+                            }
+                            if (activitySummary.getCalories() != null) {
+                                calories = activitySummary.getCalories();
+                            }
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    showMoabiNotification();
+                                }
+                            });
+                        }
+                    }).start();
+                    return START_STICKY;
                 } else {
-                    progressDouble = intent.getDoubleExtra("progress", 0);
+                    if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) != null) {
+                        stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+                        sensorManager.unregisterListener(UserGoalService.this, stepDetectorSensor);
+                    }
+                    hasLong = intent.getBooleanExtra("hasLong", false);
+                    if (hasLong) {
+                        progressLong = intent.getLongExtra("progress", 0);
+                    } else {
+                        progressDouble = intent.getDoubleExtra("progress", 0);
+                    }
+                    startInForeground();
+                    return START_STICKY;
                 }
-                startInForeground();
-                return START_STICKY;
+            } else {
+                stopForeground(true);
+                return START_NOT_STICKY;
             }
         } else {
             stopForeground(true);

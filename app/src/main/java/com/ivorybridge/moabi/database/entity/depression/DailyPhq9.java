@@ -12,7 +12,7 @@ public class DailyPhq9 {
     @PrimaryKey
     @NonNull
     public String date;
-    public Double averageScore;
+    public Double average;
     public Long dateInLong;
     public Long timeOfEntry;
     public Long numOfEntries;
@@ -26,12 +26,12 @@ public class DailyPhq9 {
         this.date = date;
     }
 
-    public Double getAverageScore() {
-        return averageScore;
+    public Double getAverage() {
+        return average;
     }
 
-    public void setAverageScore(Double averageScore) {
-        this.averageScore = averageScore;
+    public void setAverage(Double average) {
+        this.average = average;
     }
 
     public Long getDateInLong() {
@@ -61,6 +61,6 @@ public class DailyPhq9 {
     @NonNull
     @Override
     public String toString() {
-        return getDate() + ": " + getAverageScore();
+        return getDate() + ": " + getAverage();
     }
 }

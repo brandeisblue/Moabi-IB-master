@@ -12,7 +12,7 @@ public class WeeklyDailyReview {
     @PrimaryKey
     @NonNull
     public String YYYYW;
-    public Double averageDailyReview;
+    public Double average;
     public Long startDateInLong;
     public Long endDateInLong;
     public Long timeOfEntry;
@@ -28,11 +28,11 @@ public class WeeklyDailyReview {
     }
 
     public Double getAverageDailyReview() {
-        return averageDailyReview;
+        return average;
     }
 
-    public void setAverageDailyReview(Double averageDailyReview) {
-        this.averageDailyReview = averageDailyReview;
+    public void setAverageDailyReview(Double average) {
+        this.average = average;
     }
 
     public Long getStartDateInLong() {

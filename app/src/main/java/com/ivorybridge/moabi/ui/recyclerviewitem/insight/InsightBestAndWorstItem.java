@@ -290,7 +290,6 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                     inputType.equals(itemView.getContext().getString(R.string.activity_sedentary_minutes_title)) ||
                     inputType.equals(itemView.getContext().getString(R.string.activity_sleep_title)) ||
                     inputType.equals(itemView.getContext().getString(R.string.timer_camel_case))) {
-                titleTextView.setText(itemView.getContext().getString(R.string.worst_day_title));
                 leftAxis.setTypeface(tf);
                 leftAxis.setTextColor(Color.DKGRAY);
                 //leftAxis.setAxisMaximum(3);
@@ -373,7 +372,7 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                     R.layout.mpchart_chartvalueselectedview, entryDatesList, numOfDays, barChart, inputType);
             barChart.setMarker(chartMarkerView);
             barChart.getLegend().setEnabled(false);
-            barChart.setMinOffset(0);
+            //barChart.setMinOffset(0);
             barChart.setExtraBottomOffset(8);
             barChart.setExtraTopOffset(8);
             barChart.invalidate();

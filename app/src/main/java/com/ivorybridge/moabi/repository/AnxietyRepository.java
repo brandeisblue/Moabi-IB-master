@@ -226,7 +226,7 @@ public class AnxietyRepository {
                     Float averagegad7 = gad7Entry.getValue();
                     DailyGad7 gad7 = new DailyGad7();
                     gad7.setDate(date);
-                    gad7.setAverageScore(averagegad7.doubleValue());
+                    gad7.setAverage(averagegad7.doubleValue());
                     gad7.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
                     gad7.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
                     gad7.setNumOfEntries(numDailyEntries.get(date));
@@ -238,7 +238,7 @@ public class AnxietyRepository {
                     Float averagegad7 = gad7Entry.getValue();
                     WeeklyGad7 gad7 = new WeeklyGad7();
                     gad7.setYYYYW(date);
-                    gad7.setAverageScore(averagegad7.doubleValue());
+                    gad7.setAverage(averagegad7.doubleValue());
                     int year = Integer.parseInt(date.substring(0, 4));
                     int week = Integer.parseInt(date.substring(5));
                     Long startTime = formattedTime.getStartTimeOfYYYYW(week, year);
@@ -256,7 +256,7 @@ public class AnxietyRepository {
                     Float averagegad7 = gad7Entry.getValue();
                     MonthlyGad7 gad7 = new MonthlyGad7();
                     gad7.setYYYYMM(date);
-                    gad7.setAverageScore(averagegad7.doubleValue());
+                    gad7.setAverage(averagegad7.doubleValue());
                     Long startTime = formattedTime.getStartTimeOfYYYYMM(date);
                     Long endTime = formattedTime.getEndTimeOfYYYYMM(date);
                     gad7.setStartDateInLong(startTime);

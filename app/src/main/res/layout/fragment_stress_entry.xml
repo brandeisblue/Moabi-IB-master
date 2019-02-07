@@ -38,7 +38,7 @@
                 android:paddingTop="16dp"
                 android:paddingRight="16dp"
                 seekarc:progressColor="@color/colorPrimary"
-                seekarc:rotation="180"
+                seekarc:rotationArc="180"
                 seekarc:roundEdges="true"
                 seekarc:startAngle="60"
                 seekarc:sweepAngle="240"

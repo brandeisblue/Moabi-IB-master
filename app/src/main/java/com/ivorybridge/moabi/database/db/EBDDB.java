@@ -18,10 +18,11 @@ import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 @Database(entities = {Phq9.class, DailyPhq9.class, WeeklyPhq9.class, MonthlyPhq9.class,
-Gad7.class, DailyGad7.class, WeeklyGad7.class, MonthlyGad7.class}, version = 2, exportSchema = false)
+Gad7.class, DailyGad7.class, WeeklyGad7.class, MonthlyGad7.class}, version = 1, exportSchema = false)
 public abstract class EBDDB extends RoomDatabase {
 
     public abstract Phq9Dao phq9Dao();
@@ -33,6 +34,12 @@ public abstract class EBDDB extends RoomDatabase {
         public void onOpen(@NonNull SupportSQLiteDatabase db) {
             super.onOpen(db);
             new EBDDB.PopulateDbAsync(INSTANCE).execute();
+        }
+    };
+
+    private static Migration MIGRATION_2_1 = new Migration(2, 1) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
         }
     };
 

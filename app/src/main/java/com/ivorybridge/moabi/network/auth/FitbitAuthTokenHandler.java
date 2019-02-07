@@ -24,7 +24,7 @@ import com.ivorybridge.moabi.repository.CredentialRepository;
 import com.ivorybridge.moabi.repository.DataInUseRepository;
 import com.ivorybridge.moabi.util.FormattedTime;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -167,11 +167,7 @@ public class FitbitAuthTokenHandler {
                 mFitbitEditor.apply();
                 Toast.makeText(mContext, "Authentication failed\nPlease try again", Toast.LENGTH_LONG).show();
                 if(errorRes != null && errorRes.data != null){
-                    try {
-                        stringData = new String(errorRes.data, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+                    stringData = new String(errorRes.data, StandardCharsets.UTF_8);
                 }
                 Log.i(TAG, "Error response is " + stringData);
             }

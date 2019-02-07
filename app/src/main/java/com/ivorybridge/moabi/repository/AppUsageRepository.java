@@ -7,7 +7,6 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Process;
 import android.util.Log;
@@ -42,7 +41,6 @@ import java.util.Map;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 
 import static android.app.AppOpsManager.MODE_ALLOWED;
@@ -235,7 +233,7 @@ public class AppUsageRepository {
                          previousEventType = event.getEventType();
                          pkgName = event.getPackageName();
                          appName = pkgName;
-                         Drawable appIcon;
+                         //Drawable appIcon;
                          try {
                              appName = pm.getApplicationInfo(pkgName, 0).loadLabel(pm).toString();
                          } catch (PackageManager.NameNotFoundException e) {
@@ -243,13 +241,14 @@ public class AppUsageRepository {
                              e.printStackTrace();
                          }
                          // get the app icon
+                         /*
                          try {
                              appIcon = pm.getApplicationIcon(event.getPackageName());
                          } catch (PackageManager.NameNotFoundException e) {
                              e.printStackTrace();
                              appIcon = ContextCompat
                                      .getDrawable(application.getApplicationContext(), R.drawable.ic_android);
-                         }
+                         }*/
 
                          // If both start and end are defined, we have a session
                          if (startTime != 0L && endTime != 0L) {
@@ -270,13 +269,13 @@ public class AppUsageRepository {
                              CustomUsageSummary customUsageSummary = sortedUsageMap.get(pkgName);
                              long old = customUsageSummary.totalTime;
                              customUsageSummary.appName = appName;
-                             customUsageSummary.appIcon = appIcon;
+                             //customUsageSummary.appIcon = appIcon;
                              customUsageSummary.totalTime = old + totalTime;
                              sortedUsageMap.put(pkgName, customUsageSummary);
                          } else {
                              CustomUsageSummary customUsageSummary = new CustomUsageSummary();
                              customUsageSummary.appName = appName;
-                             customUsageSummary.appIcon = appIcon;
+                             //customUsageSummary.appIcon = appIcon;
                              customUsageSummary.totalTime = totalTime;
                              sortedUsageMap.put(pkgName, customUsageSummary);
                          }

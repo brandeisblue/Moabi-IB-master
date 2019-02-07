@@ -935,12 +935,12 @@ public class InsightMindFragment extends Fragment {
 
                         for (DailyPhq9 dailyEntry : dailyEntries) {
                             // find matching record
-                            total += dailyEntry.getAverageScore();
+                            total += dailyEntry.getAverage();
                             String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailyEntry.getDate());
                             Long oldCount = countByDayMap.get(formattedDate);
                             countByDayMap.put(formattedDate, oldCount + 1L);
                             Double oldData = dataByDayMap.get(formattedDate);
-                            dataByDayMap.put(formattedDate, oldData + dailyEntry.getAverageScore());
+                            dataByDayMap.put(formattedDate, oldData + dailyEntry.getAverage());
                         }
                         int i = 0;
                         float bestValue = 0;
@@ -1061,12 +1061,12 @@ public class InsightMindFragment extends Fragment {
 
                         for (DailyGad7 dailyEntry : dailyEntries) {
                             // find matching record
-                            total += dailyEntry.getAverageScore();
+                            total += dailyEntry.getAverage();
                             String formattedDate = formattedTime.convertStringYYYYMMDDToEEE(dailyEntry.getDate());
                             Long oldCount = countByDayMap.get(formattedDate);
                             countByDayMap.put(formattedDate, oldCount + 1L);
                             Double oldData = dataByDayMap.get(formattedDate);
-                            dataByDayMap.put(formattedDate, oldData + dailyEntry.getAverageScore());
+                            dataByDayMap.put(formattedDate, oldData + dailyEntry.getAverage());
                         }
                         int i = 0;
                         float bestValue = 0;

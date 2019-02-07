@@ -138,7 +138,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
                             if (profile.getAge() != null) {
                                 bmr = bmr - 5 * profile.getAge() + 5;
                             }
-                        } else if (profile.getGender().equals(getString(R.string.profile_sex_female))){
+                        } else if (profile.getGender().equals(getString(R.string.profile_sex_female))) {
                             bmr = profile.getWeight() * 10 + 6.25 * profile.getHeight();
                             if (profile.getAge() != null) {
                                 bmr = bmr - 5 * profile.getAge() - 161;
@@ -165,34 +165,36 @@ public class MotionSensorService extends Service implements SensorEventListener 
                 activitySummary = builtInFitnessRepository.getNow(formattedTime.getCurrentDateAsYYYYMMDD());
                 if (activitySummary == null) {
                     activitySummary = new BuiltInActivitySummary();
+                }
+                if (activitySummary != null) {
                     activitySummary.setDate(formattedTime.getCurrentDateAsYYYYMMDD());
                     activitySummary.setDateInLong(formattedTime.getCurrentTimeInMilliSecs());
-                }
-                if (activitySummary.getSteps() != null) {
-                    steps = activitySummary.getSteps();
-                }
-                if (activitySummary.getActiveMinutes() != null) {
-                    activeMins = activitySummary.getActiveMinutes();
-                }
-                if (activitySummary.getSedentaryMinutes() != null) {
-                    sedentaryMins = activitySummary.getSedentaryMinutes();
-                }
-                if (activitySummary.getDistance() != null) {
-                    distance = activitySummary.getDistance();
-                }
-                if (activitySummary.getCalories() != null) {
-                    calories = activitySummary.getCalories();
-                }
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (notificationSharedPreferences.getBoolean(getString(R.string.preference_fitness_tracker_notification), false)) {
-                            showNotification();
-                        } else {
-                            stopForeground(true);
-                        }
+                    if (activitySummary.getSteps() != null) {
+                        steps = activitySummary.getSteps();
                     }
-                });
+                    if (activitySummary.getActiveMinutes() != null) {
+                        activeMins = activitySummary.getActiveMinutes();
+                    }
+                    if (activitySummary.getSedentaryMinutes() != null) {
+                        sedentaryMins = activitySummary.getSedentaryMinutes();
+                    }
+                    if (activitySummary.getDistance() != null) {
+                        distance = activitySummary.getDistance();
+                    }
+                    if (activitySummary.getCalories() != null) {
+                        calories = activitySummary.getCalories();
+                    }
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (notificationSharedPreferences.getBoolean(getString(R.string.preference_fitness_tracker_notification), false)) {
+                                showNotification();
+                            } else {
+                                stopForeground(true);
+                            }
+                        }
+                    });
+                }
             }
         }).start();
         //showNotification();
@@ -587,7 +589,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
                             distance = steps * (profile.getHeight() * 0.414) / 100;
                         } else if (profile.getGender().equals(getString(R.string.profile_sex_male))) {
                             distance = steps * profile.getHeight() * 0.415 / 100;
-                        } else if (profile.getGender().equals(getString(R.string.profile_sex_female))){
+                        } else if (profile.getGender().equals(getString(R.string.profile_sex_female))) {
                             distance = steps * profile.getHeight() * 0.413 / 100;
                         } else {
                             distance = steps * (profile.getHeight() * 0.414) / 100;
@@ -628,7 +630,7 @@ public class MotionSensorService extends Service implements SensorEventListener 
                                 distance = steps * (profile.getHeight() * 0.414) / 100;
                             } else if (profile.getGender().equals(getString(R.string.profile_sex_male))) {
                                 distance = steps * profile.getHeight() * 0.415 / 100;
-                            } else if (profile.getGender().equals(getString(R.string.profile_sex_female))){
+                            } else if (profile.getGender().equals(getString(R.string.profile_sex_female))) {
                                 distance = steps * profile.getHeight() * 0.413 / 100;
                             } else {
                                 distance = steps * (profile.getHeight() * 0.414) / 100;

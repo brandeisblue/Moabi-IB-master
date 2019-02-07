@@ -1,4 +1,4 @@
-package com.ivorybridge.moabi.database.entity.anxiety;
+package com.ivorybridge.moabi.database.entity.pain;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
@@ -6,25 +6,24 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Keep
-@Entity(tableName = "weekly_gad7_table")
-public class WeeklyGad7 {
+@Entity(tableName = "daily_pain_table")
+public class DailyPain {
 
     @PrimaryKey
     @NonNull
-    public String YYYYW;
+    public String date;
     public Double average;
-    public Long startDateInLong;
-    public Long endDateInLong;
+    public Long dateInLong;
     public Long timeOfEntry;
     public Long numOfEntries;
 
     @NonNull
-    public String getYYYYW() {
-        return YYYYW;
+    public String getDate() {
+        return date;
     }
 
-    public void setYYYYW(@NonNull String YYYYW) {
-        this.YYYYW = YYYYW;
+    public void setDate(@NonNull String date) {
+        this.date = date;
     }
 
     public Double getAverage() {
@@ -35,20 +34,12 @@ public class WeeklyGad7 {
         this.average = average;
     }
 
-    public Long getStartDateInLong() {
-        return startDateInLong;
+    public Long getDateInLong() {
+        return dateInLong;
     }
 
-    public void setStartDateInLong(Long startDateInLong) {
-        this.startDateInLong = startDateInLong;
-    }
-
-    public Long getEndDateInLong() {
-        return endDateInLong;
-    }
-
-    public void setEndDateInLong(Long endDateInLong) {
-        this.endDateInLong = endDateInLong;
+    public void setDateInLong(Long dateInLong) {
+        this.dateInLong = dateInLong;
     }
 
     public Long getTimeOfEntry() {
@@ -70,6 +61,7 @@ public class WeeklyGad7 {
     @NonNull
     @Override
     public String toString() {
-        return getYYYYW() + ": " + getAverage();
+        return getDate() + ": " + getAverage();
     }
 }
+

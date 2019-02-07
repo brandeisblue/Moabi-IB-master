@@ -78,23 +78,15 @@ public class NotificationSettingsFragment extends PreferenceFragmentCompat {
         formattedTime = new FormattedTime();
         dataInUseViewModel = ViewModelProviders.of(this).get(DataInUseViewModel.class);
         userGoalViewModel = ViewModelProviders.of(this).get(UserGoalViewModel.class);
-        timerSwitchPref = (SwitchPreference)
-                findPreference("timer_preference");
-        fitnessSwitchPref = (SwitchPreference)
-                findPreference("fitness_tracker_preference");
-        personalGoalSwitchPref = (SwitchPreference)
-                findPreference("personal_goal_preference");
-        dailyCheckInSwitchPref = (SwitchPreference)
-                findPreference("daily_check_in_preference");
-        dailyCheersSwitchPref = (SwitchPreference)
-                findPreference("cheers_preference");
-        newRecommendationsSwitchPref = (SwitchPreference)
-                findPreference("new_recommendations_preference");
+        timerSwitchPref = findPreference("timer_preference");
+        fitnessSwitchPref = findPreference("fitness_tracker_preference");
+        personalGoalSwitchPref = findPreference("personal_goal_preference");
+        dailyCheckInSwitchPref = findPreference("daily_check_in_preference");
+        dailyCheersSwitchPref = findPreference("cheers_preference");
+        newRecommendationsSwitchPref = findPreference("new_recommendations_preference");
         dailyCheersSwitchPref.setVisible(false);
-        trackerSourcePref = (ListPreference)
-        findPreference("fitness_tracker_source_preference");
-        measureListPref = (ListPreference)
-        findPreference("fitness_tracker_measures_preference");
+        trackerSourcePref = findPreference("fitness_tracker_source_preference");
+        measureListPref = findPreference("fitness_tracker_measures_preference");
         checkInTimePref = findPreference("daily_check_in_time_preference");
         newRecommendationsNotifTimePref = findPreference("new_recommendations_time_preference");
 

@@ -15,7 +15,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {DailyReview.class, DailyDailyReview.class, WeeklyDailyReview.class, MonthlyDailyReview.class}, version = 2, exportSchema = false)
+@Database(entities = {DailyReview.class, DailyDailyReview.class, WeeklyDailyReview.class, MonthlyDailyReview.class}, version = 1, exportSchema = false)
 public abstract class DailyReviewDB extends RoomDatabase {
 
     public abstract DailyReviewDao dao();

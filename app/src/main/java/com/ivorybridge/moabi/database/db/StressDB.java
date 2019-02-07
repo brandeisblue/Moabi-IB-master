@@ -13,9 +13,10 @@ import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {Stress.class, DailyStress.class, WeeklyStress.class, MonthlyStress.class}, version = 1, exportSchema = false)
+@Database(entities = {Stress.class, DailyStress.class, WeeklyStress.class, MonthlyStress.class}, version = 2, exportSchema = false)
 public abstract class StressDB extends RoomDatabase {
 
     public abstract StressDao dao();
@@ -26,6 +27,12 @@ public abstract class StressDB extends RoomDatabase {
         public void onOpen(@NonNull SupportSQLiteDatabase db) {
             super.onOpen(db);
             new StressDB.PopulateDbAsync(INSTANCE).execute();
+        }
+    };
+
+    private static Migration MIGRATION_1_2 = new Migration(1, 2) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
         }
     };
 

@@ -41,6 +41,7 @@ import com.ivorybridge.moabi.database.entity.anxiety.WeeklyGad7;
 import com.ivorybridge.moabi.database.entity.appusage.AppUsage;
 import com.ivorybridge.moabi.database.entity.appusage.AppUsageSummary;
 import com.ivorybridge.moabi.database.entity.baactivity.BAActivityEntry;
+import com.ivorybridge.moabi.database.entity.dailyreview.DailyDailyReview;
 import com.ivorybridge.moabi.database.entity.dailyreview.MonthlyDailyReview;
 import com.ivorybridge.moabi.database.entity.dailyreview.WeeklyDailyReview;
 import com.ivorybridge.moabi.database.entity.depression.DailyPhq9;
@@ -52,13 +53,12 @@ import com.ivorybridge.moabi.database.entity.moodandenergy.MonthlyEnergy;
 import com.ivorybridge.moabi.database.entity.moodandenergy.MonthlyMood;
 import com.ivorybridge.moabi.database.entity.moodandenergy.WeeklyEnergy;
 import com.ivorybridge.moabi.database.entity.moodandenergy.WeeklyMood;
-import com.ivorybridge.moabi.database.entity.dailyreview.DailyDailyReview;
 import com.ivorybridge.moabi.database.entity.stress.DailyStress;
 import com.ivorybridge.moabi.database.entity.stress.MonthlyStress;
 import com.ivorybridge.moabi.database.entity.stress.WeeklyStress;
 import com.ivorybridge.moabi.ui.recyclerviewitem.stats.MeansAndSumItem;
-import com.ivorybridge.moabi.ui.util.TimeChartMarkerView;
 import com.ivorybridge.moabi.ui.util.NumeralChartMarkerView;
+import com.ivorybridge.moabi.ui.util.TimeChartMarkerView;
 import com.ivorybridge.moabi.util.FormattedTime;
 import com.ivorybridge.moabi.util.wordcloud.WordCloud;
 import com.ivorybridge.moabi.util.wordcloud.WordCloudClick;
@@ -66,10 +66,10 @@ import com.ivorybridge.moabi.util.wordcloud.WordCloudEntry;
 import com.ivorybridge.moabi.viewmodel.AnxietyViewModel;
 import com.ivorybridge.moabi.viewmodel.AppUsageViewModel;
 import com.ivorybridge.moabi.viewmodel.BAActivityViewModel;
+import com.ivorybridge.moabi.viewmodel.DailyReviewViewModel;
 import com.ivorybridge.moabi.viewmodel.DepressionViewModel;
 import com.ivorybridge.moabi.viewmodel.InputHistoryViewModel;
 import com.ivorybridge.moabi.viewmodel.MoodAndEnergyViewModel;
-import com.ivorybridge.moabi.viewmodel.DailyReviewViewModel;
 import com.ivorybridge.moabi.viewmodel.StressViewModel;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IItem;
@@ -1235,7 +1235,7 @@ public class StatsNonTrackerFragment extends Fragment {
                                 for (int j = 0; j < dailyEntries.size(); j++) {
                                     for (String date : entryDatesList) {
                                         if (dailyEntries.get(j).getDate().equals(date)) {
-                                            entries.put(date, dailyEntries.get(j).getAverageScore().floatValue());
+                                            entries.put(date, dailyEntries.get(j).getAverage().floatValue());
                                         }
                                     }
                                 }
@@ -1305,7 +1305,7 @@ public class StatsNonTrackerFragment extends Fragment {
                                 for (int j = 0; j < dailyEntries.size(); j++) {
                                     for (String date : entryDatesList) {
                                         if (dailyEntries.get(j).getDate().equals(date)) {
-                                            entries.put(date, dailyEntries.get(j).getAverageScore().floatValue());
+                                            entries.put(date, dailyEntries.get(j).getAverage().floatValue());
                                         }
                                     }
                                 }
@@ -1668,7 +1668,7 @@ public class StatsNonTrackerFragment extends Fragment {
                                 for (int j = 0; j < weeklyEntries.size(); j++) {
                                     for (String date : entryDatesList) {
                                         if (weeklyEntries.get(j).getYYYYW().equals(date)) {
-                                            entries.put(date, weeklyEntries.get(j).getAverageScore().floatValue());
+                                            entries.put(date, weeklyEntries.get(j).getAverage().floatValue());
                                         }
                                     }
                                 }
@@ -1739,7 +1739,7 @@ public class StatsNonTrackerFragment extends Fragment {
                                 for (int j = 0; j < weeklyEntries.size(); j++) {
                                     for (String date : entryDatesList) {
                                         if (weeklyEntries.get(j).getYYYYW().equals(date)) {
-                                            entries.put(date, weeklyEntries.get(j).getAverageScore().floatValue());
+                                            entries.put(date, weeklyEntries.get(j).getAverage().floatValue());
                                         }
                                     }
                                 }
@@ -2099,7 +2099,7 @@ public class StatsNonTrackerFragment extends Fragment {
                                 for (int j = 0; j < monthlyEntries.size(); j++) {
                                     for (String date : entryDatesList) {
                                         if (monthlyEntries.get(j).getYYYYMM().equals(date)) {
-                                            entries.put(date, monthlyEntries.get(j).getAverageScore().floatValue());
+                                            entries.put(date, monthlyEntries.get(j).getAverage().floatValue());
                                         }
                                     }
                                 }
@@ -2171,7 +2171,7 @@ public class StatsNonTrackerFragment extends Fragment {
                                 for (int j = 0; j < monthlyEntries.size(); j++) {
                                     for (String date : entryDatesList) {
                                         if (monthlyEntries.get(j).getYYYYMM().equals(date)) {
-                                            entries.put(date, monthlyEntries.get(j).getAverageScore().floatValue());
+                                            entries.put(date, monthlyEntries.get(j).getAverage().floatValue());
                                         }
                                     }
                                 }

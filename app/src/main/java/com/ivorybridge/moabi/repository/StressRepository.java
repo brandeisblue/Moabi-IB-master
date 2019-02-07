@@ -230,10 +230,10 @@ public class StressRepository {
 
                 for (Map.Entry<String, Float> stressEntry: stressDailyEntries.entrySet()) {
                     String date = stressEntry.getKey();
-                    Float averageStress = stressEntry.getValue();
+                    Float average = stressEntry.getValue();
                     DailyStress stress = new DailyStress();
                     stress.setDate(date);
-                    stress.setAverageStress(averageStress.doubleValue());
+                    stress.setAverageStress(average.doubleValue());
                     stress.setDateInLong(formattedTime.convertStringYYYYMMDDToLong(date));
                     stress.setTimeOfEntry(formattedTime.getCurrentTimeInMilliSecs());
                     stress.setNumOfEntries(numDailyEntries.get(date));
@@ -242,10 +242,10 @@ public class StressRepository {
 
                 for (Map.Entry<String, Float> stressEntry: stressWeeklyEntries.entrySet()) {
                     String date = stressEntry.getKey();
-                    Float averageStress = stressEntry.getValue();
+                    Float average = stressEntry.getValue();
                     WeeklyStress stress = new WeeklyStress();
                     stress.setYYYYW(date);
-                    stress.setAverageStress(averageStress.doubleValue());
+                    stress.setAverageStress(average.doubleValue());
                     int year = Integer.parseInt(date.substring(0, 4));
                     int week = Integer.parseInt(date.substring(5));
                     Long startTime = formattedTime.getStartTimeOfYYYYW(week, year);
@@ -260,10 +260,10 @@ public class StressRepository {
 
                 for (Map.Entry<String, Float> stressEntry: stressMonthlyEntries.entrySet()) {
                     String date = stressEntry.getKey();
-                    Float averageStress = stressEntry.getValue();
+                    Float average = stressEntry.getValue();
                     MonthlyStress stress = new MonthlyStress();
                     stress.setYYYYMM(date);
-                    stress.setAverageStress(averageStress.doubleValue());
+                    stress.setAverageStress(average.doubleValue());
                     Long startTime = formattedTime.getStartTimeOfYYYYMM(date);
                     Long endTime = formattedTime.getEndTimeOfYYYYMM(date);
                     stress.setStartDateInLong(startTime);
