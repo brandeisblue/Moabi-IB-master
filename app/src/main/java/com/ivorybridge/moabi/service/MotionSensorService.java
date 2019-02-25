@@ -584,8 +584,8 @@ public class MotionSensorService extends Service implements SensorEventListener 
                 }
                 if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
                     steps++;
-                    if (profile.getHeight() != null) {
-                        if (profile.getGender() == null) {
+                    if (profile != null && profile.getHeight() != null) {
+                        if (profile != null && profile.getGender() == null) {
                             distance = steps * (profile.getHeight() * 0.414) / 100;
                         } else if (profile.getGender().equals(getString(R.string.profile_sex_male))) {
                             distance = steps * profile.getHeight() * 0.415 / 100;
@@ -625,8 +625,8 @@ public class MotionSensorService extends Service implements SensorEventListener 
                     if ((Math.abs(prevY - gravity[1]) > threshold) && !ignore) {
                         steps++;
                         ignore = true;
-                        if (profile.getHeight() != null) {
-                            if (profile.getGender() == null) {
+                        if (profile != null && profile.getHeight() != null) {
+                            if (profile != null && profile.getGender() == null) {
                                 distance = steps * (profile.getHeight() * 0.414) / 100;
                             } else if (profile.getGender().equals(getString(R.string.profile_sex_male))) {
                                 distance = steps * profile.getHeight() * 0.415 / 100;
