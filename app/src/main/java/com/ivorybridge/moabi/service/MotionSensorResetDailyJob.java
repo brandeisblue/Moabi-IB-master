@@ -2,6 +2,7 @@ package com.ivorybridge.moabi.service;
 
 import android.app.Application;
 import android.content.Intent;
+import android.os.Build;
 
 import com.evernote.android.job.DailyJob;
 import com.evernote.android.job.JobRequest;
@@ -77,7 +78,11 @@ public class MotionSensorResetDailyJob extends DailyJob {
                         }
                     }
                 }
-                application.startService(new Intent(application, MotionSensorService.class));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    application.startForegroundService(new Intent(application, MotionSensorService.class));
+                } else {
+                    application.startService(new Intent(application, MotionSensorService.class));
+                }
             }
         }).start();
         return DailyJobResult.SUCCESS;

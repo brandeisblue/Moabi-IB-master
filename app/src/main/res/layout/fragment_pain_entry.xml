@@ -38,14 +38,6 @@
             android:scaleType="fitXY"
             android:src="@drawable/ic_img_human_body_man" />-->
 
-
-        <com.github.chrisbanes.photoview.PhotoView
-            android:id="@+id/fragment_pain_entry_body_imageview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitXY"
-            android:src="@drawable/ic_imag_human_body_man_front" />
-
     </RelativeLayout>
 
     <com.warkiz.widget.IndicatorStayLayout

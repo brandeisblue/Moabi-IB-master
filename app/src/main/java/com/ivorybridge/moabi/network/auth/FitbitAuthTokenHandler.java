@@ -24,6 +24,8 @@ import com.ivorybridge.moabi.repository.CredentialRepository;
 import com.ivorybridge.moabi.repository.DataInUseRepository;
 import com.ivorybridge.moabi.util.FormattedTime;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -194,5 +196,21 @@ public class FitbitAuthTokenHandler {
             }
         };
         return stringRequest;
+    }
+
+    public void wrtieFileOnInternalStorage(Context mcoContext,String sFileName, String sBody){
+        File file = new File(mcoContext.getFilesDir(),"Moabi");
+        if(!file.exists()){
+            file.mkdir();
+        }
+        try{
+            File gpxfile = new File(file, sFileName);
+            FileWriter writer = new FileWriter(gpxfile);
+            writer.append(sBody);
+            writer.flush();
+            writer.close();
+
+        }catch (Exception e){
+        }
     }
 }

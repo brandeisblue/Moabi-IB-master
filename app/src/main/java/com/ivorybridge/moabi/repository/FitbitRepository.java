@@ -1,6 +1,7 @@
 package com.ivorybridge.moabi.repository;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
@@ -31,6 +32,8 @@ import com.ivorybridge.moabi.util.FormattedTime;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -133,7 +136,7 @@ public class FitbitRepository {
                                     "Fitbit call limit reached.", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        //Log.i(TAG, "Summary Request Success: " + isSuccessful.getValue());
+                        Log.i(TAG, "Summary Request Success: " + response.isSuccessful());
                         if (response.isSuccessful()) {
                             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                                 firebaseManager.getFitbitRef().child(date).child("activitySummary").setValue(response.body());
@@ -271,7 +274,6 @@ public class FitbitRepository {
         String CLIENT_SECRET = "05f59d5f32a14ecba00cd6c2a58fa7a5";
         String clientCredentials = CLIENT_ID + ":" + CLIENT_SECRET;
         String encodedCodeString = Base64.encodeToString(clientCredentials.getBytes(), Base64.NO_WRAP);
-
         String authHeader = "Basic " + encodedCodeString;
         String contentType = "application/x-www-form-urlencoded";
         String grantType = "refresh_token";
@@ -283,13 +285,22 @@ public class FitbitRepository {
                 Credential credential = credentialRepository.getNow(mApplication.getString(R.string.fitbit_camel_case));
                 final String refreshToken = credential.getRefreshToken();
                 AsyncTaskBoolean fitbitTaskSuccess = new AsyncTaskBoolean(mApplication.getString(R.string.fitbit_camel_case));
-                Call<FitbitAuthCredentialsSummary> fitbitAuthCredentialsSummaryCall = fitbitService.getAccessTokenWithRefreshToken(authHeader, contentType, grantType, refreshToken, expiresIn);
+                Call<FitbitAuthCredentialsSummary> fitbitAuthCredentialsSummaryCall =
+                        fitbitService.getAccessTokenWithRefreshToken(authHeader, contentType,
+                                grantType, refreshToken, expiresIn);
                 fitbitAuthCredentialsSummaryCall.enqueue(new Callback<FitbitAuthCredentialsSummary>() {
                     @Override
-                    public void onResponse(Call<FitbitAuthCredentialsSummary> call, Response<FitbitAuthCredentialsSummary> response) {
+                    public void onResponse(Call<FitbitAuthCredentialsSummary> call,
+                                           Response<FitbitAuthCredentialsSummary> response) {
                         Log.i(TAG, response.toString());
                         Log.i(TAG, "Access token refresh success: " + response.isSuccessful());
                         if (response.isSuccessful()) {
+                            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                                firebaseManager.getFitbitRef().child(date).child("log").child("successResponse")
+                                        .setValue(response.toString());
+                                firebaseManager.getFitbitRef().child(date).child("log").child("successResponseBody")
+                                        .setValue(response.body().toString());
+                            }
                             credential.setAccessToken(response.body().getAccess_token());
                             credential.setRefreshToken(response.body().getRefresh_token());
                             credential.setTokenType(response.body().getToken_type());
@@ -306,7 +317,14 @@ public class FitbitRepository {
                             inputInUse.setInUse(true);
                             dataInUseRepository.insert(inputInUse);
                             //Toast.makeText(mApplication, "Refreshing token successful.", Toast.LENGTH_LONG).show();
+                            wrtieFileOnInternalStorage(mApplication, "successlog.txt", response.body().toString());
                         } else {
+                            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                                firebaseManager.getFitbitRef().child(date).child("log").child("failureResponse")
+                                        .setValue(response.toString());
+                                firebaseManager.getFitbitRef().child(date).child("log").child("failureResponseBody")
+                                        .setValue(response.body().toString());
+                            }
                             InputInUse inputInUse = new InputInUse();
                             inputInUse.setType("tracker");
                             inputInUse.setName(mApplication.getString(R.string.fitbit_camel_case));
@@ -319,7 +337,9 @@ public class FitbitRepository {
                             dataInUseRepository.insert(connectedService);
                             fitbitTaskSuccess.setResult(true);
                             insertSuccess(fitbitTaskSuccess);
+                            wrtieFileOnInternalStorage(mApplication, "faillog.txt", response.toString() + "\n" + response.body().toString());
                             //Toast.makeText(mApplication, "Refreshing token unsuccessful.", Toast.LENGTH_LONG).show();
+
                             //TODO - when this happens, show a notification to let the user know something is wrong
                         }
                     }
@@ -366,6 +386,22 @@ public class FitbitRepository {
         protected synchronized Void doInBackground(final AsyncTaskBoolean... params) {
             mAsyncTaskDao.insert(params[0]);
             return null;
+        }
+    }
+
+    public void wrtieFileOnInternalStorage(Context mcoContext, String sFileName, String sBody){
+        File file = new File(mcoContext.getFilesDir(),"Moabi");
+        if(!file.exists()){
+            file.mkdir();
+        }
+        try{
+            File gpxfile = new File(file, sFileName);
+            FileWriter writer = new FileWriter(gpxfile);
+            writer.append(sBody);
+            writer.flush();
+            writer.close();
+
+        }catch (Exception e){
         }
     }
 }

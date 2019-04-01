@@ -128,7 +128,7 @@ public class EditSurveyItemsActivity extends AppCompatActivity {
         userInputsInUseItemItemAdapter.add(new EntryItemItem(this, getString(R.string.stress_camel_case)));
         userInputsInUseItemItemAdapter.add(new EntryItemItem(this, getString(R.string.depression_phq9_camel_case)));
         userInputsInUseItemItemAdapter.add(new EntryItemItem(this, getString(R.string.anxiety_gad7_camel_case)));
-        userInputsInUseItemItemAdapter.add(new EntryItemItem(this, getString(R.string.pain_camel_case)));
+        //userInputsInUseItemItemAdapter.add(new EntryItemItem(this, getString(R.string.pain_camel_case)));
         userInputsInUseItemItemAdapter.add(new EntryItemItem(this, getString(R.string.baactivity_camel_case)));
     }
 

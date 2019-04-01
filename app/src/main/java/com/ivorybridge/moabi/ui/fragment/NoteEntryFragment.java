@@ -12,9 +12,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.hendraanggrian.widget.Hashtag;
-import com.hendraanggrian.widget.HashtagAdapter;
-import com.hendraanggrian.widget.SocialAutoCompleteTextView;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.firebase.FirebaseManager;
 import com.ivorybridge.moabi.ui.activity.MainActivity;
@@ -51,8 +48,6 @@ public class NoteEntryFragment extends Fragment {
     private DatabaseReference personalHashTagLast30DaysRef;
     private DatabaseReference activityHasDataRef;
     private FirebaseManager firebaseManager;
-    @BindView(R.id.fragment_journal_entry_socialautocompletetextview)
-    SocialAutoCompleteTextView socialAutoCompleteTextView;
     @BindView(R.id.fragment_journal_entry_submitbutton)
     SubmitButton submitButton;
 
@@ -95,9 +90,6 @@ public class NoteEntryFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.fragment_journal_entry, container, false);
         ButterKnife.bind(this, mView);
-        if (getContext() != null) {
-            socialAutoCompleteTextView.setHashtagColor(ContextCompat.getColor(getContext(), R.color.reduction_blue));
-        }
         final FragmentManager fragmentManager = getFragmentManager();
         final List<Fragment> fragments = new ArrayList<>();
         if (fragmentManager != null) {
@@ -106,109 +98,6 @@ public class NoteEntryFragment extends Fragment {
         LocalDateTime now = LocalDateTime.now();
         ZonedDateTime zdt = now.atZone(ZoneId.systemDefault());
         Long currentTime = zdt.toInstant().toEpochMilli();
-
-
-        personalHashTagRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (getContext() != null) {
-                    ArrayAdapter<Hashtag> hashTagAdapter = new HashtagAdapter(getContext());
-                    Long numPostLong = 0L;
-                    Integer numPost = 0;
-                    for (DataSnapshot hashTagEntry : dataSnapshot.getChildren()) {
-                        numPostLong = (Long) hashTagEntry.getValue();
-                        if (numPostLong != null) {
-                            numPost = numPostLong.intValue();
-                        }
-                        if (hashTagEntry.getKey() != null) {
-                            hashTagAdapter.add(new Hashtag(hashTagEntry.getKey(), numPost));
-                        }
-                    }
-                    socialAutoCompleteTextView.setHashtagAdapter(hashTagAdapter);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //TODO - if getActivities for today (start of day till now) isn't null, update daysWithData
-
-                final List<String> hashTags = socialAutoCompleteTextView.getHashtags();
-                if (hashTags.size() > 0) {
-                    activityHasDataRef.setValue(true);
-                }
-                collectiveHashTagRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (String hashTag : hashTags) {
-                            // if the hashtag already exists
-                            if (dataSnapshot.child(hashTag).getValue() != null) {
-                                Long count = (Long) dataSnapshot.child(hashTag).getValue();
-                                if (count != null) {
-                                    collectiveHashTagRef.child(hashTag).setValue(count + 1L);
-                                }
-
-                            } else {
-                                collectiveHashTagRef.child(hashTag).setValue(1L);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-                personalHashTagRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (String hashTag : hashTags) {
-                            // if the hashtag already exists
-                            if (dataSnapshot.child(hashTag).getValue() != null) {
-                                Long count = (Long) dataSnapshot.child(hashTag).getValue();
-                                personalHashTagRef.child(hashTag).setValue(count + 1L);
-
-                            } else {
-                                personalHashTagRef.child(hashTag).setValue(1L);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-                personalHashTagLast30DaysRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (String hashTag : hashTags) {
-                            // if the hashtag already exists
-                            if (dataSnapshot.child(hashTag).getValue() != null) {
-                                Long count = (Long) dataSnapshot.child(hashTag).getValue();
-                                personalHashTagLast30DaysRef.child(hashTag).setValue(count + 1L);
-
-                            } else {
-                                personalHashTagLast30DaysRef.child(hashTag).setValue(1L);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-                submitButton.doResult(true);
-            }
-        });
 
         submitButton.setOnResultEndListener(new SubmitButton.OnResultEndListener() {
             @Override

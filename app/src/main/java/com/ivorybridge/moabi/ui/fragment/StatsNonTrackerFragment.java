@@ -29,7 +29,7 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
@@ -752,9 +752,9 @@ public class StatsNonTrackerFragment extends Fragment {
                 xAxis.setSpaceMin(1);
                 xAxis.setGranularity(1);
                 xAxis.setGranularityEnabled(true);
-                xAxis.setValueFormatter(new IAxisValueFormatter() {
+                xAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         //Log.i(TAG, "X-axis - " + value + ", " + (int) value);
                         if (value >= 0) {
                             int index = (int) value;
@@ -777,9 +777,9 @@ public class StatsNonTrackerFragment extends Fragment {
                 xAxis.setSpaceMin(1);
                 xAxis.setGranularity(1);
                 xAxis.setGranularityEnabled(true);
-                xAxis.setValueFormatter(new IAxisValueFormatter() {
+                xAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         //Log.i(TAG, value + ", " + (int) value);
                         if (value >= 0) {
                             int index = (int) value;
@@ -808,9 +808,9 @@ public class StatsNonTrackerFragment extends Fragment {
                     xAxis.setGranularityEnabled(true);
                     xAxis.setSpaceMin(1);
                 }
-                xAxis.setValueFormatter(new IAxisValueFormatter() {
+                xAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         //Log.i(TAG, value + ", " + (int) value);
                         if (value >= 0) {
                             int index = (int) value;
@@ -840,9 +840,9 @@ public class StatsNonTrackerFragment extends Fragment {
         leftAxis.setTextColor(Color.DKGRAY);
         leftAxis.setDrawAxisLine(false);
         leftAxis.setLabelCount(3, true);
-        leftAxis.setValueFormatter(new IAxisValueFormatter() {
+        leftAxis.setValueFormatter(new ValueFormatter() {
             @Override
-            public String getFormattedValue(float value, AxisBase axis) {
+            public String getFormattedValue(float value) {
                 return convertToTimeString(value);
             }
         });
@@ -2284,9 +2284,9 @@ public class StatsNonTrackerFragment extends Fragment {
                 xAxis.setSpaceMin(1);
                 xAxis.setGranularity(1);
                 xAxis.setGranularityEnabled(true);
-                xAxis.setValueFormatter(new IAxisValueFormatter() {
+                xAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         Log.i(TAG, "X-axis - " + value + ", " + (int) value);
                         if (value >= 0) {
                             int index = (int) value;
@@ -2309,9 +2309,9 @@ public class StatsNonTrackerFragment extends Fragment {
                 xAxis.setSpaceMin(1);
                 xAxis.setGranularity(1);
                 xAxis.setGranularityEnabled(true);
-                xAxis.setValueFormatter(new IAxisValueFormatter() {
+                xAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         Log.i(TAG, value + ", " + (int) value);
                         if (value >= 0) {
                             int index = (int) value;
@@ -2340,9 +2340,9 @@ public class StatsNonTrackerFragment extends Fragment {
                     xAxis.setGranularityEnabled(true);
                     xAxis.setSpaceMin(1);
                 }
-                xAxis.setValueFormatter(new IAxisValueFormatter() {
+                xAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         //Log.i(TAG, value + ", " + (int) value);
                         if (value >= 0) {
                             int index = (int) value;
@@ -2376,9 +2376,9 @@ public class StatsNonTrackerFragment extends Fragment {
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
             //leftAxis.setLabelCount(3, true);
-            leftAxis.setValueFormatter(new IAxisValueFormatter() {
+            leftAxis.setValueFormatter(new ValueFormatter() {
                 @Override
-                public String getFormattedValue(float value, AxisBase axis) {
+                public String getFormattedValue(float value) {
                     //Log.i(TAG, "Y-axis value is: " + value);
                     if (value == 1f) {
                         return getString(R.string.chart_label_poor);
@@ -2401,9 +2401,9 @@ public class StatsNonTrackerFragment extends Fragment {
             leftAxis.setLabelCount(12, true);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
-            leftAxis.setValueFormatter(new IAxisValueFormatter() {
+            leftAxis.setValueFormatter(new ValueFormatter() {
                 @Override
-                public String getFormattedValue(float value, AxisBase axis) {
+                public String getFormattedValue(float value) {
                     //Log.i(TAG, "Y-axis value is: " + value);
                     if (value == 10f) {
                         return getString(R.string.chart_label_max);
@@ -2424,9 +2424,9 @@ public class StatsNonTrackerFragment extends Fragment {
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
             leftAxis.setLabelCount(10, true);
-            leftAxis.setValueFormatter(new IAxisValueFormatter() {
+            leftAxis.setValueFormatter(new ValueFormatter() {
                 @Override
-                public String getFormattedValue(float value, AxisBase axis) {
+                public String getFormattedValue(float value) {
                     //Log.i(TAG, "Y-axis value is: " + value);
                     if (value == 5f) {
                         return getString(R.string.chart_label_excellent);
@@ -2446,9 +2446,9 @@ public class StatsNonTrackerFragment extends Fragment {
             leftAxis.setGranularityEnabled(true);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setLabelCount(11, true);
-            leftAxis.setValueFormatter(new IAxisValueFormatter() {
+            leftAxis.setValueFormatter(new ValueFormatter() {
                 @Override
-                public String getFormattedValue(float value, AxisBase axis) {
+                public String getFormattedValue(float value) {
                     Log.i(TAG, "Y-axis value is: " + value);
                     /*
                     if (value == 4f) {
@@ -2474,9 +2474,9 @@ public class StatsNonTrackerFragment extends Fragment {
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
             leftAxis.setLabelCount(9, true);
-            leftAxis.setValueFormatter(new IAxisValueFormatter() {
+            leftAxis.setValueFormatter(new ValueFormatter() {
                 @Override
-                public String getFormattedValue(float value, AxisBase axis) {
+                public String getFormattedValue(float value) {
                     Log.i(TAG, "Y-axis value is: " + value);
                     /*if (value == 4f) {
                         return "Min";

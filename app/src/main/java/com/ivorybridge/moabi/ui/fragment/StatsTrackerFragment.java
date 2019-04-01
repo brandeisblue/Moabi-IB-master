@@ -27,7 +27,7 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.model.GradientColor;
@@ -2951,9 +2951,9 @@ public class StatsTrackerFragment extends Fragment {
                 xAxis.setSpaceMin(1);
                 xAxis.setGranularity(1);
                 xAxis.setGranularityEnabled(true);
-                xAxis.setValueFormatter(new IAxisValueFormatter() {
+                xAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         //Log.i(TAG, "X-axis - " + value + ", " + (int) value);
                         if (value >= 0) {
                             int index = (int) value;
@@ -2976,9 +2976,9 @@ public class StatsTrackerFragment extends Fragment {
                 xAxis.setSpaceMin(1);
                 xAxis.setGranularity(1);
                 xAxis.setGranularityEnabled(true);
-                xAxis.setValueFormatter(new IAxisValueFormatter() {
+                xAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         //Log.i(TAG, value + ", " + (int) value);
                         if (value >= 0) {
                             int index = (int) value;
@@ -3007,9 +3007,9 @@ public class StatsTrackerFragment extends Fragment {
                     xAxis.setGranularityEnabled(true);
                     xAxis.setSpaceMin(1);
                 }
-                xAxis.setValueFormatter(new IAxisValueFormatter() {
+                xAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         //Log.i(TAG, value + ", " + (int) value);
                         if (value >= 0) {
                             int index = (int) value;
@@ -3047,9 +3047,9 @@ public class StatsTrackerFragment extends Fragment {
             leftAxis.setTypeface(tf);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setSpaceMax(40f);
-            leftAxis.setValueFormatter(new IAxisValueFormatter() {
+            leftAxis.setValueFormatter(new ValueFormatter() {
                 @Override
-                public String getFormattedValue(float value, AxisBase axis) {
+                public String getFormattedValue(float value) {
                     return convertToTimeString(value);
                 }
             });

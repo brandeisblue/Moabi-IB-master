@@ -18,7 +18,8 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.model.GradientColor;
@@ -136,9 +137,9 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
             xAxis.setGranularity(1);
             xAxis.setGranularityEnabled(true);
             //xAxis.setLabelCount(numOfDays);
-            xAxis.setValueFormatter(new IAxisValueFormatter() {
+            xAxis.setValueFormatter(new ValueFormatter() {
                 @Override
-                public String getFormattedValue(float value, AxisBase axis) {
+                public String getFormattedValue(float value) {
                     Log.i(TAG, value + ", " + (int) value);
                     if (value >= 0) {
                         int index = (int) value;
@@ -172,9 +173,9 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 leftAxis.setTextColor(Color.DKGRAY);
                 leftAxis.setGranularityEnabled(true);
                 leftAxis.setLabelCount(6, true);
-                leftAxis.setValueFormatter(new IAxisValueFormatter() {
+                leftAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         Log.i(TAG, "Y-axis value is: " + value);
                         if (value == 1f) {
                             return itemView.getContext().getString(R.string.chart_label_poor);
@@ -195,9 +196,9 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 leftAxis.setLabelCount(12, true);
                 leftAxis.setTextColor(Color.DKGRAY);
                 leftAxis.setGranularityEnabled(true);
-                leftAxis.setValueFormatter(new IAxisValueFormatter() {
+                leftAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         //Log.i(TAG, "Y-axis value is: " + value);
                         if (value == 10f) {
                             return itemView.getContext().getString(R.string.chart_label_max);
@@ -217,9 +218,9 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 leftAxis.setTextColor(Color.DKGRAY);
                 leftAxis.setGranularityEnabled(true);
                 leftAxis.setLabelCount(10, true);
-                leftAxis.setValueFormatter(new IAxisValueFormatter() {
+                leftAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         //Log.i(TAG, "Y-axis value is: " + value);
                         if (value == 5f) {
                             return itemView.getContext().getString(R.string.chart_label_excellent);
@@ -240,9 +241,9 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 leftAxis.setGranularityEnabled(true);
                 leftAxis.setTextColor(Color.DKGRAY);
                 leftAxis.setLabelCount(11, true);
-                leftAxis.setValueFormatter(new IAxisValueFormatter() {
+                leftAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         Log.i(TAG, "Y-axis value is: " + value);
                     /*
                     if (value == 4f) {
@@ -269,9 +270,9 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 leftAxis.setTextColor(Color.DKGRAY);
                 leftAxis.setGranularityEnabled(true);
                 leftAxis.setLabelCount(9, true);
-                leftAxis.setValueFormatter(new IAxisValueFormatter() {
+                leftAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         Log.i(TAG, "Y-axis value is: " + value);
                     /*if (value == 4f) {
                         return "Min";
@@ -301,9 +302,9 @@ public class InsightBestAndWorstItem extends AbstractItem<InsightBestAndWorstIte
                 leftAxis.setDrawAxisLine(false);
                 leftAxis.setSpaceMax(40f);
                 //leftAxis.setSpaceMin(10f);
-                leftAxis.setValueFormatter(new IAxisValueFormatter() {
+                leftAxis.setValueFormatter(new ValueFormatter() {
                     @Override
-                    public String getFormattedValue(float value, AxisBase axis) {
+                    public String getFormattedValue(float value) {
                         return convertToTimeString(value);
                     }
                 });

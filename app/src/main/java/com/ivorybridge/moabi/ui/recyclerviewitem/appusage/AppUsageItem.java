@@ -18,7 +18,7 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.model.GradientColor;
 import com.github.mikephil.charting.utils.EntryXComparator;
@@ -246,9 +246,9 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
             xAxis.setDrawAxisLine(false);
             xAxis.setLabelRotationAngle(0f);
-            xAxis.setValueFormatter(new IAxisValueFormatter() {
+            xAxis.setValueFormatter(new ValueFormatter() {
                 @Override
-                public String getFormattedValue(float value, AxisBase axis) {
+                public String getFormattedValue(float value) {
                     for (Map.Entry<String, Long> appSummary : AppUsageNameRankMap.entrySet()) {
                         //Log.i(TAG, "Rank: " + appSummary.getValue() + " Axis Value: " + value);
                         if (appSummary.getValue() == 1f * value) {
@@ -271,9 +271,9 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             AppUsageDataSet.setDrawValues(false);
             AppUsageDataSet.setColor(itemView.getContext().getColor(R.color.colorPrimary));
             //AppUsageDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
-            AppUsageDataSet.setValueFormatter(new IValueFormatter() {
+            AppUsageDataSet.setValueFormatter(new ValueFormatter() {
                 @Override
-                public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                public String getFormattedValue(float value) {
                     return convertToTimeString(value);
                 }
             });
@@ -372,9 +372,9 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             xAxis.setGranularityEnabled(true);
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
             xAxis.setLabelRotationAngle(0f);
-            xAxis.setValueFormatter(new IAxisValueFormatter() {
+            xAxis.setValueFormatter(new ValueFormatter() {
                 @Override
-                public String getFormattedValue(float value, AxisBase axis) {
+                public String getFormattedValue(float value) {
                     for (Map.Entry<String, Long> appSummary : AppUsageNameRankMap.entrySet()) {
                         //Log.i(TAG, "Rank: " + appSummary.getValue() + " Axis Value: " + value);
                         if (appSummary.getValue() == 1f * value) {
@@ -448,9 +448,9 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             leftAxis.setDrawAxisLine(false);
             leftAxis.setSpaceMax(40f);
             //leftAxis.setSpaceMin(10f);
-            leftAxis.setValueFormatter(new IAxisValueFormatter() {
+            leftAxis.setValueFormatter(new ValueFormatter() {
                 @Override
-                public String getFormattedValue(float value, AxisBase axis) {
+                public String getFormattedValue(float value) {
                     return convertToTimeString(value);
                 }
             });
@@ -459,9 +459,9 @@ public class AppUsageItem extends AbstractItem<AppUsageItem, AppUsageItem.ViewHo
             rightAxis.setEnabled(false);
             rightAxis.setDrawGridLines(true);
             rightAxis.setLabelCount(3, true);
-            rightAxis.setValueFormatter(new IAxisValueFormatter() {
+            rightAxis.setValueFormatter(new ValueFormatter() {
                 @Override
-                public String getFormattedValue(float value, AxisBase axis) {
+                public String getFormattedValue(float value) {
                     return convertToTimeString(value);
                 }
             });

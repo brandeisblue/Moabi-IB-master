@@ -22,7 +22,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.EntryXComparator;
 import com.ivorybridge.moabi.R;
@@ -383,9 +383,9 @@ public class MoodItem extends AbstractItem<MoodItem, MoodItem.ViewHolder> {
                     xAxis.setSpaceMax(0.5f);
                     xAxis.setSpaceMin(0.5f);
                     xAxis.setCenterAxisLabels(false);
-                    xAxis.setValueFormatter(new IAxisValueFormatter() {
+                    xAxis.setValueFormatter(new ValueFormatter() {
                         @Override
-                        public String getFormattedValue(float value, AxisBase axis) {
+                        public String getFormattedValue(float value) {
                             return convertToTimeString(value);
                         }
                     });
@@ -417,9 +417,9 @@ public class MoodItem extends AbstractItem<MoodItem, MoodItem.ViewHolder> {
                         xAxis.setGranularityEnabled(true);
                         xAxis.setSpaceMin(1);
                     }
-                    xAxis.setValueFormatter(new IAxisValueFormatter() {
+                    xAxis.setValueFormatter(new ValueFormatter() {
                         @Override
-                        public String getFormattedValue(float value, AxisBase axis) {
+                        public String getFormattedValue(float value) {
                             //Log.i(TAG, value + ", " + (int) value);
                             if (value >= 0) {
                                 int index = (int) value;
@@ -451,9 +451,9 @@ public class MoodItem extends AbstractItem<MoodItem, MoodItem.ViewHolder> {
             leftAxis.setGranularity(0.5f);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setGranularityEnabled(true);
-            leftAxis.setValueFormatter(new IAxisValueFormatter() {
+            leftAxis.setValueFormatter(new ValueFormatter() {
                 @Override
-                public String getFormattedValue(float value, AxisBase axis) {
+                public String getFormattedValue(float value) {
                     //Log.i(TAG, "Y-axis value is: " + value);
                     if (value == 1f) {
                         return itemView.getContext().getString(R.string.chart_label_poor);

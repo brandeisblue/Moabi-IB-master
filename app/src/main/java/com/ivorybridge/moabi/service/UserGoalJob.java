@@ -2,6 +2,7 @@ package com.ivorybridge.moabi.service;
 
 import android.app.Application;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
 import com.evernote.android.job.Job;
@@ -287,7 +288,12 @@ public class UserGoalJob extends Job {
             serviceIntent.putExtra("progress", progressDouble);
             serviceIntent.putExtra("hasLong", false);
         }
-        application.startService(serviceIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            application.startForegroundService(serviceIntent);
+        } else {
+            application.startService(serviceIntent);
+        }
+
         return Result.SUCCESS;
     }
 

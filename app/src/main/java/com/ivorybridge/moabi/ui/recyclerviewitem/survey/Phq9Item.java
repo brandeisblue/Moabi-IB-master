@@ -22,7 +22,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.EntryXComparator;
 import com.ivorybridge.moabi.R;
@@ -381,9 +381,9 @@ public class Phq9Item extends AbstractItem<Phq9Item, Phq9Item.ViewHolder> {
                     xAxis.setGranularity(1f);
                     xAxis.setGranularityEnabled(true);
                     xAxis.setCenterAxisLabels(false);
-                    xAxis.setValueFormatter(new IAxisValueFormatter() {
+                    xAxis.setValueFormatter(new ValueFormatter() {
                         @Override
-                        public String getFormattedValue(float value, AxisBase axis) {
+                        public String getFormattedValue(float value) {
                             return convertToTimeString(value);
                         }
                     });
@@ -412,9 +412,9 @@ public class Phq9Item extends AbstractItem<Phq9Item, Phq9Item.ViewHolder> {
                         xAxis.setGranularityEnabled(true);
                         xAxis.setSpaceMin(1);
                     }
-                    xAxis.setValueFormatter(new IAxisValueFormatter() {
+                    xAxis.setValueFormatter(new ValueFormatter() {
                         @Override
-                        public String getFormattedValue(float value, AxisBase axis) {
+                        public String getFormattedValue(float value) {
                             //Log.i(TAG, value + ", " + (int) value);
                             if (value >= 0) {
                                 int index = (int) value;
@@ -446,9 +446,9 @@ public class Phq9Item extends AbstractItem<Phq9Item, Phq9Item.ViewHolder> {
             leftAxis.setGranularityEnabled(true);
             leftAxis.setTextColor(Color.DKGRAY);
             leftAxis.setLabelCount(11, true);
-            leftAxis.setValueFormatter(new IAxisValueFormatter() {
+            leftAxis.setValueFormatter(new ValueFormatter() {
                 @Override
-                public String getFormattedValue(float value, AxisBase axis) {
+                public String getFormattedValue(float value) {
                     Log.i(TAG, "Y-axis value is: " + value);
                     /*
                     if (value == 4f) {

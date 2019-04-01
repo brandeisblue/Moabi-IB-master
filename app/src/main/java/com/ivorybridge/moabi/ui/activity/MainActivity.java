@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        ButterKnife.setDebug(true);
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                     @Override
@@ -130,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
         lastFragEditor = lastFragmentSharedPreference.edit();
         isFABOpen = false;
         formattedTime = new FormattedTime();
+
         fabBGLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

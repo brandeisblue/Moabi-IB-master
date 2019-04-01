@@ -15,8 +15,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.github.chrisbanes.photoview.OnPhotoTapListener;
-import com.github.chrisbanes.photoview.PhotoView;
 import com.ivorybridge.moabi.R;
 import com.ivorybridge.moabi.database.firebase.FirebaseManager;
 import com.ivorybridge.moabi.ui.views.DrawingView;
@@ -41,8 +39,6 @@ public class PainEntryFragment extends Fragment {
     static final String FLING_LOG_STRING = "Fling velocityX: %.2f, velocityY: %.2f";
     @BindView(R.id.fragment_pain_entry_seekbar)
     IndicatorSeekBar seekBar;
-    @BindView(R.id.fragment_pain_entry_body_imageview)
-    PhotoView bodyImageView;
     /*
     @BindView(R.id.fragment_pain_entry_body_imageview)
     DrawImageView bodyImageView;*/
@@ -96,8 +92,8 @@ public class PainEntryFragment extends Fragment {
         //TouchView touchView = new TouchView(getContext());
         //bodyLayout.addView(drawingView);
         //bodyLayout.addView(touchView);
-        bodyImageView.setVisibility(View.VISIBLE);
-        bodyImageView.setOnPhotoTapListener(new PhotoTapListener());
+        //bodyImageView.setVisibility(View.VISIBLE);
+        //bodyImageView.setOnPhotoTapListener(new PhotoTapListener());
         //bodyImageView.setZoomable(false);
         /*
         bodyImageView.setOnTouchListener(new View.OnTouchListener() {
@@ -192,16 +188,6 @@ public class PainEntryFragment extends Fragment {
         matrix.postTranslate(view.getScrollX(), view.getScrollY());
         matrix.mapPoints(coords);
         return coords;
-    }
-
-    private class PhotoTapListener implements OnPhotoTapListener {
-
-        @Override
-        public void onPhotoTap(ImageView view, float x, float y) {
-            float xPercentage = x * 100f;
-            float yPercentage = y * 100f;
-            showToast(String.format(Locale.US, PHOTO_TAP_TOAST_STRING, xPercentage, yPercentage, view == null ? 0 : view.getId()));
-        }
     }
 
     private void showToast(CharSequence text) {
