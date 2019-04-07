@@ -15,11 +15,55 @@
       },
       "oauth_client": [
         {
-          "client_id": "1013812736265-fpo5pgoeerckg0jdtduje35a5u2lpson.apps.googleusercontent.com",
+          "client_id": "1013812736265-d4lo93pqob5chjigkdgesqvfkngre20o.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.ivorybridge.moabi",
-            "certificate_hash": "7f15eaafcad16f97492134fe66cf36ad4e2d5857"
+            "certificate_hash": "93f31f6d2194044b36099360db4b03294bec422e"
+          }
+        },
+        {
+          "client_id": "1013812736265-fdmd7r3tcbf7vipppanevchrfam5l20v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkuZJf4LNXfiPpWlgbQZlB1f91Cce3xjY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1013812736265-fdmd7r3tcbf7vipppanevchrfam5l20v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013812736265:android:46a089eadb1bd1f8",
+        "android_client_info": {
+          "package_name": "com.ivorybridge.moabi.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1013812736265-ief9tj43i1bbhqvckp98sf1rlqmvpnl8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ivorybridge.moabi.debug",
+            "certificate_hash": "a0ef469ff9dbe7e8146ee7681e5216c2dae9311e"
           }
         },
         {
